@@ -130,6 +130,7 @@ export default function Home() {
        setPhoneError('有効な携帯番号を入力してください。');
        setIsSubmitDisabled(true);
        // Optionally call notifyInvalidPhoneNumber here if needed immediately
+       notifyInvalidPhoneNumber(trimmedNumber);
      } else {
        setPhoneError(null);
        setIsSubmitDisabled(false); // Enable submit only if phone is potentially valid
