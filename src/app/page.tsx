@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
   // State for loading screen visibility
   const [loading, setLoading] = useState(true);
   // State for current card index
@@ -206,10 +208,8 @@ export default function Home() {
          if (response.ok) {
            const result = await response.json();
            console.log('Form submitted successfully:', result.message);
-           // Optionally, redirect to a thank you page or show a success message
-           alert('お申し込みありがとうございます！'); // Show success alert
-           // Reset form or redirect here if needed
-           // Example: setCurrentCardIndex(1); setFormData({ ...initial state... });
+           // Redirect to completion page
+           router.push('/applicants/new');
          } else {
            const errorResult = await response.json();
            console.error('Form submission failed:', errorResult.message);
