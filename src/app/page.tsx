@@ -1,11 +1,17 @@
 'use client'; // Add this directive for client-side interactivity
 
 import Image from "next/image";
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function Home() {
+function HomeContent() {
+  console.log('HomeContent component rendering...');
+  
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  console.log('searchParams available:', searchParams);
+  
   // State for loading screen visibility
   const [loading, setLoading] = useState(true);
   // State for image loading
@@ -22,6 +28,13 @@ export default function Home() {
     firstNameKana: '',
     postalCode: '',
     phoneNumber: '',
+  });
+  // State for UTM parameters (traffic source tracking)
+  const [utmParams, setUtmParams] = useState({
+    utm_source: '',
+    utm_medium: '',
+    utm_campaign: '',
+    utm_term: '',
   });
   // State for job count
   const [jobCount, setJobCount] = useState<number | null>(null);
@@ -100,17 +113,17 @@ export default function Home() {
       if (isFormDirty) {
         event.preventDefault();
         setShowExitModal(true);
-        // ブラウザの履歴を元に戻す
-        window.history.pushState(null, '', window.location.pathname);
+        // ブラウザの履歴を元に戻す（UTMパラメーターを保持）
+        window.history.pushState(null, '', window.location.pathname + window.location.search);
       }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     window.addEventListener('popstate', handlePopState);
 
-    // ページ読み込み時に履歴エントリを追加
+    // ページ読み込み時に履歴エントリを追加（UTMパラメーターを保持）
     if (isFormDirty) {
-      window.history.pushState(null, '', window.location.pathname);
+      window.history.pushState(null, '', window.location.pathname + window.location.search);
     }
 
     return () => {
@@ -118,6 +131,38 @@ export default function Home() {
       window.removeEventListener('popstate', handlePopState);
     };
   }, [isFormDirty]);
+
+  // --- UTM Parameters Initialization ---
+  useEffect(() => {
+    console.log('UTM useEffect running...');
+    console.log('window.location:', window.location.href);
+    
+    // Get UTM parameters directly from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log('urlParams:', urlParams.toString());
+    
+    const utm_source = urlParams.get('utm_source') || '';
+    const utm_medium = urlParams.get('utm_medium') || '';
+    const utm_campaign = urlParams.get('utm_campaign') || '';
+    const utm_term = urlParams.get('utm_term') || '';
+    
+    console.log('Individual params:', { utm_source, utm_medium, utm_campaign, utm_term });
+    
+    const newUtmParams = {
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_term,
+    };
+    
+    setUtmParams(newUtmParams);
+    
+    // Log UTM parameters for debugging
+    if (utm_source || utm_medium) {
+      console.log('UTM Parameters detected:', newUtmParams);
+    }
+    console.log('All UTM params set:', newUtmParams);
+  }, []);
 
   // --- Kuroshiro Initialization ---
   useEffect(() => {
@@ -381,10 +426,29 @@ export default function Home() {
 
        // Call the backend API route
        try {
+         // Get fresh UTM parameters directly from URL at submission time
+         console.log('Current URL:', window.location.href);
+         console.log('Current search params:', window.location.search);
+         
+         const urlParams = new URLSearchParams(window.location.search);
+         const currentUtmParams = {
+           utm_source: urlParams.get('utm_source') || '',
+           utm_medium: urlParams.get('utm_medium') || '',
+           utm_campaign: urlParams.get('utm_campaign') || '',
+           utm_term: urlParams.get('utm_term') || '',
+         };
+         
+         const submissionData = {
+           ...formData,
+           utmParams: currentUtmParams, // Use fresh UTM parameters
+         };
+         
+         console.log('Submitting data with UTM params:', { formData, utmParams, currentUtmParams, submissionData });
+         
          const response = await fetch('/api/applicants', {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify(formData),
+           body: JSON.stringify(submissionData),
          });
 
          if (response.ok) {
@@ -717,5 +781,13 @@ export default function Home() {
        */}
 
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
