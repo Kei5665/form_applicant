@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getJobCountByPostalCode, getJobCountByPrefecture } from '@/lib/microcms';
+import { getJobCountByPrefecture } from '@/lib/microcms';
 import { getPrefectureByPostcode, normalizePostcode } from '@/lib/postcode';
 
 export async function GET(request: NextRequest) {
