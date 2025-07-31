@@ -8,6 +8,9 @@ export default function Home() {
   const router = useRouter();
   // State for loading screen visibility
   const [loading, setLoading] = useState(true);
+  // State for image loading
+  const [imagesLoaded, setImagesLoaded] = useState(0);
+  const [totalImages] = useState(6); // Total number of critical images to load (STEP1, STEP2, STEP3, kange2, car, ride_logo in header)
   // State for current card index
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
   // State for form data (example structure, adjust as needed)
@@ -38,15 +41,49 @@ export default function Home() {
   // State for kuroshiro instance
   const [kuroshiroInstance, setKuroshiroInstance] = useState<import('kuroshiro').default | null>(null);
 
+  // --- Image Loading Handler ---
+  const handleImageLoad = () => {
+    setImagesLoaded(prev => prev + 1);
+  };
+
+  // --- Image Preloading ---
+  useEffect(() => {
+    const imagesToPreload = [
+      '/images/ride_logo.png',
+      '/images/kange2.png', 
+      '/images/STEP1.png',
+      '/images/STEP2.png',
+      '/images/STEP3.png',
+      '/images/car.png'
+    ];
+
+    const preloadImages = () => {
+      imagesToPreload.forEach((src) => {
+        const img = document.createElement('img');
+        img.src = src;
+      });
+    };
+
+    preloadImages();
+  }, []);
+
   // --- Loading Screen Effect ---
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Hide loading screen when all critical images are loaded or after 5 seconds maximum
+    if (imagesLoaded >= totalImages) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 500); // Small delay for smooth transition
+      return () => clearTimeout(timer);
+    }
+    
+    // Fallback: hide loading screen after 5 seconds even if images aren't loaded
+    const fallbackTimer = setTimeout(() => {
       setLoading(false);
-    }, 2000); // Hide after 2 seconds
-
-    // Simulate fade-out effect via state change, CSS handles the transition
-    return () => clearTimeout(timer);
-  }, []);
+    }, 5000);
+    
+    return () => clearTimeout(fallbackTimer);
+  }, [imagesLoaded, totalImages]);
 
   // --- Form Exit Prevention ---
   useEffect(() => {
@@ -385,26 +422,23 @@ export default function Home() {
     <div className="mx-auto max-w-md"> {/* Added max-width like mw */}
 
       {/* Loading Screen */}
-      {loading && (
-         <div
-            id="loading-screen"
-            className="fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col justify-center items-center z-[9999] transition-opacity duration-1000 ease-out"
-            style={{ opacity: loading ? 1 : 0 }} // Control opacity via state
-          >
-            <Image src="/images/ride_logo.png" alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4"/> {/* Adjust width as needed */}
-             {/* Replace spinners with Tailwind equivalent or remove */}
-            <div className="flex space-x-2">
-                <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce"></div>
-                <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-150"></div>
-                <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-300"></div>
-            </div>
+      <div
+        id="loading-screen"
+        className={`fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col justify-center items-center z-[9999] transition-all duration-1000 ease-out ${loading ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+      >
+        <Image src="/images/ride_logo.png" alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4"/> {/* Adjust width as needed */}
+         {/* Replace spinners with Tailwind equivalent or remove */}
+        <div className="flex space-x-2">
+            <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce"></div>
+            <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-150"></div>
+            <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-300"></div>
         </div>
-      )}
+      </div>
 
       {/* Header */}
       <header className="flex items-center justify-between p-1.5 bg-white w-[95%] mx-auto mt-2.5 rounded-md shadow"> {/* Approximate styles */}
         <div className="pl-2.5">
-          <Image src="/images/ride_logo.png" alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto"/> {/* Adjust size */}
+          <Image src="/images/ride_logo.png" alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" onLoad={handleImageLoad}/> {/* Adjust size */}
         </div>
         <div className="text-right pr-2.5">
           <p className="text-xs text-gray-800 my-1">未経験でタクシー会社に就職するなら</p> {/* Changed text-gray-700 to text-gray-800 */}
@@ -414,7 +448,7 @@ export default function Home() {
 
       {/* People Image */}
       <div className="container mx-auto text-center px-2 flex justify-center my-4"> {/* Added margin */}
-        <Image src="/images/kange2.png" alt="" width={500} height={150} className="w-full max-w-lg"/> {/* Adjust size */}
+        <Image src="/images/kange2.png" alt="" width={500} height={150} className="w-full max-w-lg" onLoad={handleImageLoad}/> {/* Adjust size */}
       </div>
 
       {/* Form Section */}
@@ -423,7 +457,7 @@ export default function Home() {
           {/* Card 1: Birth Year */}
           <div id="card1" className={`${cardBaseStyle} ${currentCardIndex === 1 ? cardActiveStyle : cardInactiveStyle}`}>
             <div className="mb-7 text-left"> {/* form-group */}
-              <Image className="w-full mb-4" src="/images/STEP1.png" alt="Step 1" width={300} height={50}/>
+              <Image className="w-full mb-4" src="/images/STEP1.png" alt="Step 1" width={300} height={50} onLoad={handleImageLoad}/>
               <label htmlFor="birthYear" className="font-bold mb-2.5 block text-gray-900">生まれ年（西暦）</label> {/* Added text-gray-900 */}
               <div className="flex items-center">
                 <input
@@ -445,7 +479,7 @@ export default function Home() {
 
           {/* Card 2: Name */}
           <div id="card2" className={`${cardBaseStyle} ${currentCardIndex === 2 ? cardActiveStyle : cardInactiveStyle}`}>
-             <Image className="w-full mb-4" src="/images/STEP2.png" alt="Step 2" width={300} height={50}/>
+             <Image className="w-full mb-4" src="/images/STEP2.png" alt="Step 2" width={300} height={50} onLoad={handleImageLoad}/>
              {/* Kanji Name */}
             <div className="mb-7 text-left">
               <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label> {/* Added text-gray-900 */}
@@ -538,7 +572,7 @@ export default function Home() {
 
           {/* Card 3: Job Search Results */}
            <div id="card3" className={`${cardBaseStyle} ${currentCardIndex === 3 ? cardActiveStyle : cardInactiveStyle}`}>
-             <Image className="w-full mb-4" src="/images/STEP3.png" alt="Step 3" width={300} height={50}/>
+             <Image className="w-full mb-4" src="/images/STEP3.png" alt="Step 3" width={300} height={50} onLoad={handleImageLoad}/>
              
              {/* Job Count Display */}
              <div className="mb-6">
@@ -614,7 +648,7 @@ export default function Home() {
 
       {/* Taxi Image */}
       <div className="relative text-center mt-4"> {/* Added margin */}
-        <Image className="w-1/2 inline-block" src="/images/car.png" alt="Taxi" width={200} height={100} /> {/* Adjust size */}
+        <Image className="w-1/2 inline-block" src="/images/car.png" alt="Taxi" width={200} height={100} onLoad={handleImageLoad}/> {/* Adjust size */}
       </div>
 
 
