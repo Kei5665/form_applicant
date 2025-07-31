@@ -20,12 +20,23 @@ export default function Home() {
     postalCode: '',
     phoneNumber: '',
   });
+  // State for job count
+  const [jobCount, setJobCount] = useState<number | null>(null);
+  const [jobCountMessage, setJobCountMessage] = useState<string>('');
+  const [isLoadingJobCount, setIsLoadingJobCount] = useState(false);
+  const [jobCountError, setJobCountError] = useState<string>('');
   // State for form errors
   const [errors, setErrors] = useState<Record<string, string>>({});
   // State for phone number validation error message
   const [phoneError, setPhoneError] = useState<string | null>(null);
   // State for submit button disabled status
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  // State for form dirty tracking (for exit prevention)
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  // State for custom exit confirmation modal
+  const [showExitModal, setShowExitModal] = useState(false);
+  // State for kuroshiro instance
+  const [kuroshiroInstance, setKuroshiroInstance] = useState<any>(null);
 
   // --- Loading Screen Effect ---
   useEffect(() => {
@@ -37,6 +48,60 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+  // --- Form Exit Prevention ---
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isFormDirty) {
+        // ブラウザの標準ダイアログは英語で表示されるため、preventDefaultのみ設定
+        event.preventDefault();
+        event.returnValue = '';
+        return '';
+      }
+    };
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (isFormDirty) {
+        event.preventDefault();
+        setShowExitModal(true);
+        // ブラウザの履歴を元に戻す
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+
+    // ページ読み込み時に履歴エントリを追加
+    if (isFormDirty) {
+      window.history.pushState(null, '', window.location.pathname);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isFormDirty]);
+
+  // --- Kuroshiro Initialization ---
+  useEffect(() => {
+    const initKuroshiro = async () => {
+      try {
+        // Dynamic import to avoid SSR issues
+        const Kuroshiro = (await import('kuroshiro')).default;
+        const KuromojiAnalyzer = (await import('kuroshiro-analyzer-kuromoji')).default;
+        
+        const kuroshiro = new Kuroshiro();
+        await kuroshiro.init(new KuromojiAnalyzer({ dictPath: "/dict" }));
+        setKuroshiroInstance(kuroshiro);
+        console.log('Kuroshiro initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize Kuroshiro:', error);
+      }
+    };
+    
+    initKuroshiro();
+  }, []);
+
   // --- Card Navigation ---
   const showNextCard = () => {
     setCurrentCardIndex((prevIndex) => Math.min(prevIndex + 1, 3)); // Assuming 3 cards total
@@ -46,13 +111,55 @@ export default function Home() {
     setCurrentCardIndex((prevIndex) => Math.max(prevIndex - 1, 1));
   };
 
+  // --- Job Count Fetching ---
+  const fetchJobCount = async (postalCode: string) => {
+    if (!/^\d{7}$/.test(postalCode)) return;
+    
+    setIsLoadingJobCount(true);
+    setJobCountError('');
+    
+    try {
+      const response = await fetch(`/api/jobs-count?postalCode=${postalCode}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setJobCount(data.jobCount);
+        setJobCountMessage(data.message);
+      } else {
+        setJobCountError(data.error || '求人件数の取得に失敗しました');
+        setJobCount(null);
+        setJobCountMessage('');
+      }
+    } catch (error) {
+      console.error('Error fetching job count:', error);
+      setJobCountError('求人件数の取得中にエラーが発生しました');
+      setJobCount(null);
+      setJobCountMessage('');
+    } finally {
+      setIsLoadingJobCount(false);
+    }
+  };
+
   // --- Form Input Handling ---
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
+    
+    // Remove hyphens from phone number input
+    if (name === 'phoneNumber') {
+      value = value.replace(/[-－ー]/g, '');
+    }
+    
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    
+    // Mark form as dirty when user starts typing
+    if (!isFormDirty) {
+      setIsFormDirty(true);
+    }
+    
     // Clear specific error when user starts typing
     if (errors[name]) {
       setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
@@ -60,6 +167,42 @@ export default function Home() {
     // Specific logic for phone number validation on input
     if (name === 'phoneNumber') {
       validatePhoneNumberInput(value);
+    }
+    // Fetch job count when postal code is entered
+    if (name === 'postalCode' && value.length === 7) {
+      fetchJobCount(value);
+    }
+  };
+
+  // --- Auto Furigana Conversion ---
+  const convertToHiragana = async (kanjiText: string): Promise<string> => {
+    if (kuroshiroInstance && kanjiText.trim()) {
+      try {
+        const result = await kuroshiroInstance.convert(kanjiText, { 
+          to: "hiragana",
+          mode: "spaced"
+        });
+        return result;
+      } catch (error) {
+        console.error('Failed to convert to hiragana:', error);
+        return '';
+      }
+    }
+    return '';
+  };
+
+  const handleNameBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    if ((name === 'lastName' || name === 'firstName') && value.trim()) {
+      const hiragana = await convertToHiragana(value);
+      if (hiragana) {
+        const targetField = name === 'lastName' ? 'lastNameKana' : 'firstNameKana';
+        setFormData((prevData) => ({
+          ...prevData,
+          [targetField]: hiragana,
+        }));
+      }
     }
   };
 
@@ -94,6 +237,13 @@ export default function Home() {
        newErrors.firstNameKana = 'ひらがなで入力してください。';
        isValid = false;
     }
+    if (!formData.postalCode) {
+      newErrors.postalCode = '郵便番号は必須です。';
+      isValid = false;
+    } else if (!/^\d{7}$/.test(formData.postalCode)) {
+      newErrors.postalCode = '郵便番号はハイフンなしの7桁で入力してください。';
+      isValid = false;
+    }
     setErrors(newErrors);
     return isValid;
   };
@@ -107,6 +257,10 @@ export default function Home() {
   const handleNextCard2 = () => {
     if (validateCard2()) {
       showNextCard();
+      // Fetch job count if postal code is already entered
+      if (formData.postalCode && formData.postalCode.length === 7) {
+        fetchJobCount(formData.postalCode);
+      }
     }
   };
 
@@ -167,14 +321,6 @@ export default function Home() {
     let isValid = true;
     const newErrors: Record<string, string> = { ...errors }; // Keep existing errors
 
-    if (!formData.postalCode) {
-      newErrors.postalCode = '郵便番号は必須です。';
-      isValid = false;
-    } else if (!/^\d{7}$/.test(formData.postalCode)) {
-      newErrors.postalCode = '郵便番号はハイフンなしの7桁で入力してください。';
-      isValid = false;
-    }
-
     // Check phone number validity again before submitting
     if (!formData.phoneNumber || !isValidPhoneNumber(formData.phoneNumber)) {
         newErrors.phoneNumber = '有効な携帯番号を入力してください。'; // Add error if not already set or re-validate
@@ -183,7 +329,6 @@ export default function Home() {
     } else {
         setIsSubmitDisabled(false); // Ensure button is enabled if valid
     }
-
 
     setErrors(newErrors);
     return isValid;
@@ -208,6 +353,8 @@ export default function Home() {
          if (response.ok) {
            const result = await response.json();
            console.log('Form submitted successfully:', result.message);
+           // Clear form dirty state on successful submission
+           setIsFormDirty(false);
            // Redirect to completion page
            router.push('/applicants/new');
          } else {
@@ -313,6 +460,7 @@ export default function Home() {
                     className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`} // Added text-gray-900 and placeholder-gray-500
                     value={formData.lastName}
                     onChange={handleInputChange}
+                    onBlur={handleNameBlur}
                   />
                    {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                  </div>
@@ -326,6 +474,7 @@ export default function Home() {
                      className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`} // Added text-gray-900 and placeholder-gray-500
                      value={formData.firstName}
                      onChange={handleInputChange}
+                     onBlur={handleNameBlur}
                    />
                    {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                  </div>
@@ -363,6 +512,23 @@ export default function Home() {
                  </div>
               </div>
             </div>
+            
+            {/* Postal Code */}
+            <div className="mb-7 text-left">
+              <label htmlFor="postalCode" className="block mb-1 text-gray-900">お住まいの郵便番号<br/>( ハイフンなし7桁 )</label>
+              <input
+                type="number"
+                id="postalCode"
+                name="postalCode"
+                placeholder="例: 1234567"
+                className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.postalCode ? 'border-red-500' : 'border-gray-300'}`}
+                value={formData.postalCode}
+                onChange={handleInputChange}
+                maxLength={7}
+              />
+              {errors.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
+            </div>
+            
              {/* Navigation Buttons */}
              <div className="flex justify-around items-center"> {/* Adjusted alignment */}
                <button type="button" className="py-2 px-4 font-bold cursor-pointer text-gray-800" onClick={showPreviousCard}>＜ 戻る</button> {/* Added text-gray-800 */}
@@ -370,23 +536,47 @@ export default function Home() {
              </div>
           </div>
 
-          {/* Card 3: Contact Info */}
+          {/* Card 3: Job Search Results */}
            <div id="card3" className={`${cardBaseStyle} ${currentCardIndex === 3 ? cardActiveStyle : cardInactiveStyle}`}>
              <Image className="w-full mb-4" src="/images/STEP3.png" alt="Step 3" width={300} height={50}/>
-             {/* Postal Code */}
-             <div className="mb-7 text-left">
-               <label htmlFor="postalCode" className="block mb-1 text-gray-900">お住まいの郵便番号<br/>( ハイフンなし7桁 )</label> {/* Added text-gray-900 */}
-               <input
-                 type="text" // Keep as text for pattern matching
-                 id="postalCode"
-                 name="postalCode"
-                 placeholder="例: 1234567"
-                 className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.postalCode ? 'border-red-500' : 'border-gray-300'}`} // Added text-gray-900 and placeholder-gray-500
-                 value={formData.postalCode}
-                 onChange={handleInputChange}
-                 maxLength={7}
-               />
-                {errors.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
+             
+             {/* Job Count Display */}
+             <div className="mb-6">
+               {formData.postalCode && formData.postalCode.length === 7 ? (
+                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                   {isLoadingJobCount ? (
+                     <div className="flex items-center justify-center">
+                       <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce mr-2"></div>
+                       <span className="text-blue-700 text-sm">求人件数を確認中...</span>
+                     </div>
+                   ) : jobCountError ? (
+                     <p className="text-red-600 text-sm text-center">{jobCountError}</p>
+                   ) : jobCount !== null ? (
+                     <div className="text-center">
+                       <p className="text-blue-800 font-bold text-xl mb-2">
+                         郵便番号 {formData.postalCode} エリア
+                       </p>
+                       <p className="text-blue-800 font-bold text-2xl mb-2">
+                         {jobCount}件の求人があります
+                       </p>
+                       <p className="text-blue-700 text-sm">{jobCountMessage}</p>
+                       {jobCount > 0 && (
+                         <p className="text-green-700 text-sm mt-2 font-medium">
+                           ✅ お近くの求人をご案内できます！
+                         </p>
+                       )}
+                     </div>
+                   ) : (
+                     <div className="text-center text-gray-600">
+                       <p>郵便番号を入力して求人を検索してください</p>
+                     </div>
+                   )}
+                 </div>
+               ) : (
+                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-600">
+                   <p>郵便番号を入力して求人を検索してください</p>
+                 </div>
+               )}
              </div>
              {/* Phone Number */}
              <div className="mb-7 text-left">
@@ -428,7 +618,42 @@ export default function Home() {
       </div>
 
 
-       {/* Footer */}
+       {/* Exit Confirmation Modal */}
+      {showExitModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-2xl">
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">ページを離れますか？</h3>
+            </div>
+            <p className="text-gray-600 mb-6">入力中のデータが失われる可能性があります。</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowExitModal(false)}
+                className="px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={() => {
+                  setIsFormDirty(false);
+                  setShowExitModal(false);
+                  window.history.back();
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                離れる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
       <footer className="text-white py-5 mt-8 bg-[#6DCFE4]"> {/* Common background color */}
         {/* Common Footer Content */}
         <div className="container mx-auto px-4">
