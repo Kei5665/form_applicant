@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getJobCountByPostalCode } from '@/lib/microcms';
+import { getJobCountByPostalCode, getJobCountByPrefecture } from '@/lib/microcms';
+import { getPrefectureByPostcode, normalizePostcode } from '@/lib/postcode';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,22 +14,40 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Validate postal code format (7 digits)
-    if (!/^\d{7}$/.test(postalCode)) {
+    // Normalize and validate postal code format (7 digits)
+    const normalizedPostalCode = normalizePostcode(postalCode);
+    if (!/^\d{7}$/.test(normalizedPostalCode)) {
       return NextResponse.json(
         { error: 'Invalid postal code format. Must be 7 digits.' },
         { status: 400 }
       );
     }
 
-    const jobCount = await getJobCountByPostalCode(postalCode);
+    // Get prefecture from postal code
+    const prefecture = getPrefectureByPostcode(normalizedPostalCode);
+    
+    if (!prefecture) {
+      return NextResponse.json(
+        { error: 'Prefecture not found for this postal code' },
+        { status: 404 }
+      );
+    }
+
+    // Search by prefecture (broader search for better user experience)
+    const jobCount = await getJobCountByPrefecture(prefecture);
+    const searchMethod = 'prefecture';
+    const searchArea = `${prefecture}内`;
 
     return NextResponse.json({
-      postalCode,
+      postalCode: normalizedPostalCode,
       jobCount,
+      searchMethod,
+      searchArea,
       message: jobCount > 0 
-        ? `${postalCode}エリアで${jobCount}件の求人が見つかりました`
-        : `${postalCode}エリアでは現在求人がありません`
+        ? `${searchArea}で${jobCount}件の求人が見つかりました`
+        : searchMethod === 'prefecture' 
+          ? `${searchArea}では現在求人がありません`
+          : `${searchArea}では現在求人がありません`
     });
 
   } catch (error) {
