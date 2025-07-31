@@ -36,7 +36,7 @@ export default function Home() {
   // State for custom exit confirmation modal
   const [showExitModal, setShowExitModal] = useState(false);
   // State for kuroshiro instance
-  const [kuroshiroInstance, setKuroshiroInstance] = useState<any>(null);
+  const [kuroshiroInstance, setKuroshiroInstance] = useState<import('kuroshiro').default | null>(null);
 
   // --- Loading Screen Effect ---
   useEffect(() => {
