@@ -154,7 +154,7 @@ npm run lint
 
 ## ライセンス
 
-© 2024 株式会社PMAgent
+© 2025 株式会社PMAgent
 
 ## 連絡先
 
