@@ -21,7 +21,11 @@ function HomeContent() {
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
   // State for form data (example structure, adjust as needed)
   const [formData, setFormData] = useState({
-    birthYear: '',
+    birthDate: {
+      year: '',
+      month: '',
+      day: ''
+    },
     lastName: '',
     firstName: '',
     lastNameKana: '',
@@ -53,6 +57,36 @@ function HomeContent() {
   const [showExitModal, setShowExitModal] = useState(false);
   // State for kuroshiro instance
   const [kuroshiroInstance, setKuroshiroInstance] = useState<import('kuroshiro').default | null>(null);
+
+  // --- Helper Functions ---
+  const getDaysInMonth = (year: string, month: string): number => {
+    if (!year || !month) return 31;
+    const yearNum = parseInt(year);
+    const monthNum = parseInt(month);
+    return new Date(yearNum, monthNum, 0).getDate();
+  };
+
+  const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear - 84; // 84歳まで
+    const endYear = currentYear - 18;   // 18歳から
+    const years = [];
+    for (let year = endYear; year >= startYear; year--) {
+      years.push(year);
+    }
+    return years;
+  };
+
+  // Format functions for confirmation screen
+  const formatBirthDate = (birthDate: { year: string; month: string; day: string }): string => {
+    if (!birthDate.year || !birthDate.month || !birthDate.day) return '';
+    return `${birthDate.year}年${birthDate.month}月${birthDate.day}日`;
+  };
+
+  const formatPhoneNumber = (phoneNumber: string): string => {
+    if (!phoneNumber || phoneNumber.length !== 11) return phoneNumber;
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7)}`;
+  };
 
   // --- Image Loading Handler ---
   const handleImageLoad = () => {
@@ -186,7 +220,7 @@ function HomeContent() {
 
   // --- Card Navigation ---
   const showNextCard = () => {
-    setCurrentCardIndex((prevIndex) => Math.min(prevIndex + 1, 3)); // Assuming 3 cards total
+    setCurrentCardIndex((prevIndex) => Math.min(prevIndex + 1, 4)); // Now 4 cards total (including confirmation)
   };
 
   const showPreviousCard = () => {
@@ -223,7 +257,7 @@ function HomeContent() {
   };
 
   // --- Form Input Handling ---
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name } = e.target;
     let { value } = e.target;
     
@@ -232,10 +266,22 @@ function HomeContent() {
       value = value.replace(/[-－ー]/g, '');
     }
     
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    // Handle birth date fields separately
+    if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
+      const fieldName = name.replace('birth', '').toLowerCase() as 'year' | 'month' | 'day';
+      setFormData((prevData) => ({
+        ...prevData,
+        birthDate: {
+          ...prevData.birthDate,
+          [fieldName]: value,
+        },
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
     
     // Mark form as dirty when user starts typing
     if (!isFormDirty) {
@@ -243,8 +289,12 @@ function HomeContent() {
     }
     
     // Clear specific error when user starts typing
-    if (errors[name]) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+    if (errors[name] || (name.startsWith('birth') && errors.birthDate)) {
+      setErrors((prevErrors) => ({ 
+        ...prevErrors, 
+        [name]: '',
+        birthDate: '' 
+      }));
     }
     // Specific logic for phone number validation on input
     if (name === 'phoneNumber') {
@@ -292,9 +342,49 @@ function HomeContent() {
   const validateCard1 = () => {
     let isValid = true;
     const newErrors: Record<string, string> = {};
-    if (!formData.birthYear || !/^\d{4}$/.test(formData.birthYear)) {
-      newErrors.birthYear = '西暦4桁で入力してください。';
+    
+    const { year, month, day } = formData.birthDate;
+    
+    // Check if all fields are selected
+    if (!year || !month || !day) {
+      newErrors.birthDate = '生年月日をすべて選択してください。';
       isValid = false;
+    } else {
+      // Create date object from selected values
+      const birthDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const today = new Date();
+      const minAge = 18;
+      const maxAge = 84;
+      
+      // Check if the date is valid (handles invalid dates like Feb 30)
+      if (birthDate.getFullYear() !== parseInt(year) || 
+          birthDate.getMonth() !== parseInt(month) - 1 || 
+          birthDate.getDate() !== parseInt(day)) {
+        newErrors.birthDate = '有効な日付を選択してください。';
+        isValid = false;
+      } else {
+        // Calculate age
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        
+        // Check age range
+        if (age < minAge) {
+          newErrors.birthDate = `${minAge}歳以上である必要があります。`;
+          isValid = false;
+        } else if (age > maxAge) {
+          newErrors.birthDate = `${maxAge}歳以下である必要があります。`;
+          isValid = false;
+        }
+        
+        // Check if date is in the future
+        if (birthDate > today) {
+          newErrors.birthDate = '未来の日付は選択できません。';
+          isValid = false;
+        }
+      }
     }
     setErrors(newErrors);
     return isValid;
@@ -344,6 +434,24 @@ function HomeContent() {
         fetchJobCount(formData.postalCode);
       }
     }
+  };
+
+  const handleNextCard3 = () => {
+    if (validateFinalStep()) {
+      showNextCard(); // Move to confirmation screen (Card 4)
+    }
+  };
+
+  // Confirmation screen button handlers
+  const handleFinalSubmit = async () => {
+    // Re-validate before final submission
+    if (!validateFinalStep()) {
+      setCurrentCardIndex(3); // Go back to Step 3 if validation fails
+      return;
+    }
+
+    // Execute the actual form submission
+    await performFormSubmission();
   };
 
   // Phone number specific validation logic
@@ -417,61 +525,64 @@ function HomeContent() {
   };
 
 
-  // --- Form Submit Handler ---
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
+  // --- Form Submit Handler (now just prevents default form submission) ---
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent default form submission - now handled by confirmation screen
+  };
 
-    if (validateFinalStep()) {
-       console.log("Form Data to be Submitted:", formData); // Changed log message
+  // --- Actual form submission logic ---
+  const performFormSubmission = async () => {
+    console.log("Form Data to be Submitted:", formData);
 
-       // Call the backend API route
-       try {
-         // Get fresh UTM parameters directly from URL at submission time
-         console.log('Current URL:', window.location.href);
-         console.log('Current search params:', window.location.search);
-         
-         const urlParams = new URLSearchParams(window.location.search);
-         const currentUtmParams = {
-           utm_source: urlParams.get('utm_source') || '',
-           utm_medium: urlParams.get('utm_medium') || '',
-           utm_campaign: urlParams.get('utm_campaign') || '',
-           utm_term: urlParams.get('utm_term') || '',
-         };
-         
-         const submissionData = {
-           ...formData,
-           utmParams: currentUtmParams, // Use fresh UTM parameters
-         };
-         
-         console.log('Submitting data with UTM params:', { formData, utmParams, currentUtmParams, submissionData });
-         
-         const response = await fetch('/api/applicants', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify(submissionData),
-         });
+    try {
+      // Get fresh UTM parameters directly from URL at submission time
+      console.log('Current URL:', window.location.href);
+      console.log('Current search params:', window.location.search);
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentUtmParams = {
+        utm_source: urlParams.get('utm_source') || '',
+        utm_medium: urlParams.get('utm_medium') || '',
+        utm_campaign: urlParams.get('utm_campaign') || '',
+        utm_term: urlParams.get('utm_term') || '',
+      };
+      
+      // Convert birth date object to string format for API
+      const birthDateString = formData.birthDate.year && formData.birthDate.month && formData.birthDate.day
+        ? `${formData.birthDate.year}-${formData.birthDate.month.padStart(2, '0')}-${formData.birthDate.day.padStart(2, '0')}`
+        : '';
+      
+      const submissionData = {
+        ...formData,
+        birthDate: birthDateString, // Convert to string format
+        utmParams: currentUtmParams, // Use fresh UTM parameters
+      };
+      
+      console.log('Submitting data with UTM params:', { formData, utmParams, currentUtmParams, submissionData });
+      
+      const response = await fetch('/api/applicants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      });
 
-         if (response.ok) {
-           const result = await response.json();
-           console.log('Form submitted successfully:', result.message);
-           // Clear form dirty state on successful submission
-           setIsFormDirty(false);
-           // Redirect to completion page
-           router.push('/applicants/new');
-         } else {
-           const errorResult = await response.json();
-           console.error('Form submission failed:', errorResult.message);
-           // Handle error - show error message to the user
-           alert(`エラーが発生しました: ${errorResult.message || 'サーバーエラー'}`);
-         }
-       } catch (error) {
-         console.error('Error submitting form:', error);
-         // Handle network error or other fetch issues
-         alert('フォームの送信中にエラーが発生しました。ネットワーク接続を確認してください。');
-       }
-       // Removed the old placeholder alert
-    } else {
-       console.log("Final validation failed", errors);
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Form submitted successfully:', result.message);
+        // Clear form dirty state on successful submission
+        setIsFormDirty(false);
+        // Redirect to completion page
+        router.push('/applicants/new');
+      } else {
+        const errorResult = await response.json();
+        console.error('Form submission failed:', errorResult.message);
+        // Handle error - show error message to the user
+        alert(`エラーが発生しました: ${errorResult.message || 'サーバーエラー'}`);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Handle network error or other fetch issues
+      alert('フォームの送信中にエラーが発生しました。ネットワーク接続を確認してください。');
     }
   };
 
@@ -518,25 +629,68 @@ function HomeContent() {
       {/* Form Section */}
       <form onSubmit={handleSubmit} id="form" className="flex justify-center">
         <div className="relative w-full flex justify-center"> {/* Container for cards */}
-          {/* Card 1: Birth Year */}
+          {/* Card 1: Birth Date */}
           <div id="card1" className={`${cardBaseStyle} ${currentCardIndex === 1 ? cardActiveStyle : cardInactiveStyle}`}>
             <div className="mb-7 text-left"> {/* form-group */}
               <Image className="w-full mb-4" src="/images/STEP1.png" alt="Step 1" width={300} height={50} onLoad={handleImageLoad}/>
-              <label htmlFor="birthYear" className="font-bold mb-2.5 block text-gray-900">生まれ年（西暦）</label> {/* Added text-gray-900 */}
-              <div className="flex items-center">
-                <input
-                  type="number" // Use number type for year
-                  id="birthYear"
-                  name="birthYear"
-                  placeholder="例: 1990"
-                  className={`flex-grow p-2 border rounded text-gray-900 placeholder-gray-500 ${errors.birthYear ? 'border-red-500' : 'border-gray-300'}`} // Added text-gray-900 and placeholder-gray-500
-                  value={formData.birthYear}
-                  onChange={handleInputChange}
-                  maxLength={4}
-                />
-                <span className="ml-2 font-bold text-gray-900">年</span> {/* Added text-gray-900 */}
+              <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
+              
+              <div className="flex flex-col sm:flex-row gap-2">
+                {/* Year Select */}
+                <div className="flex-1">
+                  <label htmlFor="birthYear" className="block text-xs text-gray-600 mb-1 sm:hidden">年</label>
+                  <select
+                    id="birthYear"
+                    name="birthYear"
+                    className={`w-full p-3 border rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.birthDate ? 'border-red-500' : 'border-gray-300'} ${!formData.birthDate.year ? 'text-gray-500' : ''}`}
+                    value={formData.birthDate.year}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">年を選択</option>
+                    {generateYearOptions().map(year => (
+                      <option key={year} value={year}>{year}年</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Month Select */}
+                <div className="flex-1">
+                  <label htmlFor="birthMonth" className="block text-xs text-gray-600 mb-1 sm:hidden">月</label>
+                  <select
+                    id="birthMonth"
+                    name="birthMonth"
+                    className={`w-full p-3 border rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.birthDate ? 'border-red-500' : 'border-gray-300'} ${!formData.birthDate.month ? 'text-gray-500' : ''} ${!formData.birthDate.year ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    value={formData.birthDate.month}
+                    onChange={handleInputChange}
+                    disabled={!formData.birthDate.year}
+                  >
+                    <option value="">月を選択</option>
+                    {Array.from({length: 12}, (_, i) => i + 1).map(month => (
+                      <option key={month} value={month}>{month}月</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Day Select */}
+                <div className="flex-1">
+                  <label htmlFor="birthDay" className="block text-xs text-gray-600 mb-1 sm:hidden">日</label>
+                  <select
+                    id="birthDay"
+                    name="birthDay"
+                    className={`w-full p-3 border rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.birthDate ? 'border-red-500' : 'border-gray-300'} ${!formData.birthDate.day ? 'text-gray-500' : ''} ${!formData.birthDate.month || !formData.birthDate.year ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    value={formData.birthDate.day}
+                    onChange={handleInputChange}
+                    disabled={!formData.birthDate.month || !formData.birthDate.year}
+                  >
+                    <option value="">日を選択</option>
+                    {Array.from({length: getDaysInMonth(formData.birthDate.year, formData.birthDate.month)}, (_, i) => i + 1).map(day => (
+                      <option key={day} value={day}>{day}日</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-               {errors.birthYear && <p className="text-red-500 text-xs mt-1">{errors.birthYear}</p>}
+              
+              {errors.birthDate && <p className="text-red-500 text-xs mt-1">{errors.birthDate}</p>}
             </div>
             <button type="button" className="w-full py-2.5 px-5 rounded-md bg-[#ff702a] text-white font-bold cursor-pointer" onClick={handleNextCard1}>次へ</button>
           </div>
@@ -694,18 +848,89 @@ function HomeContent() {
                 {/* Original phoneError logic retained if specific message needed */}
                {/* <small className={`text-red-500 ${phoneError ? 'block' : 'hidden'}`}>{phoneError}</small> */}
              </div>
-              {/* Navigation/Submit Buttons */}
+              {/* Navigation Buttons */}
              <div className="flex justify-around items-center">
-               <button type="button" className="py-2 px-4 font-bold cursor-pointer text-gray-800 mb-0" onClick={showPreviousCard}>＜ 戻る</button> {/* Added text-gray-800 */}
+               <button type="button" className="py-2 px-4 font-bold cursor-pointer text-gray-800 mb-0" onClick={showPreviousCard}>＜ 戻る</button>
                <button
-                 type="submit"
-                 id="submitButton"
+                 type="button"
                  className={`w-[60%] py-2.5 px-5 rounded-md text-white font-bold cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
                  disabled={isSubmitDisabled}
+                 onClick={handleNextCard3}
                >
-                 送信
+                 入力内容を確認する
                 </button>
              </div>
+          </div>
+
+          {/* Card 4: Confirmation Screen */}
+          <div id="card4" className={`${cardBaseStyle} ${currentCardIndex === 4 ? cardActiveStyle : cardInactiveStyle}`}>
+            <div className="mb-7 text-left">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-2">📋 入力内容をご確認ください</h2>
+              </div>
+
+              {/* Phone Number - Emphasized Section */}
+              <div className="mb-6 p-4 bg-orange-50 border-2 border-orange-200 rounded-lg">
+                <div className="flex items-center justify-center mb-2">
+                  <span className="text-2xl mr-2">📱</span>
+                  <h3 className="text-lg font-bold text-orange-800">携帯番号の確認</h3>
+                </div>
+                <div className="bg-white p-3 rounded border border-orange-300">
+                  <p className="text-2xl font-bold text-center text-gray-900 mb-2">
+                    {formatPhoneNumber(formData.phoneNumber)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Other Information */}
+              <div className="space-y-4 mb-6">
+                <div className="bg-white border border-gray-200 p-4 rounded-lg">
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-700 font-medium">生年月日：</span>
+                      <span className="font-bold text-gray-900">{formatBirthDate(formData.birthDate)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-700 font-medium">お名前：</span>
+                      <span className="font-bold text-gray-900">{formData.lastName} {formData.firstName}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-700 font-medium">ふりがな：</span>
+                      <span className="font-bold text-gray-900">{formData.lastNameKana} {formData.firstNameKana}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-700 font-medium">郵便番号：</span>
+                      <span className="font-bold text-gray-900">{formData.postalCode}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                {/* Modify button */}
+                <button 
+                  type="button"
+                  className="w-full py-2.5 px-4 bg-gray-100 text-gray-700 rounded-md font-medium border border-gray-300 hover:bg-gray-200 transition-colors"
+                  onClick={() => setCurrentCardIndex(3)}
+                >
+                  ✏️ 入力内容を修正する
+                </button>
+                
+                {/* Final submit button */}
+                <button
+                  type="button"
+                  className="w-full py-3 px-5 bg-[#ff702a] text-white rounded-md font-bold text-lg hover:bg-orange-600 transition-colors"
+                  onClick={handleFinalSubmit}
+                >
+                  ✅ この内容で送信する
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </form>
