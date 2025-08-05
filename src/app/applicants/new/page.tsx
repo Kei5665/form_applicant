@@ -1,6 +1,26 @@
+'use client';
+
 import Image from "next/image";
+import { useEffect } from "react";
+
+// Extend Window interface for GTM dataLayer
+declare global {
+  interface Window {
+    dataLayer: Record<string, unknown>[];
+  }
+}
 
 export default function ApplicationComplete() {
+  // Track form completion on page load
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({
+        'event': 'form_complete',
+        'form_name': 'ridejob_application'
+      });
+    }
+  }, []);
+
   return (
     <div className="mx-auto max-w-md">
       {/* Header */}

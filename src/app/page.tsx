@@ -4,6 +4,13 @@ import Image from "next/image";
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+// Extend Window interface for GTM dataLayer
+declare global {
+  interface Window {
+    dataLayer: Record<string, unknown>[];
+  }
+}
+
 function HomeContent() {
   console.log('HomeContent component rendering...');
   
@@ -19,6 +26,38 @@ function HomeContent() {
   const [totalImages] = useState(6); // Total number of critical images to load (STEP1, STEP2, STEP3, kange2, car, ride_logo in header)
   // State for current card index
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
+  
+  // GTM tracking helper functions
+  const trackStepView = (stepNumber: number) => {
+    const stepName = stepNumber === 4 ? 'confirmation' : `step_${stepNumber}`;
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({
+        'event': 'step_view',
+        'step_name': stepName,
+        'step_number': stepNumber
+      });
+    }
+  };
+
+  const trackStepComplete = (stepNumber: number) => {
+    const stepName = stepNumber === 4 ? 'confirmation' : `step_${stepNumber}`;
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({
+        'event': 'step_complete',
+        'step_name': stepName,
+        'step_number': stepNumber
+      });
+    }
+  };
+
+  const trackFormSubmit = () => {
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({
+        'event': 'form_submit',
+        'form_name': 'ridejob_application'
+      });
+    }
+  };
   // State for form data (example structure, adjust as needed)
   const [formData, setFormData] = useState({
     birthDate: {
@@ -218,13 +257,52 @@ function HomeContent() {
     initKuroshiro();
   }, []);
 
+  // Track initial step view
+  useEffect(() => {
+    trackStepView(1);
+  }, []);
+
+  // Track page abandonment
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Only track abandon if form has been started but not completed
+      if (isFormDirty && currentCardIndex < 4) {
+        if (typeof window !== 'undefined' && window.dataLayer) {
+          window.dataLayer.push({
+            'event': 'step_abandon',
+            'step_name': currentCardIndex === 4 ? 'confirmation' : `step_${currentCardIndex}`,
+            'step_number': currentCardIndex
+          });
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isFormDirty, currentCardIndex]);
+
   // --- Card Navigation ---
   const showNextCard = () => {
-    setCurrentCardIndex((prevIndex) => Math.min(prevIndex + 1, 4)); // Now 4 cards total (including confirmation)
+    setCurrentCardIndex((prevIndex) => {
+      const nextIndex = Math.min(prevIndex + 1, 4);
+      if (nextIndex > prevIndex) {
+        trackStepView(nextIndex);
+      }
+      return nextIndex;
+    });
   };
 
   const showPreviousCard = () => {
-    setCurrentCardIndex((prevIndex) => Math.max(prevIndex - 1, 1));
+    setCurrentCardIndex((prevIndex) => {
+      const nextIndex = Math.max(prevIndex - 1, 1);
+      if (nextIndex !== prevIndex) {
+        trackStepView(nextIndex);
+      }
+      return nextIndex;
+    });
   };
 
   // --- Job Count Fetching ---
@@ -422,12 +500,14 @@ function HomeContent() {
 
   const handleNextCard1 = () => {
     if (validateCard1()) {
+      trackStepComplete(1);
       showNextCard();
     }
   }
 
   const handleNextCard2 = () => {
     if (validateCard2()) {
+      trackStepComplete(2);
       showNextCard();
       // Fetch job count if postal code is already entered
       if (formData.postalCode && formData.postalCode.length === 7) {
@@ -438,6 +518,7 @@ function HomeContent() {
 
   const handleNextCard3 = () => {
     if (validateFinalStep()) {
+      trackStepComplete(3);
       showNextCard(); // Move to confirmation screen (Card 4)
     }
   };
@@ -533,6 +614,9 @@ function HomeContent() {
   // --- Actual form submission logic ---
   const performFormSubmission = async () => {
     console.log("Form Data to be Submitted:", formData);
+    
+    // Track form submission attempt
+    trackFormSubmit();
 
     try {
       // Get fresh UTM parameters directly from URL at submission time
