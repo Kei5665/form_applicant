@@ -116,16 +116,6 @@ function HomeContent() {
     return years;
   };
 
-  // Format functions for confirmation screen
-  const formatBirthDate = (birthDate: { year: string; month: string; day: string }): string => {
-    if (!birthDate.year || !birthDate.month || !birthDate.day) return '';
-    return `${birthDate.year}年${birthDate.month}月${birthDate.day}日`;
-  };
-
-  const formatPhoneNumber = (phoneNumber: string): string => {
-    if (!phoneNumber || phoneNumber.length !== 11) return phoneNumber;
-    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7)}`;
-  };
 
   // --- Image Loading Handler ---
   const handleImageLoad = () => {
@@ -287,7 +277,7 @@ function HomeContent() {
   // --- Card Navigation ---
   const showNextCard = () => {
     setCurrentCardIndex((prevIndex) => {
-      const nextIndex = Math.min(prevIndex + 1, 4);
+      const nextIndex = Math.min(prevIndex + 1, 3);
       if (nextIndex > prevIndex) {
         trackStepView(nextIndex);
       }
@@ -516,24 +506,6 @@ function HomeContent() {
     }
   };
 
-  const handleNextCard3 = () => {
-    if (validateFinalStep()) {
-      trackStepComplete(3);
-      showNextCard(); // Move to confirmation screen (Card 4)
-    }
-  };
-
-  // Confirmation screen button handlers
-  const handleFinalSubmit = async () => {
-    // Re-validate before final submission
-    if (!validateFinalStep()) {
-      setCurrentCardIndex(3); // Go back to Step 3 if validation fails
-      return;
-    }
-
-    // Execute the actual form submission
-    await performFormSubmission();
-  };
 
   // Phone number specific validation logic
   const isValidPhoneNumber = (phoneNumber: string): boolean => {
@@ -606,69 +578,71 @@ function HomeContent() {
   };
 
 
-  // --- Form Submit Handler (now just prevents default form submission) ---
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission - now handled by confirmation screen
-  };
+  // --- Form Submit Handler ---
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent default form submission
 
-  // --- Actual form submission logic ---
-  const performFormSubmission = async () => {
-    console.log("Form Data to be Submitted:", formData);
-    
-    // Track form submission attempt
-    trackFormSubmit();
+    if (validateFinalStep()) {
+      console.log("Form Data to be Submitted:", formData);
+      
+      // Track form submission attempt
+      trackFormSubmit();
 
-    try {
-      // Get fresh UTM parameters directly from URL at submission time
-      console.log('Current URL:', window.location.href);
-      console.log('Current search params:', window.location.search);
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      const currentUtmParams = {
-        utm_source: urlParams.get('utm_source') || '',
-        utm_medium: urlParams.get('utm_medium') || '',
-        utm_campaign: urlParams.get('utm_campaign') || '',
-        utm_term: urlParams.get('utm_term') || '',
-      };
-      
-      // Convert birth date object to string format for API
-      const birthDateString = formData.birthDate.year && formData.birthDate.month && formData.birthDate.day
-        ? `${formData.birthDate.year}-${formData.birthDate.month.padStart(2, '0')}-${formData.birthDate.day.padStart(2, '0')}`
-        : '';
-      
-      const submissionData = {
-        ...formData,
-        birthDate: birthDateString, // Convert to string format
-        utmParams: currentUtmParams, // Use fresh UTM parameters
-      };
-      
-      console.log('Submitting data with UTM params:', { formData, utmParams, currentUtmParams, submissionData });
-      
-      const response = await fetch('/api/applicants', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submissionData),
-      });
+      try {
+        // Get fresh UTM parameters directly from URL at submission time
+        console.log('Current URL:', window.location.href);
+        console.log('Current search params:', window.location.search);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentUtmParams = {
+          utm_source: urlParams.get('utm_source') || '',
+          utm_medium: urlParams.get('utm_medium') || '',
+          utm_campaign: urlParams.get('utm_campaign') || '',
+          utm_term: urlParams.get('utm_term') || '',
+        };
+        
+        // Convert birth date object to string format for API
+        const birthDateString = formData.birthDate.year && formData.birthDate.month && formData.birthDate.day
+          ? `${formData.birthDate.year}-${formData.birthDate.month.padStart(2, '0')}-${formData.birthDate.day.padStart(2, '0')}`
+          : '';
+        
+        const submissionData = {
+          ...formData,
+          birthDate: birthDateString, // Convert to string format
+          utmParams: currentUtmParams, // Use fresh UTM parameters
+        };
+        
+        console.log('Submitting data with UTM params:', { formData, utmParams, currentUtmParams, submissionData });
+        
+        const response = await fetch('/api/applicants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(submissionData),
+        });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Form submitted successfully:', result.message);
-        // Clear form dirty state on successful submission
-        setIsFormDirty(false);
-        // Redirect to completion page
-        router.push('/applicants/new');
-      } else {
-        const errorResult = await response.json();
-        console.error('Form submission failed:', errorResult.message);
-        // Handle error - show error message to the user
-        alert(`エラーが発生しました: ${errorResult.message || 'サーバーエラー'}`);
+        if (response.ok) {
+          const result = await response.json();
+          console.log('Form submitted successfully:', result.message);
+          // Clear form dirty state on successful submission
+          setIsFormDirty(false);
+          // Redirect to completion page
+          router.push('/applicants/new');
+        } else {
+          const errorResult = await response.json();
+          console.error('Form submission failed:', errorResult.message);
+          // Handle error - show error message to the user
+          alert(`エラーが発生しました: ${errorResult.message || 'サーバーエラー'}`);
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        // Handle network error or other fetch issues
+        alert('フォームの送信中にエラーが発生しました。ネットワーク接続を確認してください。');
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      // Handle network error or other fetch issues
-      alert('フォームの送信中にエラーが発生しました。ネットワーク接続を確認してください。');
+    } else {
+      console.log("Final validation failed", errors);
     }
   };
+
 
 
   // --- Card Styles ---
@@ -936,86 +910,15 @@ function HomeContent() {
              <div className="flex justify-around items-center">
                <button type="button" className="py-2 px-4 font-bold cursor-pointer text-gray-800 mb-0" onClick={showPreviousCard}>＜ 戻る</button>
                <button
-                 type="button"
+                 type="submit"
                  className={`w-[60%] py-2.5 px-5 rounded-md text-white font-bold cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
                  disabled={isSubmitDisabled}
-                 onClick={handleNextCard3}
                >
-                 入力内容を確認する
+                 送信
                 </button>
              </div>
           </div>
 
-          {/* Card 4: Confirmation Screen */}
-          <div id="card4" className={`${cardBaseStyle} ${currentCardIndex === 4 ? cardActiveStyle : cardInactiveStyle}`}>
-            <div className="mb-7 text-left">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-2">📋 入力内容をご確認ください</h2>
-              </div>
-
-              {/* Phone Number - Emphasized Section */}
-              <div className="mb-6 p-4 bg-orange-50 border-2 border-orange-200 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <span className="text-2xl mr-2">📱</span>
-                  <h3 className="text-lg font-bold text-orange-800">携帯番号の確認</h3>
-                </div>
-                <div className="bg-white p-3 rounded border border-orange-300">
-                  <p className="text-2xl font-bold text-center text-gray-900 mb-2">
-                    {formatPhoneNumber(formData.phoneNumber)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Other Information */}
-              <div className="space-y-4 mb-6">
-                <div className="bg-white border border-gray-200 p-4 rounded-lg">
-                  
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-gray-700 font-medium">生年月日：</span>
-                      <span className="font-bold text-gray-900">{formatBirthDate(formData.birthDate)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-gray-700 font-medium">お名前：</span>
-                      <span className="font-bold text-gray-900">{formData.lastName} {formData.firstName}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-gray-700 font-medium">ふりがな：</span>
-                      <span className="font-bold text-gray-900">{formData.lastNameKana} {formData.firstNameKana}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-700 font-medium">郵便番号：</span>
-                      <span className="font-bold text-gray-900">{formData.postalCode}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                {/* Modify button */}
-                <button 
-                  type="button"
-                  className="w-full py-2.5 px-4 bg-gray-100 text-gray-700 rounded-md font-medium border border-gray-300 hover:bg-gray-200 transition-colors"
-                  onClick={() => setCurrentCardIndex(3)}
-                >
-                  ✏️ 入力内容を修正する
-                </button>
-                
-                {/* Final submit button */}
-                <button
-                  type="button"
-                  className="w-full py-3 px-5 bg-[#ff702a] text-white rounded-md font-bold text-lg hover:bg-orange-600 transition-colors"
-                  onClick={handleFinalSubmit}
-                >
-                  ✅ この内容で送信する
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </form>
 
