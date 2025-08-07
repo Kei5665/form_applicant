@@ -4,9 +4,7 @@ import {
   getPrefectureByRegion,
   getJobsByPrefectureId,
   getJobCountByPrefecture,
-  Job,
   JobsResponse,
-  Prefecture,
   PrefecturesResponse
 } from '../microcms'
 
@@ -33,22 +31,24 @@ describe('microcms utils', () => {
   })
 
   describe('Environment variable validation', () => {
-    it('should throw error when MICROCMS_SERVICE_DOMAIN is not set', () => {
+    it('should throw error when MICROCMS_SERVICE_DOMAIN is not set', async () => {
       delete process.env.MICROCMS_SERVICE_DOMAIN
       
-      expect(() => {
+      await expect(async () => {
         jest.resetModules()
-        require('../microcms')
-      }).toThrow('microCMS environment variables are not set')
+        const { getJobsByPostalCode } = await import('../microcms')
+        await getJobsByPostalCode('1234567')
+      }).rejects.toThrow('microCMS environment variables are not set')
     })
 
-    it('should throw error when MICROCMS_API_KEY is not set', () => {
+    it('should throw error when MICROCMS_API_KEY is not set', async () => {
       delete process.env.MICROCMS_API_KEY
       
-      expect(() => {
+      await expect(async () => {
         jest.resetModules()
-        require('../microcms')
-      }).toThrow('microCMS environment variables are not set')
+        const { getJobsByPostalCode } = await import('../microcms')
+        await getJobsByPostalCode('1234567')
+      }).rejects.toThrow('microCMS environment variables are not set')
     })
   })
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Home from '../page'
 
 // Mock kuroshiro
@@ -26,7 +25,6 @@ jest.mock('kuroshiro-analyzer-kuromoji', () => {
 global.fetch = jest.fn()
 
 describe('Home Page - Card 2 (Name and Address)', () => {
-  const user = userEvent.setup()
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -223,7 +221,6 @@ describe('Home Page - Card 2 (Name and Address)', () => {
       await navigateToCard2()
 
       const lastNameInput = screen.getByLabelValue('姓')
-      const lastNameKanaInput = screen.getByLabelValue('せい')
 
       await act(async () => {
         fireEvent.change(lastNameInput, { target: { value: '田中' } })

@@ -183,7 +183,7 @@ describe('ApplicationComplete Page', () => {
     it('should render without errors when dataLayer is not available', () => {
       // Temporarily remove dataLayer
       const originalDataLayer = window.dataLayer
-      delete (window as any).dataLayer
+      delete (window as Record<string, unknown>).dataLayer
 
       expect(() => {
         render(<ApplicationComplete />)

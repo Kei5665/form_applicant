@@ -1,6 +1,5 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 import Home from '../app/page'
@@ -88,7 +87,7 @@ const server = setupServer(
 
   // Mock applicants API
   http.post('/api/applicants', async ({ request }) => {
-    const body = await request.json() as any
+    const body = await request.json() as Record<string, unknown>
     
     // Simulate different response scenarios
     if (body.phoneNumber === '09099999999') {
@@ -105,7 +104,6 @@ const server = setupServer(
 )
 
 describe('Integration Tests - Complete User Journey', () => {
-  const user = userEvent.setup()
 
   beforeAll(() => {
     server.listen({ onUnhandledRequest: 'error' })

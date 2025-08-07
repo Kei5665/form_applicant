@@ -1,12 +1,13 @@
 import '@testing-library/jest-dom'
+import React from 'react'
 
 // Mock global objects
 global.fetch = jest.fn()
 
 // Mock Next.js Image component
 jest.mock('next/image', () => {
-  return function Image({ src, alt, ...props }: any) {
-    return <img src={src} alt={alt} {...props} />
+  return function Image({ src, alt, ...props }: Record<string, unknown>) {
+    return React.createElement('img', { src, alt, ...props })
   }
 })
 

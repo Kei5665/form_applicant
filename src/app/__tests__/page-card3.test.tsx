@@ -1,6 +1,5 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Home from '../page'
 
 // Mock kuroshiro
@@ -26,7 +25,6 @@ jest.mock('kuroshiro-analyzer-kuromoji', () => {
 global.fetch = jest.fn()
 
 describe('Home Page - Card 3 (Phone Number and Job Search)', () => {
-  const user = userEvent.setup()
 
   beforeEach(() => {
     jest.clearAllMocks()
