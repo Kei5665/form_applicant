@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 新しい応募がありました！
 -------------------------
 流入元: ${mediaName}
-生まれ年: ${formData.birthYear || '未入力'}
+生年月日: ${formData.birthDate || '未入力'}
 氏名: ${formData.lastName || ''} ${formData.firstName || ''} (${formData.lastNameKana || ''} ${formData.firstNameKana || ''})
 郵便番号: ${formData.postalCode || '未入力'}
 電話番号: ${formData.phoneNumber || '未入力'}
