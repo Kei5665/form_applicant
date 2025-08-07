@@ -55,7 +55,12 @@ export async function POST(request: NextRequest) {
   try {
     const submissionData = await request.json();
     const { utmParams, ...formData } = submissionData;
-    const larkWebhookUrl = process.env.LARK_WEBHOOK_URL;
+    
+    // Determine the appropriate Lark webhook URL based on environment
+    const isProduction = process.env.NODE_ENV === 'production';
+    const larkWebhookUrl = isProduction 
+      ? process.env.LARK_WEBHOOK_URL_PROD 
+      : process.env.LARK_WEBHOOK_URL_TEST || process.env.LARK_WEBHOOK_URL;
 
     if (!larkWebhookUrl) {
       console.error('Lark Webhook URL is not configured in environment variables.');
