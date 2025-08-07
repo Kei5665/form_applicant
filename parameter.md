@@ -1,0 +1,8 @@
+| 媒体            | 入稿URL                                                                                                           | パラメーター                                                                              |
+|:--------------|:----------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
+| Googleリスティング  | https://ridejob.pmagent.jp/?utm_source=google&utm_medium=searchh&utm_campaign=em&utm_term={keyword}_{matchtype} | ?utm_source=google&utm_medium=search&utm_campaign=em&utm_term={keyword}_{matchtype} |
+| TikTok広告      | https://ridejob.pmagent.jp/?utm_source=tiktok&utm_medium=ad                                                     | ?utm_source=tiktok&utm_medium=ad                                                    |
+| TikTokオーガニック  | https://ridejob.pmagent.jp/?utm_source=tiktok&utm_medium=organic                                                | ?utm_source=tiktok&utm_medium=organic                                               |
+| meta広告        | https://ridejob.pmagent.jp/?utm_source=tiktok&utm_medium=organic                                                | ?utm_source=meta&utm_medium=ad                                                      |
+| YouTubeオーガニック | https://ridejob.pmagent.jp/?utm_source=youtube&utm_medium=organic                                               | ?utm_source=youtube&utm_medium=organic                                              |
+| スレッドオーガニック    | https://ridejob.pmagent.jp/?utm_source=threads&utm_medium=organic                                               | ?utm_source=threads&utm_medium=organic                                              |

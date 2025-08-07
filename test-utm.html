@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTMパラメーター テスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-link {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            text-decoration: none;
+            color: #333;
+            border-radius: 3px;
+        }
+        .test-link:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <h1>UTMパラメーター 流入元追跡テスト</h1>
+    <p>以下のリンクをクリックしてフォームページにアクセスし、各媒体の識別をテストしてください。</p>
+    
+    <div class="test-section">
+        <h2>🎯 Google広告</h2>
+        <a href="http://localhost:3000/?utm_source=google&utm_medium=search&utm_campaign=em&utm_term=taxi_job" class="test-link">
+            Googleリスティング広告からの流入をテスト
+        </a>
+    </div>
+
+    <div class="test-section">
+        <h2>📱 TikTok</h2>
+        <a href="http://localhost:3000/?utm_source=tiktok&utm_medium=ad" class="test-link">
+            TikTok広告からの流入をテスト
+        </a>
+        <a href="http://localhost:3000/?utm_source=tiktok&utm_medium=organic" class="test-link">
+            TikTokオーガニックからの流入をテスト
+        </a>
+    </div>
+
+    <div class="test-section">
+        <h2>📘 Meta広告</h2>
+        <a href="http://localhost:3000/?utm_source=meta&utm_medium=ad" class="test-link">
+            Meta広告からの流入をテスト
+        </a>
+    </div>
+
+    <div class="test-section">
+        <h2>🎥 YouTube</h2>
+        <a href="http://localhost:3000/?utm_source=youtube&utm_medium=organic" class="test-link">
+            YouTubeオーガニックからの流入をテスト
+        </a>
+    </div>
+
+    <div class="test-section">
+        <h2>🧵 スレッド</h2>
+        <a href="http://localhost:3000/?utm_source=threads&utm_medium=organic" class="test-link">
+            スレッドオーガニックからの流入をテスト
+        </a>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 直接アクセス</h2>
+        <a href="http://localhost:3000/" class="test-link">
+            UTMパラメーターなしの直接アクセスをテスト
+        </a>
+    </div>
+
+    <div class="test-section">
+        <h2>❓ 未定義の媒体</h2>
+        <a href="http://localhost:3000/?utm_source=unknown&utm_medium=test" class="test-link">
+            未定義の媒体からの流入をテスト
+        </a>
+    </div>
+
+    <hr>
+    <h2>📋 テスト手順</h2>
+    <ol>
+        <li>上記のリンクをクリックしてフォームページに移動</li>
+        <li>ブラウザの開発者ツール（F12）を開く</li>
+        <li>Consoleタブで「UTM Parameters detected:」のログを確認</li>
+        <li>フォームに適当な値を入力して送信</li>
+        <li>NetworkタブでAPI送信データを確認</li>
+        <li>Lark通知で媒体名が正しく表示されるか確認</li>
+    </ol>
+
+    <h2>🔍 確認ポイント</h2>
+    <ul>
+        <li>各媒体で正しい日本語名が表示されるか</li>
+        <li>parameter.mdの定義通りにマッピングされるか</li>
+        <li>UTMパラメーターがない場合「直接アクセス」と表示されるか</li>
+        <li>未定義の媒体でも適切に処理されるか</li>
+    </ul>
+</body>
+</html>
