@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 declare global {
   interface Window {
@@ -19,7 +19,6 @@ interface ApplicationFormProps {
 
 function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // Loading / assets
   const [loading, setLoading] = useState(true);
@@ -80,12 +79,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
     phoneNumber: '',
   });
 
-  const [utmParams, setUtmParams] = useState({
-    utm_source: '',
-    utm_medium: '',
-    utm_campaign: '',
-    utm_term: '',
-  });
+  // UTMは送信時にURLから都度取得する
 
   const [jobCount, setJobCount] = useState<number | null>(null);
   const [jobCountMessage, setJobCountMessage] = useState<string>('');
@@ -169,16 +163,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
     };
   }, [isFormDirty]);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const newUtmParams = {
-      utm_source: urlParams.get('utm_source') || '',
-      utm_medium: urlParams.get('utm_medium') || '',
-      utm_campaign: urlParams.get('utm_campaign') || '',
-      utm_term: urlParams.get('utm_term') || '',
-    };
-    setUtmParams(newUtmParams);
-  }, []);
+  // UTMの事前保存は不要
 
   useEffect(() => {
     const initKuroshiro = async () => {
