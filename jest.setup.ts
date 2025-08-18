@@ -35,7 +35,7 @@ Object.defineProperty(window, 'dataLayer', {
   writable: true,
 })
 
-// Mock window.location
+// window.location: テストごとに上書きできるよう、configurable: true で初期値を設定
 Object.defineProperty(window, 'location', {
   value: {
     href: 'http://localhost:3000',
@@ -46,6 +46,7 @@ Object.defineProperty(window, 'location', {
     protocol: 'http:',
   },
   writable: true,
+  configurable: true,
 })
 
 // Reset all mocks after each test
