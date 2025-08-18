@@ -23,7 +23,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
   // Loading / assets
   const [loading, setLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState(0);
-  const [totalImages] = useState(6);
+  const [totalImages] = useState(3);
 
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
 
@@ -115,12 +115,9 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
   useEffect(() => {
     const imagesToPreload = [
-      '/images/ride_logo.png',
+      '/images/ride_logo.svg',
       peopleImageSrc,
       '/images/STEP1.png',
-      '/images/STEP2.png',
-      '/images/STEP3.png',
-      '/images/car.png',
     ];
     imagesToPreload.forEach((src) => {
       const img = document.createElement('img');
@@ -487,7 +484,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
           loading ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
       >
-        <Image src="/images/ride_logo.png" alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4" />
+        <Image src="/images/ride_logo.svg" alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4" />
         <div className="flex space-x-2">
           <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce"></div>
           <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-150"></div>
@@ -497,7 +494,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
       <header className="flex items-center justify-between p-1.5 bg-white w-[95%] mx-auto mt-2.5 rounded-md shadow">
         <div className="pl-2.5">
-          <Image src="/images/ride_logo.png" alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" onLoad={handleImageLoad} />
+          <Image src="/images/ride_logo.svg" alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" onLoad={handleImageLoad} priority loading="eager" />
         </div>
         <div className="text-right pr-2.5">
           <p className="text-xs text-gray-800 my-1">未経験でタクシー会社に就職するなら</p>
@@ -507,7 +504,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
       {/* People Image */}
       <div className="container mx-auto text-center px-2 flex justify-center my-4">
-        <Image src={peopleImageSrc} alt="" width={500} height={150} className="w-full max-w-lg" onLoad={handleImageLoad} />
+        <Image src={peopleImageSrc} alt="" width={500} height={150} className="w-full max-w-lg" onLoad={handleImageLoad} priority loading="eager" />
       </div>
 
       <form onSubmit={handleSubmit} id="form" className="flex justify-center">
@@ -515,7 +512,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
           {/* Card 1 */}
           <div id="card1" className={`${cardBaseStyle} ${currentCardIndex === 1 ? cardActiveStyle : cardInactiveStyle}`}>
             <div className="mb-7 text-left">
-              <Image className="w-full mb-4" src="/images/STEP1.png" alt="Step 1" width={300} height={50} onLoad={handleImageLoad} />
+              <Image className="w-full mb-4" src="/images/STEP1.png" alt="Step 1" width={300} height={50} onLoad={handleImageLoad} priority loading="eager" />
               <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="flex-1">
@@ -595,7 +592,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
           {/* Card 2 */}
           <div id="card2" className={`${cardBaseStyle} ${currentCardIndex === 2 ? cardActiveStyle : cardInactiveStyle}`}>
-            <Image className="w-full mb-4" src="/images/STEP2.png" alt="Step 2" width={300} height={50} onLoad={handleImageLoad} />
+            <Image className="w-full mb-4" src="/images/STEP2.png" alt="Step 2" width={300} height={50} />
             <div className="mb-7 text-left">
               <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
               <div className="flex justify-between mb-5">
@@ -698,7 +695,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
           {/* Card 3 */}
           <div id="card3" className={`${cardBaseStyle} ${currentCardIndex === 3 ? cardActiveStyle : cardInactiveStyle}`}>
-            <Image className="w-full mb-4" src="/images/STEP3.png" alt="Step 3" width={300} height={50} onLoad={handleImageLoad} />
+            <Image className="w-full mb-4" src="/images/STEP3.png" alt="Step 3" width={300} height={50} />
             <div className="mb-6">
               {formData.postalCode && formData.postalCode.length === 7 ? (
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -767,7 +764,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
       </form>
 
       <div className="relative text-center mt-4">
-        <Image className="w-1/2 inline-block" src="/images/car.png" alt="Taxi" width={200} height={100} onLoad={handleImageLoad} />
+        <Image className="w-1/2 inline-block" src="/images/car.png" alt="Taxi" width={200} height={100} />
       </div>
 
       {showExitModal && (
@@ -804,7 +801,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
       <footer className="text-white py-5 mt-8 bg-[#6DCFE4]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-5">
-            <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src="/images/flogo.png" alt="Footer Logo" width={150} height={40} />
+            <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src="/images/ride_logo.svg" alt="Footer Logo" width={150} height={40} />
           </div>
           <div className="flex flex-col md:flex-row justify-around items-center text-center md:text-left text-xs mb-3 space-y-2 md:space-y-0">
             <a href="https://pmagent.jp/" className="text-white hover:underline">
