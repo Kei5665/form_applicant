@@ -88,13 +88,21 @@ export async function POST(request: NextRequest) {
     const isProduction = process.env.NODE_ENV === 'production';
     const sendBaseOnly = process.env.LARK_SEND_BASE_ONLY === 'true';
 
-    // Determine the appropriate Lark webhook URLs based on environment
+    // Determine the appropriate Lark webhook URLs based on environment (with sensible fallbacks)
     const larkWebhookUrl = isProduction
       ? process.env.LARK_WEBHOOK_URL_PROD
-      : process.env.LARK_WEBHOOK_URL_TEST || process.env.LARK_WEBHOOK_URL;
+          || process.env.LARK_WEBHOOK_URL
+          || process.env.LARK_WEBHOOK_URL_TEST
+      : process.env.LARK_WEBHOOK_URL_TEST
+          || process.env.LARK_WEBHOOK_URL
+          || process.env.LARK_WEBHOOK_URL_PROD;
     const baseWebhookUrl = isProduction
       ? process.env.LARK_BASE_WEBHOOK_URL_PROD
-      : process.env.LARK_BASE_WEBHOOK_URL_TEST || process.env.LARK_BASE_WEBHOOK_URL;
+          || process.env.LARK_BASE_WEBHOOK_URL
+          || process.env.LARK_BASE_WEBHOOK_URL_TEST
+      : process.env.LARK_BASE_WEBHOOK_URL_TEST
+          || process.env.LARK_BASE_WEBHOOK_URL
+          || process.env.LARK_BASE_WEBHOOK_URL_PROD;
 
     // 必須URLの検証（Baseのみテスト時はBase URL、通常時はLark URL）
     if (sendBaseOnly) {
