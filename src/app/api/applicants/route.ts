@@ -1,5 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Types for submission payload
+type ExperimentInfo = {
+  name?: string;
+  variant?: string;
+};
+
+type UTMParams = {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+};
+
+type ApplicantFormData = {
+  birthDate?: string;
+  lastName?: string;
+  firstName?: string;
+  lastNameKana?: string;
+  firstNameKana?: string;
+  postalCode?: string;
+  phoneNumber?: string;
+};
+
+type ApplicantSubmission = ApplicantFormData & {
+  utmParams?: UTMParams;
+  experiment?: ExperimentInfo;
+};
+
 // UTM parameters to media name mapping function
 function getMediaName(utmParams: { utm_source?: string; utm_medium?: string }): string {
   const { utm_source, utm_medium } = utmParams;
@@ -53,7 +81,7 @@ function getMediaName(utmParams: { utm_source?: string; utm_medium?: string }): 
 
 export async function POST(request: NextRequest) {
   try {
-    const submissionData = (await request.json()) as any;
+    const submissionData = (await request.json()) as ApplicantSubmission;
     const { utmParams, ...formData } = submissionData;
     
     // Determine env and feature flags
