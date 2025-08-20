@@ -53,19 +53,32 @@ function getMediaName(utmParams: { utm_source?: string; utm_medium?: string }): 
 
 export async function POST(request: NextRequest) {
   try {
-    const submissionData = await request.json();
+    const submissionData = (await request.json()) as any;
     const { utmParams, ...formData } = submissionData;
     
-    // Determine the appropriate Lark webhook URL based on environment
+    // Determine env and feature flags
     const isProduction = process.env.NODE_ENV === 'production';
-    const larkWebhookUrl = isProduction 
-      ? process.env.LARK_WEBHOOK_URL_PROD 
-      : process.env.LARK_WEBHOOK_URL_TEST || process.env.LARK_WEBHOOK_URL;
+    const sendBaseOnly = process.env.LARK_SEND_BASE_ONLY === 'true';
 
-    if (!larkWebhookUrl) {
-      console.error('Lark Webhook URL is not configured in environment variables.');
-      // サーバー内部のエラーとし、具体的な理由はクライアントに返さない
-      return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    // Determine the appropriate Lark webhook URLs based on environment
+    const larkWebhookUrl = isProduction
+      ? process.env.LARK_WEBHOOK_URL_PROD
+      : process.env.LARK_WEBHOOK_URL_TEST || process.env.LARK_WEBHOOK_URL;
+    const baseWebhookUrl = isProduction
+      ? process.env.LARK_BASE_WEBHOOK_URL_PROD
+      : process.env.LARK_BASE_WEBHOOK_URL_TEST || process.env.LARK_BASE_WEBHOOK_URL;
+
+    // 必須URLの検証（Baseのみテスト時はBase URL、通常時はLark URL）
+    if (sendBaseOnly) {
+      if (!baseWebhookUrl) {
+        console.error('Lark Base Webhook URL is not configured while LARK_SEND_BASE_ONLY=true.');
+        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+      }
+    } else {
+      if (!larkWebhookUrl) {
+        console.error('Lark Webhook URL is not configured in environment variables.');
+        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+      }
     }
 
     // Debug: Log received UTM parameters
@@ -75,9 +88,13 @@ export async function POST(request: NextRequest) {
     const mediaName = getMediaName(utmParams || {});
     console.log('Generated media name:', mediaName);
     
-    // Larkに送信するメッセージを作成
-    // シンプルなテキスト形式
-    const messageContent = `
+    // 並列送信（Baseのみテスト中は直下の単独送信へ）
+    if (!sendBaseOnly) {
+      const tasks: Promise<void>[] = [];
+
+      // Lark 送信タスク
+      if (larkWebhookUrl) {
+        const messageContent = `
 新しい応募がありました！
 -------------------------
 流入元: ${mediaName}
@@ -86,38 +103,115 @@ export async function POST(request: NextRequest) {
 郵便番号: ${formData.postalCode || '未入力'}
 電話番号: ${formData.phoneNumber || '未入力'}
 -------------------------
-    `.trim(); // 前後の空白を削除
+        `.trim();
 
-    // Lark Webhookのペイロード (msg_type は必須)
-    const larkPayload = {
-      msg_type: 'text',
-      content: {
-        text: messageContent,
-      },
-    };
+        const larkPayload = {
+          msg_type: 'text',
+          content: { text: messageContent },
+        } as const;
 
-    // Lark WebhookにPOSTリクエストを送信
-    const larkResponse = await fetch(larkWebhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(larkPayload),
-    });
+        tasks.push(
+          (async () => {
+            const resp = await fetch(larkWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(larkPayload),
+            });
+            if (!resp.ok) {
+              const errorBody = await resp.text();
+              console.error(`Failed to send notification to Lark (${resp.status}): ${errorBody}`);
+            } else {
+              const result = await resp.json();
+              console.log('Lark notification sent successfully:', result);
+            }
+          })()
+        );
+      }
 
-    // Lark APIからのレスポンスをチェック
-    if (!larkResponse.ok) {
-      // Larkへの通知失敗時の処理
-      const errorBody = await larkResponse.text();
-      console.error(`Failed to send notification to Lark (${larkResponse.status}): ${errorBody}`);
-      // エラーが発生しても、ユーザーの申し込み自体は受け付けたとみなす場合が多い
-      // ここではクライアントには成功を返す（内部的にはエラーログで追跡）
-      // 必要であれば、クライアントにエラーを返すことも検討
-      // return NextResponse.json({ message: 'Failed to send notification' }, { status: 502 }); // Bad Gatewayなど
+      // Base 送信タスク
+      if (baseWebhookUrl) {
+        const userAgent = request.headers.get('user-agent') || '';
+        const clientIp = (request.headers.get('x-forwarded-for') || '').split(',')[0]?.trim() || '';
+        const basePayload = {
+          media_name: mediaName,
+          utm_source: utmParams?.utm_source || '',
+          utm_medium: utmParams?.utm_medium || '',
+          utm_campaign: utmParams?.utm_campaign || '',
+          utm_term: utmParams?.utm_term || '',
+          birth_date: formData.birthDate || '',
+          last_name: formData.lastName || '',
+          first_name: formData.firstName || '',
+          last_name_kana: formData.lastNameKana || '',
+          first_name_kana: formData.firstNameKana || '',
+          postal_code: formData.postalCode || '',
+          phone_number: formData.phoneNumber || '',
+          experiment_name: submissionData?.experiment?.name || '',
+          experiment_variant: submissionData?.experiment?.variant || '',
+          submitted_at: new Date().toISOString(),
+          environment: process.env.NODE_ENV,
+          user_agent: userAgent,
+          client_ip: clientIp,
+        };
+
+        tasks.push(
+          (async () => {
+            const resp = await fetch(baseWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(basePayload),
+            });
+            if (!resp.ok) {
+              const errorBody = await resp.text();
+              console.error(`Failed to send to Lark Base Webhook (${resp.status}): ${errorBody}`);
+            } else {
+              console.log('Lark Base webhook triggered successfully');
+            }
+          })()
+        );
+      } else {
+        console.warn('Lark Base Webhook URL is not configured. Skipping Base record creation.');
+      }
+
+      // どちらも失敗しても応募自体は成功扱い
+      await Promise.allSettled(tasks);
     } else {
-        // Larkからの成功レスポンスをログ出力 (デバッグ用)
-        const larkResult = await larkResponse.json();
-        console.log('Lark notification sent successfully:', larkResult);
+      // Baseのみ送信（テストモード）
+      if (baseWebhookUrl) {
+        const userAgent = request.headers.get('user-agent') || '';
+        const clientIp = (request.headers.get('x-forwarded-for') || '').split(',')[0]?.trim() || '';
+        const basePayload = {
+          media_name: mediaName,
+          utm_source: utmParams?.utm_source || '',
+          utm_medium: utmParams?.utm_medium || '',
+          utm_campaign: utmParams?.utm_campaign || '',
+          utm_term: utmParams?.utm_term || '',
+          birth_date: formData.birthDate || '',
+          last_name: formData.lastName || '',
+          first_name: formData.firstName || '',
+          last_name_kana: formData.lastNameKana || '',
+          first_name_kana: formData.firstNameKana || '',
+          postal_code: formData.postalCode || '',
+          phone_number: formData.phoneNumber || '',
+          experiment_name: submissionData?.experiment?.name || '',
+          experiment_variant: submissionData?.experiment?.variant || '',
+          submitted_at: new Date().toISOString(),
+          environment: process.env.NODE_ENV,
+          user_agent: userAgent,
+          client_ip: clientIp,
+        };
+
+        const resp = await fetch(baseWebhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(basePayload),
+        });
+        if (!resp.ok) {
+          const errorBody = await resp.text();
+          console.error(`Failed to send to Lark Base Webhook (${resp.status}): ${errorBody}`);
+        } else {
+          console.log('Lark Base webhook triggered successfully');
+        }
+      }
     }
 
     // クライアントには成功したことを返す
