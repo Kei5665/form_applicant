@@ -27,7 +27,7 @@ export default function CoupangApplicationComplete() {
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">お申し込み完了</h2>
             <p className="text-gray-800 mb-4">
-              この度は、RIDE JOBにお申し込みいただき、<br/>
+              この度は、お申し込みいただき、<br/>
               誠にありがとうございました。
             </p>
             <p className="text-gray-800 mb-4">

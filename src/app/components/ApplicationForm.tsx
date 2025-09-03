@@ -318,7 +318,9 @@ function ApplicationFormInner({
       validatePhoneNumberInput(value);
     }
     if (name === 'postalCode' && value.length === 7) {
-      fetchJobCount(value);
+      if (formOrigin !== 'coupang') {
+        fetchJobCount(value);
+      }
     }
   };
 
@@ -429,8 +431,10 @@ function ApplicationFormInner({
     if (validateCard2()) {
       trackStepComplete(2);
       showNextCard();
-      if (formData.postalCode && formData.postalCode.length === 7) {
-        fetchJobCount(formData.postalCode);
+      if (formOrigin !== 'coupang') {
+        if (formData.postalCode && formData.postalCode.length === 7) {
+          fetchJobCount(formData.postalCode);
+        }
       }
     }
   };
@@ -758,35 +762,37 @@ function ApplicationFormInner({
           {/* Card 3 */}
           <div id="card3" className={`${cardBaseStyle} ${currentCardIndex === 3 ? cardActiveStyle : cardInactiveStyle}`}>
             <Image className="w-full mb-4" src={step3ImageSrc} alt="Step 3" width={300} height={50} />
-            <div className="mb-6">
-              {formData.postalCode && formData.postalCode.length === 7 ? (
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  {isLoadingJobCount ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce mr-2"></div>
-                      <span className="text-blue-700 text-sm">求人件数を確認中...</span>
-                    </div>
-                  ) : jobCountError ? (
-                    <p className="text-red-600 text-sm text-center">{jobCountError}</p>
-                  ) : jobCount !== null ? (
-                    <div className="text-center">
-                      <p className="text-blue-800 font-bold text-xl mb-2">郵便番号 {formData.postalCode} エリア</p>
-                      <p className="text-blue-800 font-bold text-2xl mb-2">{jobCount}件の求人があります</p>
-                      <p className="text-blue-700 text-sm">{jobCountMessage}</p>
-                      {jobCount > 0 && <p className="text-green-700 text-sm mt-2 font-medium">✅ お近くの求人をご案内できます！</p>}
-                    </div>
-                  ) : (
-                    <div className="text-center text-gray-600">
-                      <p>郵便番号を入力して求人を検索してください</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-600">
-                  <p>郵便番号を入力して求人を検索してください</p>
-                </div>
-              )}
-            </div>
+            {formOrigin !== 'coupang' && (
+              <div className="mb-6">
+                {formData.postalCode && formData.postalCode.length === 7 ? (
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    {isLoadingJobCount ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce mr-2"></div>
+                        <span className="text-blue-700 text-sm">求人件数を確認中...</span>
+                      </div>
+                    ) : jobCountError ? (
+                      <p className="text-red-600 text-sm text-center">{jobCountError}</p>
+                    ) : jobCount !== null ? (
+                      <div className="text-center">
+                        <p className="text-blue-800 font-bold text-xl mb-2">郵便番号 {formData.postalCode} エリア</p>
+                        <p className="text-blue-800 font-bold text-2xl mb-2">{jobCount}件の求人があります</p>
+                        <p className="text-blue-700 text-sm">{jobCountMessage}</p>
+                        {jobCount > 0 && <p className="text-green-700 text-sm mt-2 font-medium">✅ お近くの求人をご案内できます！</p>}
+                      </div>
+                    ) : (
+                      <div className="text-center text-gray-600">
+                        <p>郵便番号を入力して求人を検索してください</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-600">
+                    <p>郵便番号を入力して求人を検索してください</p>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="mb-7 text-left">
               <label htmlFor="phoneNumber" className="block mb-1 text-gray-900">
