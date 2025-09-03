@@ -38,6 +38,7 @@ interface ApplicationFormProps {
   bottomImageSrc?: string;
   showBottomImage?: boolean;
   showHeader?: boolean;
+  footerBgClassName?: string;
 }
 
 function ApplicationFormInner({
@@ -56,6 +57,7 @@ function ApplicationFormInner({
   bottomImageSrc = '/images/car.png',
   showBottomImage = true,
   showHeader = true,
+  footerBgClassName = 'bg-[#6DCFE4]',
 }: ApplicationFormProps) {
   const router = useRouter();
 
@@ -859,7 +861,7 @@ function ApplicationFormInner({
         </div>
       )}
 
-      <footer className="text-white py-5 mt-8 bg-[#6DCFE4]">
+      <footer className={`text-white py-5 mt-8 ${footerBgClassName}`}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-5">
             <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src={footerLogoSrc} alt="Footer Logo" width={150} height={40} />

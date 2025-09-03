@@ -11,10 +11,11 @@ export default function CoupangPage() {
         headerUpperText="クーパン求人特設フォーム"
         headerLowerText="RIDE JOB × Coupang"
         containerClassName="pb-8 overflow-hidden"
-        loadingLogoSrc="/images/ride_logo.svg"
+        loadingLogoSrc="/images/loading_rocket.png"
         footerLogoSrc="/images/coupang_footer.png"
         showBottomImage={false}
         showHeader={false}
+        footerBgClassName="bg-[#212e4a]"
       />
     </div>
   );
