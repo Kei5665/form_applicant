@@ -26,6 +26,7 @@ type ApplicantFormData = {
 type ApplicantSubmission = ApplicantFormData & {
   utmParams?: UTMParams;
   experiment?: ExperimentInfo;
+  formOrigin?: 'coupang' | 'default';
 };
 
 // UTM parameters to media name mapping function
@@ -82,20 +83,31 @@ function getMediaName(utmParams: { utm_source?: string; utm_medium?: string }): 
 export async function POST(request: NextRequest) {
   try {
     const submissionData = (await request.json()) as ApplicantSubmission;
-    const { utmParams, ...formData } = submissionData;
+    const { utmParams, formOrigin, ...formData } = submissionData;
     
     // Determine env and feature flags
     const isProduction = process.env.NODE_ENV === 'production';
     const sendBaseOnly = process.env.LARK_SEND_BASE_ONLY === 'true';
 
+    // Determine if this is from coupang
+    const referer = request.headers.get('referer') || '';
+    const isCoupang = formOrigin === 'coupang' || /\/coupang(\?|$|\/)?.*/.test(referer);
+
     // Determine the appropriate Lark webhook URLs based on environment (with sensible fallbacks)
-    const larkWebhookUrl = isProduction
+    const larkWebhookUrlCommon = isProduction
       ? process.env.LARK_WEBHOOK_URL_PROD
           || process.env.LARK_WEBHOOK_URL
           || process.env.LARK_WEBHOOK_URL_TEST
       : process.env.LARK_WEBHOOK_URL_TEST
           || process.env.LARK_WEBHOOK_URL
           || process.env.LARK_WEBHOOK_URL_PROD;
+    // Optional dedicated webhook for coupang
+    const larkWebhookUrlCoupang = isProduction
+      ? process.env.LARK_WEBHOOK_URL_COUPANG_PROD || process.env.LARK_WEBHOOK_URL_COUPANG
+      : process.env.LARK_WEBHOOK_URL_COUPANG_TEST || process.env.LARK_WEBHOOK_URL_COUPANG;
+
+    const larkWebhookUrl = (isCoupang && larkWebhookUrlCoupang) ? larkWebhookUrlCoupang : larkWebhookUrlCommon;
+
     const baseWebhookUrl = isProduction
       ? process.env.LARK_BASE_WEBHOOK_URL_PROD
           || process.env.LARK_BASE_WEBHOOK_URL
@@ -120,9 +132,9 @@ export async function POST(request: NextRequest) {
     // Debug: Log received UTM parameters
     console.log('Received UTM parameters:', utmParams);
     
-    // Get media name from UTM parameters
-    const mediaName = getMediaName(utmParams || {});
-    console.log('Generated media name:', mediaName);
+    // Get media name from UTM parameters (coupangはMeta固定)
+    const mediaName = isCoupang ? 'Meta広告' : getMediaName(utmParams || {});
+    console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
     
     // 並列送信（Baseのみテスト中は直下の単独送信へ）
     if (!sendBaseOnly) {
@@ -130,8 +142,9 @@ export async function POST(request: NextRequest) {
 
       // Lark 送信タスク
       if (larkWebhookUrl) {
+        const title = isCoupang ? 'クーパンの応募がありました！' : '新しい応募がありました！';
         const messageContent = `
-新しい応募がありました！
+${title}
 -------------------------
 流入元: ${mediaName}
 生年月日: ${formData.birthDate || '未入力'}
@@ -187,7 +200,9 @@ export async function POST(request: NextRequest) {
           environment: process.env.NODE_ENV,
           user_agent: userAgent,
           client_ip: clientIp,
-        };
+          form_origin: formOrigin || '',
+          is_coupang: isCoupang,
+        } as Record<string, unknown>;
 
         tasks.push(
           (async () => {
@@ -216,7 +231,7 @@ export async function POST(request: NextRequest) {
         const userAgent = request.headers.get('user-agent') || '';
         const clientIp = (request.headers.get('x-forwarded-for') || '').split(',')[0]?.trim() || '';
         const basePayload = {
-          media_name: mediaName,
+          media_name: isCoupang ? 'Meta広告' : (getMediaName(utmParams || {})),
           utm_source: utmParams?.utm_source || '',
           utm_medium: utmParams?.utm_medium || '',
           utm_campaign: utmParams?.utm_campaign || '',
@@ -234,7 +249,9 @@ export async function POST(request: NextRequest) {
           environment: process.env.NODE_ENV,
           user_agent: userAgent,
           client_ip: clientIp,
-        };
+          form_origin: formOrigin || '',
+          is_coupang: isCoupang,
+        } as Record<string, unknown>;
 
         const resp = await fetch(baseWebhookUrl, {
           method: 'POST',

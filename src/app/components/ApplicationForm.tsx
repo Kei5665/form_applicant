@@ -12,12 +12,27 @@ declare global {
 
 export type PeopleImageVariant = 'A' | 'B';
 
+type FormErrors = {
+  birthDate?: string;
+  lastName?: string;
+  firstName?: string;
+  lastNameKana?: string;
+  firstNameKana?: string;
+  postalCode?: string;
+  phoneNumber?: string;
+};
+
 interface ApplicationFormProps {
   peopleImageSrc: string;
   variant: PeopleImageVariant;
+  formOrigin?: 'coupang' | 'default';
+  headerLogoSrc?: string;
+  headerUpperText?: string;
+  headerLowerText?: string;
+  containerClassName?: string;
 }
 
-function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps) {
+function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default', headerLogoSrc = '/images/ride_logo.svg', headerUpperText = '未経験でタクシー会社に就職するなら', headerLowerText = 'RIDE JOB（ライドジョブ）', containerClassName = '' }: ApplicationFormProps) {
   const router = useRouter();
 
   // Loading / assets
@@ -86,7 +101,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
   const [isLoadingJobCount, setIsLoadingJobCount] = useState(false);
   const [jobCountError, setJobCountError] = useState<string>('');
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [isFormDirty, setIsFormDirty] = useState(false);
@@ -253,9 +268,26 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
       setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
     if (!isFormDirty) setIsFormDirty(true);
-    if (errors[name] || (name.startsWith('birth') && errors.birthDate)) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: '', birthDate: '' }));
+
+    // Clear related error messages
+    if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
+      if (errors.birthDate) {
+        setErrors((prevErrors) => ({ ...prevErrors, birthDate: '' }));
+      }
+    } else if (
+      name === 'lastName' ||
+      name === 'firstName' ||
+      name === 'lastNameKana' ||
+      name === 'firstNameKana' ||
+      name === 'postalCode' ||
+      name === 'phoneNumber'
+    ) {
+      const key = name as keyof FormErrors;
+      if (errors[key]) {
+        setErrors((prevErrors) => ({ ...prevErrors, [key]: '' }));
+      }
     }
+
     if (name === 'phoneNumber') {
       validatePhoneNumberInput(value);
     }
@@ -290,7 +322,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
   const validateCard1 = () => {
     let isValid = true;
-    const newErrors: Record<string, string> = {};
+    const newErrors: FormErrors = {};
     const { year, month, day } = formData.birthDate;
     if (!year || !month || !day) {
       newErrors.birthDate = '生年月日をすべて選択してください。';
@@ -332,7 +364,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
   const validateCard2 = () => {
     let isValid = true;
-    const newErrors: Record<string, string> = {};
+    const newErrors: FormErrors = {};
     if (!formData.lastName) {
       newErrors.lastName = '姓は必須です。';
       isValid = false;
@@ -417,7 +449,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
   const validateFinalStep = () => {
     let isValid = true;
-    const newErrors: Record<string, string> = { ...errors };
+    const newErrors: FormErrors = { ...errors };
     if (!formData.phoneNumber || !isValidPhoneNumber(formData.phoneNumber)) {
       newErrors.phoneNumber = '有効な携帯番号を入力してください。';
       isValid = false;
@@ -450,6 +482,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
           birthDate: birthDateString,
           utmParams: currentUtmParams,
           experiment: { name: 'people_image', variant },
+          formOrigin,
         } as Record<string, unknown>;
         const response = await fetch('/api/applicants', {
           method: 'POST',
@@ -477,7 +510,7 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
   const cardInactiveStyle = 'opacity-0 hidden';
 
   return (
-    <div className="mx-auto max-w-md">
+    <div className={`mx-auto max-w-md ${containerClassName}`}>
       <div
         id="loading-screen"
         className={`fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col justify-center items-center z-[9999] transition-all duration-1000 ease-out ${
@@ -494,11 +527,11 @@ function ApplicationFormInner({ peopleImageSrc, variant }: ApplicationFormProps)
 
       <header className="flex items-center justify-between p-1.5 bg-white w-[95%] mx-auto mt-2.5 rounded-md shadow">
         <div className="pl-2.5">
-          <Image src="/images/ride_logo.svg" alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" onLoad={handleImageLoad} priority loading="eager" />
+          <Image src={headerLogoSrc} alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" onLoad={handleImageLoad} priority loading="eager" />
         </div>
         <div className="text-right pr-2.5">
-          <p className="text-xs text-gray-800 my-1">未経験でタクシー会社に就職するなら</p>
-          <p className="text-xs text-black font-bold my-1">RIDE JOB（ライドジョブ）</p>
+          <p className="text-xs text-gray-800 my-1">{headerUpperText}</p>
+          <p className="text-xs text-black font-bold my-1">{headerLowerText}</p>
         </div>
       </header>
 
