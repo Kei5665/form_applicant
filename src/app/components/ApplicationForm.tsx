@@ -30,9 +30,33 @@ interface ApplicationFormProps {
   headerUpperText?: string;
   headerLowerText?: string;
   containerClassName?: string;
+  loadingLogoSrc?: string;
+  step1ImageSrc?: string;
+  step2ImageSrc?: string;
+  step3ImageSrc?: string;
+  footerLogoSrc?: string;
+  bottomImageSrc?: string;
+  showBottomImage?: boolean;
+  showHeader?: boolean;
 }
 
-function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default', headerLogoSrc = '/images/ride_logo.svg', headerUpperText = '未経験でタクシー会社に就職するなら', headerLowerText = 'RIDE JOB（ライドジョブ）', containerClassName = '' }: ApplicationFormProps) {
+function ApplicationFormInner({
+  peopleImageSrc,
+  variant,
+  formOrigin = 'default',
+  headerLogoSrc = '/images/ride_logo.svg',
+  headerUpperText = '未経験でタクシー会社に就職するなら',
+  headerLowerText = 'RIDE JOB（ライドジョブ）',
+  containerClassName = '',
+  loadingLogoSrc = '/images/ride_logo.svg',
+  step1ImageSrc = '/images/STEP1.png',
+  step2ImageSrc = '/images/STEP2.png',
+  step3ImageSrc = '/images/STEP3.png',
+  footerLogoSrc = '/images/ride_logo.svg',
+  bottomImageSrc = '/images/car.png',
+  showBottomImage = true,
+  showHeader = true,
+}: ApplicationFormProps) {
   const router = useRouter();
 
   // Loading / assets
@@ -130,15 +154,15 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
 
   useEffect(() => {
     const imagesToPreload = [
-      '/images/ride_logo.svg',
+      headerLogoSrc,
       peopleImageSrc,
-      '/images/STEP1.png',
+      step1ImageSrc,
     ];
     imagesToPreload.forEach((src) => {
       const img = document.createElement('img');
       img.src = src;
     });
-  }, [peopleImageSrc]);
+  }, [headerLogoSrc, peopleImageSrc, step1ImageSrc]);
 
   useEffect(() => {
     if (imagesLoaded >= totalImages) {
@@ -517,7 +541,7 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
           loading ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
       >
-        <Image src="/images/ride_logo.svg" alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4" />
+        <Image src={loadingLogoSrc} alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4" onLoad={handleImageLoad} />
         <div className="flex space-x-2">
           <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce"></div>
           <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-150"></div>
@@ -525,15 +549,17 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
         </div>
       </div>
 
-      <header className="flex items-center justify-between p-1.5 bg-white w-[95%] mx-auto mt-2.5 rounded-md shadow">
-        <div className="pl-2.5">
-          <Image src={headerLogoSrc} alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" onLoad={handleImageLoad} priority loading="eager" />
-        </div>
-        <div className="text-right pr-2.5">
-          <p className="text-xs text-gray-800 my-1">{headerUpperText}</p>
-          <p className="text-xs text-black font-bold my-1">{headerLowerText}</p>
-        </div>
-      </header>
+      {showHeader && (
+        <header className="flex items-center justify-between p-1.5 bg-white w-[95%] mx-auto mt-2.5 rounded-md shadow">
+          <div className="pl-2.5">
+            <Image src={headerLogoSrc} alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" onLoad={handleImageLoad} priority loading="eager" />
+          </div>
+          <div className="text-right pr-2.5">
+            <p className="text-xs text-gray-800 my-1">{headerUpperText}</p>
+            <p className="text-xs text-black font-bold my-1">{headerLowerText}</p>
+          </div>
+        </header>
+      )}
 
       {/* People Image */}
       <div className="container mx-auto text-center px-2 flex justify-center my-4">
@@ -545,7 +571,7 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
           {/* Card 1 */}
           <div id="card1" className={`${cardBaseStyle} ${currentCardIndex === 1 ? cardActiveStyle : cardInactiveStyle}`}>
             <div className="mb-7 text-left">
-              <Image className="w-full mb-4" src="/images/STEP1.png" alt="Step 1" width={300} height={50} onLoad={handleImageLoad} priority loading="eager" />
+              <Image className="w-full mb-4" src={step1ImageSrc} alt="Step 1" width={300} height={50} onLoad={handleImageLoad} priority loading="eager" />
               <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="flex-1">
@@ -625,7 +651,7 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
 
           {/* Card 2 */}
           <div id="card2" className={`${cardBaseStyle} ${currentCardIndex === 2 ? cardActiveStyle : cardInactiveStyle}`}>
-            <Image className="w-full mb-4" src="/images/STEP2.png" alt="Step 2" width={300} height={50} />
+            <Image className="w-full mb-4" src={step2ImageSrc} alt="Step 2" width={300} height={50} />
             <div className="mb-7 text-left">
               <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
               <div className="flex justify-between mb-5">
@@ -728,7 +754,7 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
 
           {/* Card 3 */}
           <div id="card3" className={`${cardBaseStyle} ${currentCardIndex === 3 ? cardActiveStyle : cardInactiveStyle}`}>
-            <Image className="w-full mb-4" src="/images/STEP3.png" alt="Step 3" width={300} height={50} />
+            <Image className="w-full mb-4" src={step3ImageSrc} alt="Step 3" width={300} height={50} />
             <div className="mb-6">
               {formData.postalCode && formData.postalCode.length === 7 ? (
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -796,9 +822,11 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
         </div>
       </form>
 
-      <div className="relative text-center mt-4">
-        <Image className="w-1/2 inline-block" src="/images/car.png" alt="Taxi" width={200} height={100} />
-      </div>
+      {showBottomImage && bottomImageSrc && (
+        <div className="relative text-center mt-4">
+          <Image className="w-1/2 inline-block" src={bottomImageSrc} alt="Taxi" width={200} height={100} />
+        </div>
+      )}
 
       {showExitModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]">
@@ -834,7 +862,7 @@ function ApplicationFormInner({ peopleImageSrc, variant, formOrigin = 'default',
       <footer className="text-white py-5 mt-8 bg-[#6DCFE4]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-5">
-            <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src="/images/ride_logo.svg" alt="Footer Logo" width={150} height={40} />
+            <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src={footerLogoSrc} alt="Footer Logo" width={150} height={40} />
           </div>
           <div className="flex flex-col md:flex-row justify-around items-center text-center md:text-left text-xs mb-3 space-y-2 md:space-y-0">
             <a href="https://pmagent.jp/" className="text-white hover:underline">
