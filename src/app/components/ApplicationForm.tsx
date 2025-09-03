@@ -518,7 +518,8 @@ function ApplicationFormInner({
         if (response.ok) {
           await response.json();
           setIsFormDirty(false);
-          router.push('/applicants/new');
+          const targetPath = formOrigin === 'coupang' ? '/coupang/applicants/new' : '/applicants/new';
+          router.push(targetPath);
         } else {
           const errorResult = await response.json();
           alert(`エラーが発生しました: ${errorResult.message || 'サーバーエラー'}`);
