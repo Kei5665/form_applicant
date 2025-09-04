@@ -15,6 +15,8 @@ export default function CoupangPage() {
         footerLogoSrc="/images/coupang_footer.png"
         showBottomImage={false}
         showHeader={false}
+        showLoadingScreen={false}
+        showFooterLogo={false}
         footerBgClassName="bg-[#212e4a]"
       />
     </div>

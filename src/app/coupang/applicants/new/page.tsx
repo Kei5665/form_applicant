@@ -44,9 +44,6 @@ export default function CoupangApplicationComplete() {
       {/* Footer */}
       <footer className="text-white py-5 mt-8 bg-[#212e4a]">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-5">
-            <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src="/images/coupang_footer.png" alt="Footer Logo" width={150} height={40}/>
-          </div>
           <div className="flex flex-col md:flex-row justify-around items-center text-center md:text-left text-xs mb-3 space-y-2 md:space-y-0">
             <a href="https://pmagent.jp/" className="text-white hover:underline">運営会社について</a>
             <a href="/privacy" className="text-white hover:underline">プライバシーポリシー</a>

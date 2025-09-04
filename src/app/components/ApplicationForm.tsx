@@ -39,6 +39,8 @@ interface ApplicationFormProps {
   showBottomImage?: boolean;
   showHeader?: boolean;
   footerBgClassName?: string;
+  showLoadingScreen?: boolean;
+  showFooterLogo?: boolean;
 }
 
 function ApplicationFormInner({
@@ -58,11 +60,13 @@ function ApplicationFormInner({
   showBottomImage = true,
   showHeader = true,
   footerBgClassName = 'bg-[#6DCFE4]',
+  showLoadingScreen = true,
+  showFooterLogo = true,
 }: ApplicationFormProps) {
   const router = useRouter();
 
   // Loading / assets
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(showLoadingScreen);
   const [imagesLoaded, setImagesLoaded] = useState(0);
   const [totalImages] = useState(3);
 
@@ -542,19 +546,21 @@ function ApplicationFormInner({
 
   return (
     <div className={`mx-auto max-w-md ${containerClassName}`}>
-      <div
-        id="loading-screen"
-        className={`fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col justify-center items-center z-[9999] transition-all duration-1000 ease-out ${
-          loading ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
-      >
-        <Image src={loadingLogoSrc} alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4" onLoad={handleImageLoad} />
-        <div className="flex space-x-2">
-          <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce"></div>
-          <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-150"></div>
-          <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-300"></div>
+      {showLoadingScreen && (
+        <div
+          id="loading-screen"
+          className={`fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex flex-col justify-center items-center z-[9999] transition-all duration-1000 ease-out ${
+            loading ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
+        >
+          <Image src={loadingLogoSrc} alt="Ride Job Logo" width={200} height={50} className="w-1/2 mb-4" onLoad={handleImageLoad} />
+          <div className="flex space-x-2">
+            <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce"></div>
+            <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-150"></div>
+            <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-300"></div>
+          </div>
         </div>
-      </div>
+      )}
 
       {showHeader && (
         <header className="flex items-center justify-between p-1.5 bg-white w-[95%] mx-auto mt-2.5 rounded-md shadow">
@@ -870,9 +876,11 @@ function ApplicationFormInner({
 
       <footer className={`text-white py-5 mt-8 ${footerBgClassName}`}>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-5">
-            <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src={footerLogoSrc} alt="Footer Logo" width={150} height={40} />
-          </div>
+          {showFooterLogo && (
+            <div className="text-center mb-5">
+              <Image className="mb-5 w-1/4 sm:w-1/6 md:w-[150px] inline-block" src={footerLogoSrc} alt="Footer Logo" width={150} height={40} />
+            </div>
+          )}
           <div className="flex flex-col md:flex-row justify-around items-center text-center md:text-left text-xs mb-3 space-y-2 md:space-y-0">
             <a href="https://pmagent.jp/" className="text-white hover:underline">
               運営会社について
