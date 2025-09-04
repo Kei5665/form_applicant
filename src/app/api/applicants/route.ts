@@ -143,10 +143,11 @@ export async function POST(request: NextRequest) {
       // Lark 送信タスク
       if (larkWebhookUrl) {
         const title = isCoupang ? 'クーパンの応募がありました！' : '新しい応募がありました！';
+        const utmDisplay = `${utmParams?.utm_source || ''}${utmParams?.utm_medium ? `(${utmParams.utm_medium})` : ''}`;
         const messageContent = `
 ${title}
 -------------------------
-流入元: ${mediaName}
+流入元: ${utmDisplay}
 生年月日: ${formData.birthDate || '未入力'}
 氏名: ${formData.lastName || ''} ${formData.firstName || ''} (${formData.lastNameKana || ''} ${formData.firstNameKana || ''})
 郵便番号: ${formData.postalCode || '未入力'}
