@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:applicants": "node scripts/test-applicants.mjs",
+    "webhook:local": "node scripts/local-webhook.mjs"
   },
   "dependencies": {
     "kuroshiro": "^1.2.0",

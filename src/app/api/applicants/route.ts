@@ -108,13 +108,19 @@ export async function POST(request: NextRequest) {
 
     const larkWebhookUrl = (isCoupang && larkWebhookUrlCoupang) ? larkWebhookUrlCoupang : larkWebhookUrlCommon;
 
-    const baseWebhookUrl = isProduction
+    const baseWebhookUrlCommon = isProduction
       ? process.env.LARK_BASE_WEBHOOK_URL_PROD
           || process.env.LARK_BASE_WEBHOOK_URL
           || process.env.LARK_BASE_WEBHOOK_URL_TEST
       : process.env.LARK_BASE_WEBHOOK_URL_TEST
           || process.env.LARK_BASE_WEBHOOK_URL
           || process.env.LARK_BASE_WEBHOOK_URL_PROD;
+    // Optional dedicated Base webhook for coupang
+    const baseWebhookUrlCoupang = isProduction
+      ? process.env.LARK_BASE_WEBHOOK_URL_COUPANG_PROD || process.env.LARK_BASE_WEBHOOK_URL_COUPANG
+      : process.env.LARK_BASE_WEBHOOK_URL_COUPANG_TEST || process.env.LARK_BASE_WEBHOOK_URL_COUPANG;
+
+    const baseWebhookUrl = (isCoupang && baseWebhookUrlCoupang) ? baseWebhookUrlCoupang : baseWebhookUrlCommon;
 
     // 必須URLの検証（Baseのみテスト時はBase URL、通常時はLark URL）
     if (sendBaseOnly) {

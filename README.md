@@ -131,6 +131,14 @@ npm start
 npm run lint
 ```
 
+## テスト手順
+
+- 応募API（/api/applicants）のローカルテスト方法は、`TESTING_APPLICANTS_API.md` にまとめています。
+  - ローカルWebhookの起動
+  - 本番モードでのAPI疎通
+  - 送信スクリプトによる複数ケースの一括送信
+
+
 ## セキュリティ機能
 
 - 入力値の厳密なバリデーション
