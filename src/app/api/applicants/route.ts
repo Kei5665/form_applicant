@@ -149,7 +149,9 @@ export async function POST(request: NextRequest) {
       // Lark 送信タスク
       if (larkWebhookUrl) {
         const title = isCoupang ? 'クーパンの応募がありました！' : '新しい応募がありました！';
-        const utmDisplay = `${utmParams?.utm_source || ''}${utmParams?.utm_medium ? `(${utmParams.utm_medium})` : ''}`;
+        const utmDisplay = utmParams?.utm_source
+          ? `${utmParams.utm_source}${utmParams.utm_medium ? `(${utmParams.utm_medium})` : ''}`
+          : 'RIDEJOB HP';
         const messageContent = `
 ${title}
 -------------------------
