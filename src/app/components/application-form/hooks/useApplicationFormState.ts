@@ -8,7 +8,7 @@ import { useHiraganaConverter } from './useHiraganaConverter';
 import { useFormExitGuard } from './useFormExitGuard';
 import { useImagePreloader } from './useImagePreloader';
 import { trackEvent } from '../utils/trackEvent';
-import { isValidPhoneNumber, validateCard1, validateCard2, validateFinalStep, validateNameFields } from '../utils/validators';
+import { isValidPhoneNumber, validateBirthDateCard, validateCard2, validateFinalStep, validateJobTiming, validateNameFields } from '../utils/validators';
 import { fetchJobCount } from '../utils/fetchJobCount';
 import { notifyInvalidPhoneNumber } from '../utils/notifyInvalidPhoneNumber';
 
@@ -20,6 +20,7 @@ type UseApplicationFormStateParams = {
 };
 
 const initialFormData: FormData = {
+  jobTiming: '',
   birthDate: { year: '', month: '', day: '' },
   lastName: '',
   firstName: '',
@@ -117,6 +118,13 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           };
         }
 
+        if (name === 'jobTiming') {
+          return {
+            ...prev,
+            jobTiming: value as FormData['jobTiming'],
+          };
+        }
+
         if (name === 'prefectureId') {
           return {
             ...prev,
@@ -152,6 +160,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         const next = { ...prev };
         if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
           next.birthDate = '';
+        } else if (name === 'jobTiming') {
+          next.jobTiming = '';
         } else if (name === 'prefectureId') {
           next.prefectureId = '';
           next.municipalityId = '';
@@ -212,23 +222,49 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     [hiraganaConverter]
   );
 
-  const handleNextCard1 = useCallback(() => {
-    const result = validateCard1(formData.birthDate);
-    setErrors(result.errors);
-    if (result.isValid) {
-      trackEvent('step_complete', { step_name: 'step_1', step_number: 1 });
-      setCurrentCardIndex(2);
-      trackEvent('step_view', { step_name: 'step_2', step_number: 2 });
-    }
-  }, [formData.birthDate]);
+  const handleNextCard1 = useCallback(
+    (jobTimingValue?: FormData['jobTiming']) => {
+      const value = jobTimingValue ?? formData.jobTiming;
+      const result = validateJobTiming(value);
+      setErrors(result.errors);
+      if (result.isValid) {
+        trackEvent('step_complete', { step_name: 'step_1', step_number: 1 });
+        setCurrentCardIndex(2);
+        trackEvent('step_view', { step_name: 'step_2', step_number: 2 });
+      }
+    },
+    [formData.jobTiming]
+  );
+
+  const handleJobTimingSelect = useCallback(
+    (value: FormData['jobTiming']) => {
+      setFormData((prev) => ({ ...prev, jobTiming: value }));
+      setErrors((prev) => ({ ...prev, jobTiming: '' }));
+      if (!isFormDirty) {
+        setIsFormDirty(true);
+      }
+      handleNextCard1(value);
+    },
+    [handleNextCard1, isFormDirty]
+  );
 
   const handleNextCard2 = useCallback(() => {
-    const result = validateCard2(formData);
+    const result = validateBirthDateCard(formData.birthDate);
     setErrors(result.errors);
     if (result.isValid) {
       trackEvent('step_complete', { step_name: 'step_2', step_number: 2 });
       setCurrentCardIndex(3);
       trackEvent('step_view', { step_name: 'step_3', step_number: 3 });
+    }
+  }, [formData.birthDate]);
+
+  const handleNextCard3 = useCallback(() => {
+    const result = validateCard2(formData);
+    setErrors(result.errors);
+    if (result.isValid) {
+      trackEvent('step_complete', { step_name: 'step_3', step_number: 3 });
+      setCurrentCardIndex(4);
+      trackEvent('step_view', { step_name: 'step_4', step_number: 4 });
       if (formOrigin !== 'coupang') {
         if (formData.municipalityId) {
           loadJobCount({ municipalityId: formData.municipalityId });
@@ -327,6 +363,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       isCard1Active: currentCardIndex === 1,
       isCard2Active: currentCardIndex === 2,
       isCard3Active: currentCardIndex === 3,
+      isCard4Active: currentCardIndex === 4,
     }),
     [currentCardIndex]
   );
@@ -341,9 +378,11 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     showExitModal,
     jobResult,
     handleInputChange,
+    handleJobTimingSelect,
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
+    handleNextCard3,
     handlePreviousCard,
     handleSubmit,
     setShowExitModal,

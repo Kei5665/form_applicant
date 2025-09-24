@@ -130,7 +130,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
 
   return (
     <FormCard isActive={isActive} className="h-full">
-      <Image className="w-full mb-4" src={stepImageSrc} alt="Step 2" width={300} height={50} />
+      <Image className="w-full mb-4" src={stepImageSrc} alt="Step 3" width={300} height={50} />
       <div>
         <h3 className="mb-2 text-base font-semibold text-gray-900">郵便番号を入力してください</h3>
         <p className="mb-4 text-xs text-gray-500">該当地域の求人件数を確認します</p>

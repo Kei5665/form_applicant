@@ -9,7 +9,16 @@ const isValidPhoneNumber = (phoneNumber: string): boolean => {
   return true;
 };
 
-export const validateCard1 = (birthDate: BirthDate) => {
+export const validateJobTiming = (jobTiming: FormData['jobTiming']) => {
+  const errors: FormErrors = {};
+  if (!jobTiming) {
+    errors.jobTiming = '選択してください。';
+    return { isValid: false, errors };
+  }
+  return { isValid: true, errors };
+};
+
+export const validateBirthDateCard = (birthDate: BirthDate) => {
   let isValid = true;
   const errors: FormErrors = {};
   const { year, month, day } = birthDate;

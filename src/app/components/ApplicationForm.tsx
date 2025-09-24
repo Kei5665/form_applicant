@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { BirthDateCard, NameCard, PhoneNumberCard } from './application-form/components';
+import { BirthDateCard, JobTimingCard, NameCard, PhoneNumberCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
 import type { PeopleImageVariant } from './application-form/types';
 
@@ -26,6 +26,7 @@ interface ApplicationFormProps {
   step1ImageSrc?: string;
   step2ImageSrc?: string;
   step3ImageSrc?: string;
+  step4ImageSrc?: string;
   footerLogoSrc?: string;
   bottomImageSrc?: string;
   showBottomImage?: boolean;
@@ -46,10 +47,14 @@ function ApplicationFormInner({
   step1ImageSrc = '/images/STEP1.png',
   step2ImageSrc = '/images/STEP2.png',
   step3ImageSrc = '/images/STEP3.png',
+  step4ImageSrc = '/images/STEP4.png',
   showHeader = true,
   showLoadingScreen = true,
 }: ApplicationFormProps) {
-  const imagesToPreload = useMemo(() => [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc], [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc]);
+  const imagesToPreload = useMemo(
+    () => [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc, step4ImageSrc],
+    [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc, step4ImageSrc]
+  );
 
   const {
     loading,
@@ -60,9 +65,11 @@ function ApplicationFormInner({
     isSubmitDisabled,
     jobResult,
     handleInputChange,
+    handleJobTimingSelect,
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
+    handleNextCard3,
     handlePreviousCard,
     handleSubmit,
   } = useApplicationFormState({
@@ -121,30 +128,39 @@ function ApplicationFormInner({
       )}
 
       <div ref={modalContentRef} className="relative w-full max-w-sm max-h-[calc(100vh-112px)] overflow-y-auto px-1">
-          <form onSubmit={handleSubmit} id="form" noValidate className="relative min-h-[640px] pb-4">
-            <BirthDateCard
+          <form onSubmit={handleSubmit} id="form" noValidate className="relative min-h-[720px] pb-4">
+            <JobTimingCard
               stepImageSrc={step1ImageSrc}
-              birthDate={formData.birthDate}
+              selectedTiming={formData.jobTiming}
               errors={errors}
-              onChange={handleInputChange}
-              onNext={handleNextCard1}
+              onSelect={handleJobTimingSelect}
               isActive={cardStates.isCard1Active}
             />
 
-            <NameCard
+            <BirthDateCard
               stepImageSrc={step2ImageSrc}
+              birthDate={formData.birthDate}
+              errors={errors}
+              onChange={handleInputChange}
+              onNext={handleNextCard2}
+              onPrevious={handlePreviousCard}
+              isActive={cardStates.isCard2Active}
+            />
+
+            <NameCard
+              stepImageSrc={step3ImageSrc}
               postalCode={formData.postalCode}
               prefectureId={formData.prefectureId}
               municipalityId={formData.municipalityId}
               errors={errors}
               onChange={handleInputChange}
               onPrevious={handlePreviousCard}
-              onNext={handleNextCard2}
-              isActive={cardStates.isCard2Active}
+              onNext={handleNextCard3}
+              isActive={cardStates.isCard3Active}
             />
 
             <PhoneNumberCard
-              stepImageSrc={step3ImageSrc}
+              stepImageSrc={step4ImageSrc}
               jobResult={jobResult}
               showJobCount={formOrigin !== 'coupang'}
               postalCode={formData.postalCode}
@@ -156,7 +172,7 @@ function ApplicationFormInner({
               onBlur={handleNameBlur}
               onPrevious={handlePreviousCard}
               isSubmitDisabled={isSubmitDisabled}
-              isActive={cardStates.isCard3Active}
+              isActive={cardStates.isCard4Active}
             />
           </form>
       </div>

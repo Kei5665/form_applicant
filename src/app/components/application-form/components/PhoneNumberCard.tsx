@@ -38,7 +38,7 @@ export default function PhoneNumberCard({
 }: PhoneNumberCardProps) {
   return (
     <FormCard isActive={isActive} className="pb-6">
-      <Image className="w-full mb-4" src={stepImageSrc} alt="Step 3" width={300} height={50} />
+      <Image className="w-full mb-4" src={stepImageSrc} alt="Step 4" width={300} height={50} />
 
       <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>

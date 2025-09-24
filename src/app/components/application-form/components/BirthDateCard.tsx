@@ -13,6 +13,7 @@ type BirthDateCardProps = {
   onChange: (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => void;
   onNext: () => void;
   isActive: boolean;
+  onPrevious?: () => void;
 };
 
 const generateYearOptions = () => {
@@ -33,14 +34,14 @@ const getDaysInMonth = (year: string, month: string) => {
   return new Date(yearNum, monthNum, 0).getDate();
 };
 
-export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChange, onNext, isActive }: BirthDateCardProps) {
+export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChange, onNext, isActive, onPrevious }: BirthDateCardProps) {
   const years = useMemo(generateYearOptions, []);
   const days = useMemo(() => getDaysInMonth(birthDate.year, birthDate.month), [birthDate.year, birthDate.month]);
 
   return (
     <FormCard isActive={isActive} className="h-full">
       <div className="mb-6 text-left">
-        <Image className="w-full mb-4" src={stepImageSrc} alt="Step 1" width={300} height={50} priority />
+        <Image className="w-full mb-4" src={stepImageSrc} alt="Step 2" width={300} height={50} priority />
         <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex-1">
@@ -111,9 +112,18 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
         </div>
         {errors.birthDate && <p className="text-red-500 text-xs mt-1">{errors.birthDate}</p>}
       </div>
-      <button type="button" className="w-full py-2.5 px-5 rounded-md bg-[#ff702a] text-white font-bold cursor-pointer" onClick={onNext}>
-        次へ
-      </button>
+      <div className="flex items-center justify-between gap-4">
+        {onPrevious ? (
+          <button type="button" className="py-2 px-4 font-bold text-gray-800" onClick={onPrevious}>
+            ＜ 戻る
+          </button>
+        ) : (
+          <span />
+        )}
+        <button type="button" className="flex-1 py-2.5 px-5 rounded-md bg-[#ff702a] text-white font-bold cursor-pointer" onClick={onNext}>
+          次へ
+        </button>
+      </div>
     </FormCard>
   );
 }

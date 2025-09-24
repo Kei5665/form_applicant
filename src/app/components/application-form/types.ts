@@ -8,7 +8,10 @@ export type BirthDate = {
   day: string;
 };
 
+export type JobTimingOption = 'asap' | 'no_plan';
+
 export type FormData = {
+  jobTiming: JobTimingOption | '';
   birthDate: BirthDate;
   lastName: string;
   firstName: string;
@@ -21,6 +24,7 @@ export type FormData = {
 };
 
 export type FormErrors = {
+  jobTiming?: string;
   birthDate?: string;
   lastName?: string;
   firstName?: string;
