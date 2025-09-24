@@ -20,6 +20,10 @@ type ApplicantFormData = {
   lastNameKana?: string;
   firstNameKana?: string;
   postalCode?: string;
+  prefectureId?: string;
+  prefectureName?: string;
+  municipalityId?: string;
+  municipalityName?: string;
   phoneNumber?: string;
 };
 
@@ -152,6 +156,9 @@ export async function POST(request: NextRequest) {
         const utmDisplay = utmParams?.utm_source
           ? `${utmParams.utm_source}${utmParams.utm_medium ? `(${utmParams.utm_medium})` : ''}`
           : 'RIDEJOB HP';
+        const locationDisplay = formData.prefectureName || formData.municipalityName
+          ? `${formData.prefectureName || ''} ${formData.municipalityName || ''}`.trim()
+          : '未入力';
         const messageContent = `
 ${title}
 -------------------------
@@ -159,6 +166,7 @@ ${title}
 生年月日: ${formData.birthDate || '未入力'}
 氏名: ${formData.lastName || ''} ${formData.firstName || ''} (${formData.lastNameKana || ''} ${formData.firstNameKana || ''})
 郵便番号: ${formData.postalCode || '未入力'}
+地域: ${locationDisplay}
 電話番号: ${formData.phoneNumber || '未入力'}
 -------------------------
         `.trim();
@@ -202,6 +210,10 @@ ${title}
           last_name_kana: formData.lastNameKana || '',
           first_name_kana: formData.firstNameKana || '',
           postal_code: formData.postalCode || '',
+          prefecture_id: formData.prefectureId || '',
+          prefecture_name: formData.prefectureName || '',
+          municipality_id: formData.municipalityId || '',
+          municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
@@ -251,6 +263,10 @@ ${title}
           last_name_kana: formData.lastNameKana || '',
           first_name_kana: formData.firstNameKana || '',
           postal_code: formData.postalCode || '',
+          prefecture_id: formData.prefectureId || '',
+          prefecture_name: formData.prefectureName || '',
+          municipality_id: formData.municipalityId || '',
+          municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',

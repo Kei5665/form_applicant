@@ -6,7 +6,97 @@ if (!process.env.MICROCMS_SERVICE_DOMAIN || !process.env.MICROCMS_API_KEY) {
   throw new Error('microCMS environment variables are not set');
 }
 
-// Job data type based on microCMS schema
+export interface MicroCMSListResponse<T> {
+  contents: T[];
+  totalCount: number;
+  offset: number;
+  limit: number;
+}
+
+export interface PrefectureEntry {
+  id: string;
+  region: string;
+  area: string;
+}
+
+export interface MunicipalityEntry {
+  id: string;
+  name: string;
+  prefecture: {
+    id: string;
+  };
+}
+
+const DEFAULT_LIMIT = 100;
+
+async function fetchFromMicroCMS<T>(endpoint: string, searchParams?: URLSearchParams): Promise<MicroCMSListResponse<T>> {
+  const url = new URL(`${BASE_URL}/${endpoint}`);
+  if (searchParams) {
+    url.search = searchParams.toString();
+  }
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'X-MICROCMS-API-KEY': API_KEY!,
+    },
+    // Next.js fetch caching options。必要に応じて再検討
+    next: { revalidate: 60 },
+  });
+
+  if (!response.ok) {
+    throw new Error(`microCMS API error: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+async function fetchAllFromMicroCMS<T>(endpoint: string, baseParams?: URLSearchParams): Promise<T[]> {
+  const results: T[] = [];
+  const baseParamsString = baseParams ? baseParams.toString() : undefined;
+  let offset = 0;
+
+  while (true) {
+    const params = new URLSearchParams(baseParamsString);
+    params.set('limit', DEFAULT_LIMIT.toString());
+    params.set('offset', offset.toString());
+
+    const data = await fetchFromMicroCMS<T>(endpoint, params);
+    if (data.contents.length === 0) {
+      break;
+    }
+
+    results.push(...data.contents);
+    offset += data.contents.length;
+
+    if (offset >= data.totalCount) {
+      break;
+    }
+  }
+
+  return results;
+}
+
+export async function fetchPrefectures(): Promise<PrefectureEntry[]> {
+  return fetchAllFromMicroCMS<PrefectureEntry>('prefectures');
+}
+
+export async function fetchMunicipalities(prefectureId?: string): Promise<MunicipalityEntry[]> {
+  const params = prefectureId ? new URLSearchParams({ filters: `prefecture[equals]${prefectureId}` }) : undefined;
+  return fetchAllFromMicroCMS<MunicipalityEntry>('municipalities', params);
+}
+
+export async function fetchPrefectureById(prefectureId: string): Promise<PrefectureEntry | null> {
+  const params = new URLSearchParams({ filters: `id[equals]${prefectureId}`, limit: '1' });
+  const data = await fetchFromMicroCMS<PrefectureEntry>('prefectures', params);
+  return data.contents[0] ?? null;
+}
+
+export async function fetchMunicipalityById(municipalityId: string): Promise<MunicipalityEntry | null> {
+  const params = new URLSearchParams({ filters: `id[equals]${municipalityId}`, limit: '1' });
+  const data = await fetchFromMicroCMS<MunicipalityEntry>('municipalities', params);
+  return data.contents[0] ?? null;
+}
+
 export interface Job {
   id: string;
   title?: string;
@@ -46,110 +136,44 @@ export interface Job {
   revisedAt: string;
 }
 
-// API response type
-export interface JobsResponse {
-  contents: Job[];
-  totalCount: number;
-  offset: number;
-  limit: number;
-}
+export type JobsResponse = MicroCMSListResponse<Job>;
 
-// Fetch jobs by postal code
 export async function getJobsByPostalCode(postalCode: string): Promise<JobsResponse> {
-  const url = `${BASE_URL}/jobs?filters=addressZip[equals]${postalCode}`;
-  
-  const response = await fetch(url, {
-    headers: {
-      'X-MICROCMS-API-KEY': API_KEY!,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`microCMS API error: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
+  const params = new URLSearchParams({ filters: `addressZip[equals]${postalCode}` });
+  return fetchFromMicroCMS<Job>('jobs', params);
 }
 
-// Get job count by postal code
 export async function getJobCountByPostalCode(postalCode: string): Promise<number> {
-  try {
-    const response = await getJobsByPostalCode(postalCode);
-    return response.totalCount;
-  } catch (error) {
-    console.error('Error fetching job count:', error);
-    throw error;
-  }
+  const response = await getJobsByPostalCode(postalCode);
+  return response.totalCount;
 }
 
-// Prefecture data type
-export interface Prefecture {
-  id: string;
-  region: string;
-  area: string;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  revisedAt: string;
+export async function getPrefectureByRegion(regionName: string): Promise<PrefectureEntry | null> {
+  const params = new URLSearchParams({ filters: `region[equals]${encodeURIComponent(regionName)}` });
+  const data = await fetchFromMicroCMS<PrefectureEntry>('prefectures', params);
+  return data.contents[0] ?? null;
 }
 
-// API response type for prefectures
-export interface PrefecturesResponse {
-  contents: Prefecture[];
-  totalCount: number;
-  offset: number;
-  limit: number;
-}
-
-// Fetch prefecture by region name
-export async function getPrefectureByRegion(regionName: string): Promise<Prefecture | null> {
-  const url = `${BASE_URL}/prefectures?filters=region[equals]${encodeURIComponent(regionName)}`;
-  
-  const response = await fetch(url, {
-    headers: {
-      'X-MICROCMS-API-KEY': API_KEY!,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`microCMS API error: ${response.status} ${response.statusText}`);
-  }
-
-  const data: PrefecturesResponse = await response.json();
-  return data.contents.length > 0 ? data.contents[0] : null;
-}
-
-// Fetch jobs by prefecture ID
 export async function getJobsByPrefectureId(prefectureId: string): Promise<JobsResponse> {
-  const url = `${BASE_URL}/jobs?filters=prefecture[equals]${prefectureId}`;
-  
-  const response = await fetch(url, {
-    headers: {
-      'X-MICROCMS-API-KEY': API_KEY!,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`microCMS API error: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
+  const params = new URLSearchParams({ filters: `prefecture[equals]${prefectureId}` });
+  return fetchFromMicroCMS<Job>('jobs', params);
 }
 
-// Get job count by prefecture (2-step process)
 export async function getJobCountByPrefecture(prefectureName: string): Promise<number> {
-  try {
-    // Step 1: Get prefecture ID by region name
-    const prefecture = await getPrefectureByRegion(prefectureName);
-    if (!prefecture) {
-      return 0;
-    }
-
-    // Step 2: Get jobs by prefecture ID
-    const response = await getJobsByPrefectureId(prefecture.id);
-    return response.totalCount;
-  } catch (error) {
-    console.error('Error fetching job count by prefecture:', error);
-    throw error;
+  const prefecture = await getPrefectureByRegion(prefectureName);
+  if (!prefecture) {
+    return 0;
   }
+  const response = await getJobsByPrefectureId(prefecture.id);
+  return response.totalCount;
+}
+
+export async function getJobsByMunicipalityId(municipalityId: string): Promise<JobsResponse> {
+  const params = new URLSearchParams({ filters: `municipality[equals]${municipalityId}` });
+  return fetchFromMicroCMS<Job>('jobs', params);
+}
+
+export async function getJobCountByMunicipality(municipalityId: string): Promise<number> {
+  const response = await getJobsByMunicipalityId(municipalityId);
+  return response.totalCount;
 }

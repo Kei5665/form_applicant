@@ -26,6 +26,8 @@ const initialFormData: FormData = {
   lastNameKana: '',
   firstNameKana: '',
   postalCode: '',
+  prefectureId: '',
+  municipalityId: '',
   phoneNumber: '',
 };
 
@@ -55,76 +57,27 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
   const hiraganaConverter = useHiraganaConverter();
 
-  const loadJobCount = useCallback(async (postalCode: string) => {
+  const loadJobCount = useCallback(async (params: { postalCode?: string; prefectureId?: string; municipalityId?: string }) => {
+    if (!params.postalCode && !params.prefectureId && !params.municipalityId) {
+      setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
+      return;
+    }
     setJobResult((prev) => ({ ...prev, isLoading: true, error: '' }));
     try {
-      const result = await fetchJobCount(postalCode);
-      setJobResult({ jobCount: result.jobCount, message: result.message, isLoading: false, error: result.error ?? '' });
+      const result = await fetchJobCount(params);
+      setJobResult({
+        jobCount: result.jobCount,
+        message: result.message,
+        isLoading: false,
+        error: result.error ?? '',
+        searchMethod: result.searchMethod,
+        searchArea: result.searchArea,
+      });
     } catch (error) {
       console.error('Error fetching job count:', error);
       setJobResult({ jobCount: null, message: '', isLoading: false, error: '求人件数の取得中にエラーが発生しました' });
     }
   }, []);
-
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name } = event.target;
-      let { value } = event.target as HTMLInputElement & { value: string };
-
-      if (name === 'phoneNumber') {
-        value = value.replace(/[-－ー]/g, '');
-      }
-
-      if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
-        const field = name.replace('birth', '').toLowerCase();
-        setFormData((prev) => ({
-          ...prev,
-          birthDate: { ...prev.birthDate, [field]: value },
-        }));
-      } else {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-      }
-
-      if (!isFormDirty) setIsFormDirty(true);
-
-      setErrors((prev) => {
-        const next = { ...prev };
-        if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
-          next.birthDate = '';
-        } else if (name in next) {
-          next[name as keyof FormErrors] = '';
-        }
-        return next;
-      });
-
-      if (name === 'phoneNumber') {
-        validatePhoneNumberInput(value);
-      }
-
-      if (name === 'postalCode') {
-        if (value.length === 7 && formOrigin !== 'coupang') {
-          loadJobCount(value);
-        } else {
-          setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
-        }
-      }
-    },
-    [formOrigin, isFormDirty, loadJobCount]
-  );
-
-  const handleNameBlur = useCallback(
-    async (event: React.FocusEvent<HTMLInputElement>) => {
-      const { name, value } = event.target;
-      if ((name === 'lastName' || name === 'firstName') && value.trim()) {
-        const hiragana = await hiraganaConverter(value);
-        if (hiragana) {
-          const target = name === 'lastName' ? 'lastNameKana' : 'firstNameKana';
-          setFormData((prev) => ({ ...prev, [target]: hiragana }));
-        }
-      }
-    },
-    [hiraganaConverter]
-  );
 
   const validatePhoneNumberInput = useCallback(
     (phoneNumber: string) => {
@@ -146,6 +99,119 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     [formData]
   );
 
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name } = event.target;
+      let { value } = event.target as HTMLInputElement & { value: string };
+
+      if (name === 'phoneNumber') {
+        value = value.replace(/[-－ー]/g, '');
+      }
+
+      setFormData((prev) => {
+        if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
+          const field = name.replace('birth', '').toLowerCase();
+          return {
+            ...prev,
+            birthDate: { ...prev.birthDate, [field]: value },
+          };
+        }
+
+        if (name === 'prefectureId') {
+          return {
+            ...prev,
+            prefectureId: value,
+            municipalityId: '',
+            postalCode: '',
+          };
+        }
+
+        if (name === 'municipalityId') {
+          return {
+            ...prev,
+            municipalityId: value,
+            postalCode: '',
+          };
+        }
+
+        if (name === 'postalCode') {
+          return {
+            ...prev,
+            postalCode: value,
+            prefectureId: '',
+            municipalityId: '',
+          };
+        }
+
+        return { ...prev, [name]: value };
+      });
+
+      if (!isFormDirty) setIsFormDirty(true);
+
+      setErrors((prev) => {
+        const next = { ...prev };
+        if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
+          next.birthDate = '';
+        } else if (name === 'prefectureId') {
+          next.prefectureId = '';
+          next.municipalityId = '';
+          next.postalCode = '';
+        } else if (name === 'municipalityId') {
+          next.municipalityId = '';
+          next.postalCode = '';
+        } else if (name === 'postalCode') {
+          next.postalCode = '';
+          next.prefectureId = '';
+          next.municipalityId = '';
+        } else if (name in next) {
+          next[name as keyof FormErrors] = '';
+        }
+        return next;
+      });
+
+      if (name === 'phoneNumber') {
+        validatePhoneNumberInput(value);
+      }
+
+      if (name === 'postalCode') {
+        if (value.length === 7 && formOrigin !== 'coupang') {
+          loadJobCount({ postalCode: value });
+        } else {
+          setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
+        }
+      } else if (name === 'prefectureId') {
+        if (value) {
+          loadJobCount({ prefectureId: value });
+        } else {
+          setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
+        }
+      } else if (name === 'municipalityId') {
+        if (value) {
+          loadJobCount({ municipalityId: value });
+        } else if (formData.prefectureId) {
+          loadJobCount({ prefectureId: formData.prefectureId });
+        } else {
+          setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
+        }
+      }
+    },
+    [formData.prefectureId, formOrigin, isFormDirty, loadJobCount, validatePhoneNumberInput]
+  );
+
+  const handleNameBlur = useCallback(
+    async (event: React.FocusEvent<HTMLInputElement>) => {
+      const { name, value } = event.target;
+      if ((name === 'lastName' || name === 'firstName') && value.trim()) {
+        const hiragana = await hiraganaConverter(value);
+        if (hiragana) {
+          const target = name === 'lastName' ? 'lastNameKana' : 'firstNameKana';
+          setFormData((prev) => ({ ...prev, [target]: hiragana }));
+        }
+      }
+    },
+    [hiraganaConverter]
+  );
+
   const handleNextCard1 = useCallback(() => {
     const result = validateCard1(formData.birthDate);
     setErrors(result.errors);
@@ -163,8 +229,14 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       trackEvent('step_complete', { step_name: 'step_2', step_number: 2 });
       setCurrentCardIndex(3);
       trackEvent('step_view', { step_name: 'step_3', step_number: 3 });
-      if (formOrigin !== 'coupang' && formData.postalCode.length === 7) {
-        loadJobCount(formData.postalCode);
+      if (formOrigin !== 'coupang') {
+        if (formData.municipalityId) {
+          loadJobCount({ municipalityId: formData.municipalityId });
+        } else if (formData.prefectureId) {
+          loadJobCount({ prefectureId: formData.prefectureId });
+        } else if (formData.postalCode.length === 7) {
+          loadJobCount({ postalCode: formData.postalCode });
+        }
       }
     }
   }, [formData, formOrigin, loadJobCount]);
@@ -210,9 +282,17 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           ? `${formData.birthDate.year}-${formData.birthDate.month.padStart(2, '0')}-${formData.birthDate.day.padStart(2, '0')}`
           : '';
 
+        const { fetchPrefectureName, fetchMunicipalityName } = await import('@/lib/locationClient');
+        const prefectureName = formData.prefectureId ? await fetchPrefectureName(formData.prefectureId) : '';
+        const municipalityName = formData.municipalityId
+          ? await fetchMunicipalityName(formData.municipalityId)
+          : '';
+
         const body = {
           ...formData,
           birthDate: birthDateString,
+          prefectureName,
+          municipalityName,
           utmParams,
           experiment: { name: 'people_image', variant },
           formOrigin,

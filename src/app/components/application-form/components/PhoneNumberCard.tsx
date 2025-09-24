@@ -116,31 +116,27 @@ export default function PhoneNumberCard({
 
       {showJobCount && (
         <div className="mb-6">
-          {postalCode && postalCode.length === 7 ? (
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-center text-sm text-blue-700">
-              {jobResult.isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="mr-2 h-4 w-4 animate-bounce rounded-full bg-blue-500" />
-                  <span>求人件数を確認中...</span>
-                </div>
-              ) : jobResult.error ? (
-                <p className="text-red-600">{jobResult.error}</p>
-              ) : jobResult.jobCount !== null ? (
-                <div>
-                  <p className="text-base font-bold text-blue-900">郵便番号 {postalCode} エリア</p>
-                  <p className="text-xl font-bold text-blue-900">{jobResult.jobCount}件の求人があります</p>
-                  <p>{jobResult.message}</p>
-                  {jobResult.jobCount > 0 && <p className="mt-2 font-medium text-green-700">✅ お近くの求人をご案内できます！</p>}
-                </div>
-              ) : (
-                <p>郵便番号を入力して求人を検索してください</p>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-gray-600">
-              <p>郵便番号を入力して求人を検索してください</p>
-            </div>
-          )}
+          <div className={`rounded-lg border ${jobResult.jobCount !== null ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 bg-gray-50 text-gray-600'} p-4 text-center text-sm`}>
+            {jobResult.isLoading ? (
+              <div className="flex items-center justify-center text-blue-700">
+                <div className="mr-2 h-4 w-4 animate-bounce rounded-full bg-blue-500" />
+                <span>求人件数を確認中...</span>
+              </div>
+            ) : jobResult.error ? (
+              <p className="text-red-600">{jobResult.error}</p>
+            ) : jobResult.jobCount !== null ? (
+              <div>
+                <p className="text-base font-bold text-blue-900">
+                  {jobResult.searchArea ? `${jobResult.searchArea}` : postalCode ? `郵便番号 ${postalCode} エリア` : '選択エリア'}
+                </p>
+                <p className="text-xl font-bold text-blue-900">{jobResult.jobCount}件の求人があります</p>
+                <p>{jobResult.message}</p>
+                {jobResult.jobCount > 0 && <p className="mt-2 font-medium text-green-700">✅ お近くの求人をご案内できます！</p>}
+              </div>
+            ) : (
+              <p>郵便番号を入力するか地域を選択して求人を検索してください</p>
+            )}
+          </div>
         </div>
       )}
 

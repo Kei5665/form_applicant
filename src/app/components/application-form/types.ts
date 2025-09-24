@@ -15,6 +15,8 @@ export type FormData = {
   lastNameKana: string;
   firstNameKana: string;
   postalCode: string;
+  prefectureId: string;
+  municipalityId: string;
   phoneNumber: string;
 };
 
@@ -25,6 +27,8 @@ export type FormErrors = {
   lastNameKana?: string;
   firstNameKana?: string;
   postalCode?: string;
+  prefectureId?: string;
+  municipalityId?: string;
   phoneNumber?: string;
 };
 
@@ -33,5 +37,7 @@ export type JobCountResult = {
   message: string;
   isLoading: boolean;
   error: string;
+  searchMethod?: 'postal_code' | 'prefecture' | 'municipality';
+  searchArea?: string;
 };
 

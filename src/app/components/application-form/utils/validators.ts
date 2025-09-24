@@ -59,11 +59,28 @@ export const validateCard2 = (formData: FormData) => {
   const errors: FormErrors = {};
   let isValid = true;
 
-  if (!formData.postalCode) {
-    errors.postalCode = '郵便番号は必須です。';
+  const hasPostalCode = Boolean(formData.postalCode);
+  const hasLocationSelection = Boolean(formData.prefectureId && formData.municipalityId);
+
+  if (!hasPostalCode && !hasLocationSelection) {
+    errors.postalCode = '郵便番号または地域を選択してください。';
+    errors.prefectureId = '都道府県を選択してください。';
+    errors.municipalityId = '市区町村を選択してください。';
     isValid = false;
-  } else if (!/^[0-9]{7}$/.test(formData.postalCode)) {
+  }
+
+  if (hasPostalCode && !/^[0-9]{7}$/.test(formData.postalCode)) {
     errors.postalCode = '郵便番号はハイフンなしの7桁で入力してください。';
+    isValid = false;
+  }
+
+  if (!formData.prefectureId && formData.municipalityId) {
+    errors.prefectureId = '都道府県を選択してください。';
+    isValid = false;
+  }
+
+  if (formData.prefectureId && !formData.municipalityId) {
+    errors.municipalityId = '市区町村を選択してください。';
     isValid = false;
   }
 

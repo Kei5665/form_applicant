@@ -134,6 +134,8 @@ function ApplicationFormInner({
             <NameCard
               stepImageSrc={step2ImageSrc}
               postalCode={formData.postalCode}
+              prefectureId={formData.prefectureId}
+              municipalityId={formData.municipalityId}
               errors={errors}
               onChange={handleInputChange}
               onPrevious={handlePreviousCard}
