@@ -120,48 +120,43 @@ function ApplicationFormInner({
         </div>
       )}
 
-      <div ref={modalContentRef} className="relative w-full max-w-sm">
-        
+      <div ref={modalContentRef} className="relative w-full max-w-sm max-h-[calc(100vh-112px)] overflow-y-auto px-1">
+          <form onSubmit={handleSubmit} id="form" noValidate className="relative min-h-[640px] pb-4">
+            <BirthDateCard
+              stepImageSrc={step1ImageSrc}
+              birthDate={formData.birthDate}
+              errors={errors}
+              onChange={handleInputChange}
+              onNext={handleNextCard1}
+              isActive={cardStates.isCard1Active}
+            />
 
+            <NameCard
+              stepImageSrc={step2ImageSrc}
+              postalCode={formData.postalCode}
+              errors={errors}
+              onChange={handleInputChange}
+              onPrevious={handlePreviousCard}
+              onNext={handleNextCard2}
+              isActive={cardStates.isCard2Active}
+            />
 
-          <form onSubmit={handleSubmit} id="form" className="h-[500px]">
-            
-              <BirthDateCard
-                stepImageSrc={step1ImageSrc}
-                birthDate={formData.birthDate}
-                errors={errors}
-                onChange={handleInputChange}
-                onNext={handleNextCard1}
-                isActive={cardStates.isCard1Active}
-              />
-
-              <NameCard
-                stepImageSrc={step2ImageSrc}
-                formData={formData}
-                errors={errors}
-                onChange={handleInputChange}
-                onBlur={handleNameBlur}
-                onPrevious={handlePreviousCard}
-                onNext={handleNextCard2}
-                isActive={cardStates.isCard2Active}
-              />
-
-              <PhoneNumberCard
-                stepImageSrc={step3ImageSrc}
-                jobResult={jobResult}
-                postalCode={formData.postalCode}
-                showJobCount={formOrigin !== 'coupang'}
-                errors={errors}
-                phoneError={phoneError}
-                phoneNumber={formData.phoneNumber}
-                onChange={handleInputChange}
-                onPrevious={handlePreviousCard}
-                isSubmitDisabled={isSubmitDisabled}
-                isActive={cardStates.isCard3Active}
-              />
-            
+            <PhoneNumberCard
+              stepImageSrc={step3ImageSrc}
+              jobResult={jobResult}
+              showJobCount={formOrigin !== 'coupang'}
+              postalCode={formData.postalCode}
+              formData={formData}
+              errors={errors}
+              phoneError={phoneError}
+              phoneNumber={formData.phoneNumber}
+              onChange={handleInputChange}
+              onBlur={handleNameBlur}
+              onPrevious={handlePreviousCard}
+              isSubmitDisabled={isSubmitDisabled}
+              isActive={cardStates.isCard3Active}
+            />
           </form>
-
       </div>
     </div>
   );

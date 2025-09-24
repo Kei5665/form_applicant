@@ -59,6 +59,21 @@ export const validateCard2 = (formData: FormData) => {
   const errors: FormErrors = {};
   let isValid = true;
 
+  if (!formData.postalCode) {
+    errors.postalCode = '郵便番号は必須です。';
+    isValid = false;
+  } else if (!/^[0-9]{7}$/.test(formData.postalCode)) {
+    errors.postalCode = '郵便番号はハイフンなしの7桁で入力してください。';
+    isValid = false;
+  }
+
+  return { isValid, errors };
+};
+
+export const validateNameFields = (formData: FormData) => {
+  const errors: FormErrors = {};
+  let isValid = true;
+
   if (!formData.lastName) {
     errors.lastName = '姓は必須です。';
     isValid = false;
@@ -73,14 +88,6 @@ export const validateCard2 = (formData: FormData) => {
   }
   if (!formData.firstNameKana || !/^[ぁ-んー]+$/.test(formData.firstNameKana)) {
     errors.firstNameKana = 'ひらがなで入力してください。';
-    isValid = false;
-  }
-
-  if (!formData.postalCode) {
-    errors.postalCode = '郵便番号は必須です。';
-    isValid = false;
-  } else if (!/^\d{7}$/.test(formData.postalCode)) {
-    errors.postalCode = '郵便番号はハイフンなしの7桁で入力してください。';
     isValid = false;
   }
 

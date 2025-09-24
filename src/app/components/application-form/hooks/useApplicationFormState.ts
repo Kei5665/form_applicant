@@ -8,7 +8,7 @@ import { useHiraganaConverter } from './useHiraganaConverter';
 import { useFormExitGuard } from './useFormExitGuard';
 import { useImagePreloader } from './useImagePreloader';
 import { trackEvent } from '../utils/trackEvent';
-import { isValidPhoneNumber, validateCard1, validateCard2, validateFinalStep } from '../utils/validators';
+import { isValidPhoneNumber, validateCard1, validateCard2, validateFinalStep, validateNameFields } from '../utils/validators';
 import { fetchJobCount } from '../utils/fetchJobCount';
 import { notifyInvalidPhoneNumber } from '../utils/notifyInvalidPhoneNumber';
 
@@ -182,6 +182,12 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      const nameValidation = validateNameFields(formData);
+      if (!nameValidation.isValid) {
+        setErrors((prev) => ({ ...prev, ...nameValidation.errors }));
+        setIsSubmitDisabled(true);
+        return;
+      }
       const phoneValidation = validateFinalStep(formData.phoneNumber);
       if (!phoneValidation.isValid) {
         setErrors((prev) => ({ ...prev, ...phoneValidation.errors }));

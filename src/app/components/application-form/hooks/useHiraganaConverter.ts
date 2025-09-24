@@ -25,7 +25,8 @@ export function useHiraganaConverter() {
   return useCallback(async (text: string) => {
     if (!kuroshiroRef.current || !text.trim()) return '';
     try {
-      return await kuroshiroRef.current.convert(text, { to: 'hiragana', mode: 'spaced' });
+      const converted = await kuroshiroRef.current.convert(text, { to: 'hiragana', mode: 'normal' });
+      return converted.replace(/\s+/g, '');
     } catch (error) {
       console.error('Failed to convert to hiragana:', error);
       return '';

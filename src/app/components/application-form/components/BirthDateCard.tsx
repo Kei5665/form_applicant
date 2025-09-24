@@ -38,7 +38,7 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
   const days = useMemo(() => getDaysInMonth(birthDate.year, birthDate.month), [birthDate.year, birthDate.month]);
 
   return (
-    <FormCard isActive={isActive}>
+    <FormCard isActive={isActive} className="h-full">
       <div className="mb-6 text-left">
         <Image className="w-full mb-4" src={stepImageSrc} alt="Step 1" width={300} height={50} priority />
         <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>

@@ -3,17 +3,19 @@
 import Image from 'next/image';
 
 import FormCard from './FormCard';
-import type { FormErrors, JobCountResult } from '../types';
+import type { FormData, FormErrors, JobCountResult } from '../types';
 
 type PhoneNumberCardProps = {
   stepImageSrc: string;
   jobResult: JobCountResult;
-  postalCode: string;
   showJobCount: boolean;
+  postalCode: string;
+  formData: FormData;
   errors: FormErrors;
   phoneError: string | null;
   phoneNumber: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   onPrevious: () => void;
   isSubmitDisabled: boolean;
   isActive: boolean;
@@ -22,45 +24,120 @@ type PhoneNumberCardProps = {
 export default function PhoneNumberCard({
   stepImageSrc,
   jobResult,
-  postalCode,
   showJobCount,
+  postalCode,
+  formData,
   errors,
   phoneError,
   phoneNumber,
   onChange,
+  onBlur,
   onPrevious,
   isSubmitDisabled,
   isActive,
 }: PhoneNumberCardProps) {
   return (
-    <FormCard isActive={isActive}>
+    <FormCard isActive={isActive} className="pb-6">
       <Image className="w-full mb-4" src={stepImageSrc} alt="Step 3" width={300} height={50} />
+
+      <div className="mb-6 text-left">
+        <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
+        <div className="flex justify-between mb-5">
+          <div className="flex flex-col w-[45%]">
+            <label htmlFor="lastName" className="mb-1 text-sm font-bold text-gray-900">
+              姓
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              placeholder="例: 田中"
+              className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.lastName}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+            {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+          </div>
+          <div className="flex flex-col w-[45%]">
+            <label htmlFor="firstName" className="mb-1 text-sm font-bold text-gray-900">
+              名
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              placeholder="例: 太郎"
+              className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.firstName}
+              onChange={onChange}
+              onBlur={onBlur}
+            />
+            {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6 text-left">
+        <label className="font-bold mb-2.5 block text-gray-900">お名前（ふりがな）</label>
+        <div className="flex justify-between mb-5">
+          <div className="flex flex-col w-[45%]">
+            <label htmlFor="lastNameKana" className="mb-1 text-sm font-bold text-gray-900">
+              せい
+            </label>
+            <input
+              type="text"
+              id="lastNameKana"
+              name="lastNameKana"
+              placeholder="例: たなか"
+            className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.lastNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.lastNameKana && !errors.lastNameKana ? 'text-gray-900' : ''}`}
+              value={formData.lastNameKana}
+              onChange={onChange}
+            />
+            {errors.lastNameKana && <p className="text-red-500 text-xs mt-1">{errors.lastNameKana}</p>}
+          </div>
+          <div className="flex flex-col w-[45%]">
+            <label htmlFor="firstNameKana" className="mb-1 text-sm font-bold text-gray-900">
+              めい
+            </label>
+            <input
+              type="text"
+              id="firstNameKana"
+              name="firstNameKana"
+              placeholder="例: たろう"
+            className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.firstNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.firstNameKana && !errors.firstNameKana ? 'text-gray-900' : ''}`}
+              value={formData.firstNameKana}
+              onChange={onChange}
+            />
+            {errors.firstNameKana && <p className="text-red-500 text-xs mt-1">{errors.firstNameKana}</p>}
+          </div>
+        </div>
+      </div>
+
       {showJobCount && (
         <div className="mb-6">
           {postalCode && postalCode.length === 7 ? (
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-center text-sm text-blue-700">
               {jobResult.isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce mr-2" />
-                  <span className="text-blue-700 text-sm">求人件数を確認中...</span>
+                  <div className="mr-2 h-4 w-4 animate-bounce rounded-full bg-blue-500" />
+                  <span>求人件数を確認中...</span>
                 </div>
               ) : jobResult.error ? (
-                <p className="text-red-600 text-sm text-center">{jobResult.error}</p>
+                <p className="text-red-600">{jobResult.error}</p>
               ) : jobResult.jobCount !== null ? (
-                <div className="text-center">
-                  <p className="text-blue-800 font-bold text-xl mb-2">郵便番号 {postalCode} エリア</p>
-                  <p className="text-blue-800 font-bold text-2xl mb-2">{jobResult.jobCount}件の求人があります</p>
-                  <p className="text-blue-700 text-sm">{jobResult.message}</p>
-                  {jobResult.jobCount > 0 && <p className="text-green-700 text-sm mt-2 font-medium">✅ お近くの求人をご案内できます！</p>}
+                <div>
+                  <p className="text-base font-bold text-blue-900">郵便番号 {postalCode} エリア</p>
+                  <p className="text-xl font-bold text-blue-900">{jobResult.jobCount}件の求人があります</p>
+                  <p>{jobResult.message}</p>
+                  {jobResult.jobCount > 0 && <p className="mt-2 font-medium text-green-700">✅ お近くの求人をご案内できます！</p>}
                 </div>
               ) : (
-                <div className="text-center text-gray-600">
-                  <p>郵便番号を入力して求人を検索してください</p>
-                </div>
+                <p>郵便番号を入力して求人を検索してください</p>
               )}
             </div>
           ) : (
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-600">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-gray-600">
               <p>郵便番号を入力して求人を検索してください</p>
             </div>
           )}
