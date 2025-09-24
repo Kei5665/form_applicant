@@ -20,7 +20,7 @@ export default function NameCard({ stepImageSrc, formData, errors, onChange, onB
   return (
     <FormCard isActive={isActive}>
       <Image className="w-full mb-4" src={stepImageSrc} alt="Step 2" width={300} height={50} />
-      <div className="mb-7 text-left">
+      <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
         <div className="flex justify-between mb-5">
           <div className="flex flex-col w-[45%]">
@@ -57,7 +57,7 @@ export default function NameCard({ stepImageSrc, formData, errors, onChange, onB
           </div>
         </div>
       </div>
-      <div className="mb-7 text-left">
+      <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（ふりがな）</label>
         <div className="flex justify-between mb-5">
           <div className="flex flex-col w-[45%]">
@@ -92,7 +92,7 @@ export default function NameCard({ stepImageSrc, formData, errors, onChange, onB
           </div>
         </div>
       </div>
-      <div className="mb-7 text-left">
+      <div className="mb-6 text-left">
         <label htmlFor="postalCode" className="block mb-1 text-gray-900">
           お住まいの郵便番号
           <br />

@@ -67,7 +67,7 @@ export default function PhoneNumberCard({
         </div>
       )}
 
-      <div className="mb-7 text-left">
+      <div className="mb-6 text-left">
         <label htmlFor="phoneNumber" className="block mb-1 text-gray-900">
           携帯番号
           <br />

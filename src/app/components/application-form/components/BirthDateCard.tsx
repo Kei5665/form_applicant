@@ -39,7 +39,7 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
 
   return (
     <FormCard isActive={isActive}>
-      <div className="mb-7 text-left">
+      <div className="mb-6 text-left">
         <Image className="w-full mb-4" src={stepImageSrc} alt="Step 1" width={300} height={50} priority />
         <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
         <div className="flex flex-col sm:flex-row gap-2">
