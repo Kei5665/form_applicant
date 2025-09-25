@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { BirthDateCard, JobTimingCard, NameCard, PhoneNumberCard } from './application-form/components';
+import { BirthDateCard, FormExitModal, JobTimingCard, NameCard, PhoneNumberCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
 import type { PeopleImageVariant } from './application-form/types';
 
@@ -68,6 +68,7 @@ function ApplicationFormInner({
     phoneError,
     isSubmitDisabled,
     jobResult,
+    showExitModal,
     handleInputChange,
     handleJobTimingSelect,
     handleNameBlur,
@@ -76,6 +77,8 @@ function ApplicationFormInner({
     handleNextCard3,
     handlePreviousCard,
     handleSubmit,
+    hideExitModal,
+    confirmExit,
   } = useApplicationFormState({
     showLoadingScreen,
     imagesToPreload,
@@ -195,8 +198,9 @@ function ApplicationFormInner({
       )}
 
       <div ref={modalContentRef} className={formWrapperClassName}>
-          {formContent}
+        {formContent}
       </div>
+      <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} />
     </div>
   );
 
@@ -217,6 +221,7 @@ function ApplicationFormInner({
   return (
     <div className={`flex justify-center px-4 ${containerClassName}`.trim()}>
       <div className={formWrapperClassName}>{formContent}</div>
+      <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} />
     </div>
   );
 }

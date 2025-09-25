@@ -7,9 +7,10 @@ type UseFormExitGuardParams = {
   currentCardIndex: number;
   setShowExitModal: (value: boolean) => void;
   markFormClean: () => void;
+  setPendingNavigation: (value: { type: 'history-back' } | null) => void;
 };
 
-export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitModal, markFormClean }: UseFormExitGuardParams) {
+export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitModal, markFormClean, setPendingNavigation }: UseFormExitGuardParams) {
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (isFormDirty) {
@@ -24,9 +25,11 @@ export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitMod
       if (isFormDirty) {
         event.preventDefault();
         setShowExitModal(true);
+        setPendingNavigation({ type: 'history-back' });
         window.history.pushState(null, '', window.location.pathname + window.location.search);
       } else {
         markFormClean();
+        setPendingNavigation(null);
       }
     };
 
@@ -40,7 +43,7 @@ export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitMod
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isFormDirty, setShowExitModal, markFormClean]);
+  }, [isFormDirty, setShowExitModal, markFormClean, setPendingNavigation]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {

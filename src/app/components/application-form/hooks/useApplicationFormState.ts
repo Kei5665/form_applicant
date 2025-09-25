@@ -41,6 +41,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<{ type: 'history-back' } | null>(null);
   const [jobResult, setJobResult] = useState<JobCountResult>({ jobCount: null, message: '', isLoading: false, error: '' });
 
   const markFormClean = useCallback(() => {
@@ -48,7 +49,30 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   }, []);
 
   useImagePreloader({ images: imagesToPreload, onComplete: () => setLoading(false), enable: showLoadingScreen });
-  useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitModal, markFormClean });
+  useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitModal, markFormClean, setPendingNavigation });
+
+  const hideExitModal = useCallback(() => {
+    setShowExitModal(false);
+    setPendingNavigation(null);
+  }, []);
+
+  const confirmExit = useCallback(() => {
+    if (!pendingNavigation) {
+      setShowExitModal(false);
+      return;
+    }
+
+    setShowExitModal(false);
+    markFormClean();
+    const navigation = pendingNavigation;
+    setPendingNavigation(null);
+
+    if (navigation.type === 'history-back') {
+      if (typeof window !== 'undefined') {
+        window.history.back();
+      }
+    }
+  }, [pendingNavigation, markFormClean]);
 
   useEffect(() => {
     trackEvent('experiment_impression', { experiment: 'people_image', variant });
@@ -417,7 +441,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       : {}),
     handlePreviousCard,
     handleSubmit,
-    setShowExitModal,
+    hideExitModal,
+    confirmExit,
     markFormClean,
   };
 }
