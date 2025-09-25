@@ -3,6 +3,7 @@
 import Image from 'next/image';
 
 import FormCard from './FormCard';
+import FingerHint from './FingerHint';
 import type { FormData, FormErrors, JobCountResult } from '../types';
 
 type PhoneNumberCardProps = {
@@ -36,36 +37,61 @@ export default function PhoneNumberCard({
   isSubmitDisabled,
   isActive,
 }: PhoneNumberCardProps) {
+  const isFullNameFilled = formData.fullName.trim().length > 0;
+  const isFullNameKanaFilled = formData.fullNameKana.trim().length > 0;
+  const isPhoneFilled = phoneNumber.trim().length === 11;
+
+  const firstIncompleteField = (() => {
+    if (!isFullNameFilled) {
+      return 'fullName';
+    }
+    if (!isFullNameKanaFilled) {
+      return 'fullNameKana';
+    }
+    if (!isPhoneFilled) {
+      return 'phoneNumber';
+    }
+    return null;
+  })();
+
+  const isSubmitEncouraged = !isSubmitDisabled && firstIncompleteField === null;
+
   return (
     <FormCard isActive={isActive} className="pb-6">
       <Image className="w-full mb-4" src={stepImageSrc} alt="Step 4" width={300} height={50} />
 
       <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
-        <input
-          type="text"
-          id="fullName"
-          name="fullName"
-          placeholder="例: 田中 太郎"
-          className={`p-3 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
-          value={formData.fullName}
-          onChange={onChange}
-          onBlur={onBlur}
-        />
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            placeholder="例: 田中 太郎"
+            className={`flex-1 p-3 border rounded text-gray-900 placeholder-gray-500 ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+            value={formData.fullName}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+          <FingerHint isVisible={firstIncompleteField === 'fullName'} size={40} className="sm:size-[52px]" />
+        </div>
         {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
       </div>
 
       <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（ふりがな）</label>
-        <input
-          type="text"
-          id="fullNameKana"
-          name="fullNameKana"
-          placeholder="例: たなか たろう"
-          className={`p-3 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.fullNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.fullNameKana && !errors.fullNameKana ? 'text-gray-900' : ''}`}
-          value={formData.fullNameKana}
-          onChange={onChange}
-        />
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            id="fullNameKana"
+            name="fullNameKana"
+            placeholder="例: たなか たろう"
+            className={`flex-1 p-3 border rounded text-gray-900 placeholder-gray-500 ${errors.fullNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.fullNameKana && !errors.fullNameKana ? 'text-gray-900' : ''}`}
+            value={formData.fullNameKana}
+            onChange={onChange}
+          />
+          <FingerHint isVisible={firstIncompleteField === 'fullNameKana'} size={40} className="sm:size-[52px]" />
+        </div>
         {errors.fullNameKana && <p className="text-red-500 text-xs mt-1">{errors.fullNameKana}</p>}
       </div>
 
@@ -101,16 +127,19 @@ export default function PhoneNumberCard({
           <br />
           ( ハイフンなし11桁 )
         </label>
-        <input
-          type="tel"
-          id="phoneNumber"
-          name="phoneNumber"
-          placeholder="例: 09012345678"
-          className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.phoneNumber || phoneError ? 'border-red-500' : 'border-gray-300'}`}
-          value={phoneNumber}
-          onChange={onChange}
-          maxLength={11}
-        />
+        <div className="flex items-center gap-3">
+          <input
+            type="tel"
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="例: 09012345678"
+            className={`flex-1 p-2 border rounded text-gray-900 placeholder-gray-500 ${errors.phoneNumber || phoneError ? 'border-red-500' : 'border-gray-300'}`}
+            value={phoneNumber}
+            onChange={onChange}
+            maxLength={11}
+          />
+          <FingerHint isVisible={firstIncompleteField === 'phoneNumber'} size={40} className="sm:size-[52px]" />
+        </div>
         {(errors.phoneNumber || phoneError) && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber || phoneError}</p>}
       </div>
 
@@ -118,13 +147,16 @@ export default function PhoneNumberCard({
         <button type="button" className="py-2 px-4 font-bold cursor-pointer text-gray-800 mb-0" onClick={onPrevious}>
           ＜ 戻る
         </button>
-        <button
-          type="submit"
-          className={`w-[60%] py-2.5 px-5 rounded-md text-white font-bold cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
-          disabled={isSubmitDisabled}
-        >
-          送信
-        </button>
+        <div className="relative flex w-[60%] items-center justify-end gap-2">
+          <button
+            type="submit"
+            className={`flex-1 py-2.5 px-5 rounded-md text-white font-bold cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
+            disabled={isSubmitDisabled}
+          >
+            送信
+          </button>
+          <FingerHint isVisible={isSubmitEncouraged} size={44} className="sm:size-[60px]" />
+        </div>
       </div>
     </FormCard>
   );

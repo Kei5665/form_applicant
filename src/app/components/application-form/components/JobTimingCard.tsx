@@ -1,6 +1,7 @@
 'use client';
 
 import FormCard from './FormCard';
+import FingerHint from './FingerHint';
 import type { FormData, FormErrors } from '../types';
 
 type JobTimingCardProps = {
@@ -34,6 +35,9 @@ export default function JobTimingCard({ selectedTiming, errors, onSelect, isActi
     onSelect(value);
   };
 
+  const isNextEncouraged = Boolean(selectedTiming);
+  const shouldShowInitialHint = !selectedTiming;
+
   return (
     <FormCard isActive={isActive} className="min-h-[380px]">
       <div className="mb-6 text-left">
@@ -42,7 +46,7 @@ export default function JobTimingCard({ selectedTiming, errors, onSelect, isActi
       </div>
 
       <div className="space-y-4">
-        {options.map((option) => {
+        {options.map((option, index) => {
           const isSelected = selectedTiming === option.value;
           return (
             <button
@@ -60,12 +64,19 @@ export default function JobTimingCard({ selectedTiming, errors, onSelect, isActi
                   ✓
                 </span>
               )}
+              {index === 0 && (
+                <FingerHint isVisible={shouldShowInitialHint} size={40} className="absolute right-2 top-1/2 -translate-y-1/2 sm:-right-10 sm:size-[56px]" />
+              )}
             </button>
           );
         })}
       </div>
 
       {errors.jobTiming && <p className="mt-4 text-xs text-red-500">{errors.jobTiming}</p>}
+
+      <div className="mt-6 flex items-center justify-end">
+        <FingerHint isVisible={isNextEncouraged} size={44} className="sm:size-[60px]" />
+      </div>
     </FormCard>
   );
 }
