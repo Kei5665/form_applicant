@@ -9,7 +9,7 @@ import { useFormExitGuard } from './useFormExitGuard';
 import { useImagePreloader } from './useImagePreloader';
 import { trackEvent } from '../utils/trackEvent';
 import { isValidPhoneNumber, validateBirthDateCard, validateCard2, validateFinalStep, validateJobTiming, validateNameFields } from '../utils/validators';
-import { fetchJobCount } from '../utils/fetchJobCount';
+import { fetchJobCount, type JobCountParams } from '../utils/fetchJobCount';
 import { notifyInvalidPhoneNumber } from '../utils/notifyInvalidPhoneNumber';
 
 type UseApplicationFormStateParams = {
@@ -59,14 +59,24 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
   const hiraganaConverter = useHiraganaConverter();
 
-  const loadJobCount = useCallback(async (params: { postalCode?: string; prefectureId?: string; municipalityId?: string }) => {
-    if (!params.postalCode && !params.prefectureId && !params.municipalityId) {
+  const loadJobCount = useCallback(async (params: Partial<JobCountParams>) => {
+    const hasPostal = 'postalCode' in params && typeof params.postalCode === 'string';
+    const hasPref = 'prefectureId' in params && typeof params.prefectureId === 'string';
+    const hasMunicipality = 'municipalityId' in params && typeof params.municipalityId === 'string';
+
+    if (!hasPostal && !hasPref && !hasMunicipality) {
       setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
       return;
     }
     setJobResult((prev) => ({ ...prev, isLoading: true, error: '' }));
     try {
-      const result = await fetchJobCount(params);
+      const result = await fetchJobCount(
+        hasPostal
+          ? { postalCode: params.postalCode as string }
+          : hasPref
+            ? { prefectureId: params.prefectureId as string }
+            : { municipalityId: params.municipalityId as string }
+      );
       setJobResult({
         jobCount: result.jobCount,
         message: result.message,

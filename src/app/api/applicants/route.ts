@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { FormData } from '@/app/components/application-form/types';
+import { mapJobTimingLabel } from '@/app/components/application-form/utils/mapJobTimingLabel';
 
 // Types for submission payload
 type ExperimentInfo = {
@@ -25,6 +27,7 @@ type ApplicantFormData = {
   municipalityId?: string;
   municipalityName?: string;
   phoneNumber?: string;
+  jobTiming?: FormData['jobTiming'];
 };
 
 type ApplicantSubmission = ApplicantFormData & {
@@ -144,6 +147,7 @@ export async function POST(request: NextRequest) {
     
     // Get media name from UTM parameters (coupangはMeta固定)
     const mediaName = isCoupang ? 'Meta広告' : getMediaName(utmParams || {});
+    const jobTimingLabel = mapJobTimingLabel(submissionData.jobTiming ?? '');
     console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
     
     // 並列送信（Baseのみテスト中は直下の単独送信へ）
@@ -167,6 +171,7 @@ ${title}
 氏名: ${formData.lastName || ''} ${formData.firstName || ''} (${formData.lastNameKana || ''} ${formData.firstNameKana || ''})
 郵便番号: ${formData.postalCode || '未入力'}
 地域: ${locationDisplay}
+転職時期: ${jobTimingLabel || '未選択'}
 電話番号: ${formData.phoneNumber || '未入力'}
 -------------------------
         `.trim();
@@ -215,6 +220,8 @@ ${title}
           municipality_id: formData.municipalityId || '',
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
+          job_timing: jobTimingLabel,
+          job_timing: mapJobTimingLabel((submissionData as { jobTiming?: FormData['jobTiming'] }).jobTiming ?? ''),
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),
@@ -268,6 +275,8 @@ ${title}
           municipality_id: formData.municipalityId || '',
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
+          job_timing: jobTimingLabel,
+          job_timing: mapJobTimingLabel((submissionData as { jobTiming?: FormData['jobTiming'] }).jobTiming ?? ''),
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),

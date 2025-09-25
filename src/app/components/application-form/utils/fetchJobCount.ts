@@ -6,7 +6,7 @@ type JobCountResponse = {
   error?: string;
 };
 
-type JobCountParams =
+export type JobCountParams =
   | { postalCode: string; prefectureId?: never; municipalityId?: never }
   | { postalCode?: never; prefectureId: string; municipalityId?: never }
   | { postalCode?: never; prefectureId?: never; municipalityId: string };
