@@ -1,6 +1,6 @@
 import type { FormData } from '../types';
 
-type NotifyPayload = Pick<FormData, 'lastName' | 'firstName' | 'phoneNumber'>;
+type NotifyPayload = Pick<FormData, 'fullName' | 'phoneNumber'>;
 
 export async function notifyInvalidPhoneNumber(payload: NotifyPayload) {
   try {

@@ -42,76 +42,31 @@ export default function PhoneNumberCard({
 
       <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
-        <div className="flex justify-between mb-5">
-          <div className="flex flex-col w-[45%]">
-            <label htmlFor="lastName" className="mb-1 text-sm font-bold text-gray-900">
-              姓
-            </label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              placeholder="例: 田中"
-              className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
-              value={formData.lastName}
-              onChange={onChange}
-              onBlur={onBlur}
-            />
-            {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
-          </div>
-          <div className="flex flex-col w-[45%]">
-            <label htmlFor="firstName" className="mb-1 text-sm font-bold text-gray-900">
-              名
-            </label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              placeholder="例: 太郎"
-              className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
-              value={formData.firstName}
-              onChange={onChange}
-              onBlur={onBlur}
-            />
-            {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
-          </div>
-        </div>
+        <input
+          type="text"
+          id="fullName"
+          name="fullName"
+          placeholder="例: 田中 太郎"
+          className={`p-3 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+          value={formData.fullName}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+        {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
       </div>
 
       <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（ふりがな）</label>
-        <div className="flex justify-between mb-5">
-          <div className="flex flex-col w-[45%]">
-            <label htmlFor="lastNameKana" className="mb-1 text-sm font-bold text-gray-900">
-              せい
-            </label>
-            <input
-              type="text"
-              id="lastNameKana"
-              name="lastNameKana"
-              placeholder="例: たなか"
-            className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.lastNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.lastNameKana && !errors.lastNameKana ? 'text-gray-900' : ''}`}
-              value={formData.lastNameKana}
-              onChange={onChange}
-            />
-            {errors.lastNameKana && <p className="text-red-500 text-xs mt-1">{errors.lastNameKana}</p>}
-          </div>
-          <div className="flex flex-col w-[45%]">
-            <label htmlFor="firstNameKana" className="mb-1 text-sm font-bold text-gray-900">
-              めい
-            </label>
-            <input
-              type="text"
-              id="firstNameKana"
-              name="firstNameKana"
-              placeholder="例: たろう"
-            className={`p-2 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.firstNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.firstNameKana && !errors.firstNameKana ? 'text-gray-900' : ''}`}
-              value={formData.firstNameKana}
-              onChange={onChange}
-            />
-            {errors.firstNameKana && <p className="text-red-500 text-xs mt-1">{errors.firstNameKana}</p>}
-          </div>
-        </div>
+        <input
+          type="text"
+          id="fullNameKana"
+          name="fullNameKana"
+          placeholder="例: たなか たろう"
+          className={`p-3 border rounded w-full text-gray-900 placeholder-gray-500 ${errors.fullNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.fullNameKana && !errors.fullNameKana ? 'text-gray-900' : ''}`}
+          value={formData.fullNameKana}
+          onChange={onChange}
+        />
+        {errors.fullNameKana && <p className="text-red-500 text-xs mt-1">{errors.fullNameKana}</p>}
       </div>
 
       {showJobCount && (

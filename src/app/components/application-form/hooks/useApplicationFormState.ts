@@ -22,11 +22,9 @@ type UseApplicationFormStateParams = {
 
 const initialFormData: FormData = {
   jobTiming: '',
-  birthDate: { year: '', month: '', day: '' },
-  lastName: '',
-  firstName: '',
-  lastNameKana: '',
-  firstNameKana: '',
+  birthDate: '',
+  fullName: '',
+  fullNameKana: '',
   postalCode: '',
   prefectureId: '',
   municipalityId: '',
@@ -102,7 +100,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       if (!isValidPhoneNumber(trimmed)) {
         setPhoneError('有効な携帯番号を入力してください。');
         setIsSubmitDisabled(true);
-        notifyInvalidPhoneNumber({ ...formData, phoneNumber: trimmed });
+        notifyInvalidPhoneNumber({ fullName: formData.fullName, phoneNumber: trimmed });
       } else {
         setPhoneError(null);
         setIsSubmitDisabled(false);
@@ -120,15 +118,15 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         value = value.replace(/[-－ー]/g, '');
       }
 
-      setFormData((prev) => {
-        if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
-          const field = name.replace('birth', '').toLowerCase();
-          return {
-            ...prev,
-            birthDate: { ...prev.birthDate, [field]: value },
-          };
-        }
+      if (name === 'birthDate') {
+        value = value.replace(/\D/g, '').slice(0, 8);
+      }
 
+      if (name === 'fullNameKana') {
+        value = value.replace(/[^ぁ-んー\s]/g, '');
+      }
+
+      setFormData((prev) => {
         if (name === 'jobTiming') {
           return {
             ...prev,
@@ -169,7 +167,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
       setErrors((prev) => {
         const next = { ...prev };
-        if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
+        if (name === 'birthDate') {
           next.birthDate = '';
         } else if (name === 'jobTiming') {
           next.jobTiming = '';
@@ -222,11 +220,10 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const handleNameBlur = useCallback(
     async (event: React.FocusEvent<HTMLInputElement>) => {
       const { name, value } = event.target;
-      if ((name === 'lastName' || name === 'firstName') && value.trim()) {
+      if (name === 'fullName' && value.trim()) {
         const hiragana = await hiraganaConverter(value);
         if (hiragana) {
-          const target = name === 'lastName' ? 'lastNameKana' : 'firstNameKana';
-          setFormData((prev) => ({ ...prev, [target]: hiragana }));
+          setFormData((prev) => (prev.fullNameKana ? prev : { ...prev, fullNameKana: hiragana }));
         }
       }
     },
@@ -336,8 +333,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           utm_term: urlParams.get('utm_term') || '',
         };
 
-        const birthDateString = formData.birthDate.year && formData.birthDate.month && formData.birthDate.day
-          ? `${formData.birthDate.year}-${formData.birthDate.month.padStart(2, '0')}-${formData.birthDate.day.padStart(2, '0')}`
+        const birthDateString = formData.birthDate.length === 8
+          ? `${formData.birthDate.slice(0, 4)}-${formData.birthDate.slice(4, 6)}-${formData.birthDate.slice(6, 8)}`
           : '';
 
         const { fetchPrefectureName, fetchMunicipalityName } = await import('@/lib/locationClient');

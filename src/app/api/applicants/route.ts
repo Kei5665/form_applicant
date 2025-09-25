@@ -17,10 +17,8 @@ type UTMParams = {
 
 type ApplicantFormData = {
   birthDate?: string;
-  lastName?: string;
-  firstName?: string;
-  lastNameKana?: string;
-  firstNameKana?: string;
+  fullName?: string;
+  fullNameKana?: string;
   postalCode?: string;
   prefectureId?: string;
   prefectureName?: string;
@@ -168,7 +166,7 @@ ${title}
 -------------------------
 流入元: ${utmDisplay}
 生年月日: ${formData.birthDate || '未入力'}
-氏名: ${formData.lastName || ''} ${formData.firstName || ''} (${formData.lastNameKana || ''} ${formData.firstNameKana || ''})
+氏名: ${formData.fullName || '未入力'} (${formData.fullNameKana || '未入力'})
 郵便番号: ${formData.postalCode || '未入力'}
 地域: ${locationDisplay}
 転職時期: ${jobTimingLabel || '未選択'}
@@ -210,10 +208,8 @@ ${title}
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           birth_date: formData.birthDate || '',
-          last_name: formData.lastName || '',
-          first_name: formData.firstName || '',
-          last_name_kana: formData.lastNameKana || '',
-          first_name_kana: formData.firstNameKana || '',
+          full_name: formData.fullName || '',
+          full_name_kana: formData.fullNameKana || '',
           postal_code: formData.postalCode || '',
           prefecture_id: formData.prefectureId || '',
           prefecture_name: formData.prefectureName || '',
@@ -265,10 +261,8 @@ ${title}
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           birth_date: formData.birthDate || '',
-          last_name: formData.lastName || '',
-          first_name: formData.firstName || '',
-          last_name_kana: formData.lastNameKana || '',
-          first_name_kana: formData.firstNameKana || '',
+          full_name: formData.fullName || '',
+          full_name_kana: formData.fullNameKana || '',
           postal_code: formData.postalCode || '',
           prefecture_id: formData.prefectureId || '',
           prefecture_name: formData.prefectureName || '',

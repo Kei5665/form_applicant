@@ -21,12 +21,15 @@ export const validateJobTiming = (jobTiming: FormData['jobTiming']) => {
 export const validateBirthDateCard = (birthDate: BirthDate) => {
   let isValid = true;
   const errors: FormErrors = {};
-  const { year, month, day } = birthDate;
 
-  if (!year || !month || !day) {
-    errors.birthDate = '生年月日をすべて選択してください。';
+  if (!birthDate || birthDate.length !== 8 || !/^\d{8}$/.test(birthDate)) {
+    errors.birthDate = '生年月日を8桁の数字で入力してください。';
     return { isValid: false, errors };
   }
+
+  const year = birthDate.slice(0, 4);
+  const month = birthDate.slice(4, 6);
+  const day = birthDate.slice(6, 8);
 
   const birth = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
   const today = new Date();
@@ -36,7 +39,7 @@ export const validateBirthDateCard = (birthDate: BirthDate) => {
     birth.getMonth() !== parseInt(month, 10) - 1 ||
     birth.getDate() !== parseInt(day, 10)
   ) {
-    errors.birthDate = '有効な日付を選択してください。';
+    errors.birthDate = '有効な日付を入力してください。';
     return { isValid: false, errors };
   }
 
@@ -57,7 +60,7 @@ export const validateBirthDateCard = (birthDate: BirthDate) => {
   }
 
   if (birth > today) {
-    errors.birthDate = '未来の日付は選択できません。';
+    errors.birthDate = '未来の日付は入力できません。';
     isValid = false;
   }
 
@@ -100,20 +103,12 @@ export const validateNameFields = (formData: FormData) => {
   const errors: FormErrors = {};
   let isValid = true;
 
-  if (!formData.lastName) {
-    errors.lastName = '姓は必須です。';
+  if (!formData.fullName.trim()) {
+    errors.fullName = '氏名は必須です。';
     isValid = false;
   }
-  if (!formData.firstName) {
-    errors.firstName = '名は必須です。';
-    isValid = false;
-  }
-  if (!formData.lastNameKana || !/^[ぁ-んー]+$/.test(formData.lastNameKana)) {
-    errors.lastNameKana = 'ひらがなで入力してください。';
-    isValid = false;
-  }
-  if (!formData.firstNameKana || !/^[ぁ-んー]+$/.test(formData.firstNameKana)) {
-    errors.firstNameKana = 'ひらがなで入力してください。';
+  if (!formData.fullNameKana.trim() || !/^[ぁ-んー\s]+$/.test(formData.fullNameKana)) {
+    errors.fullNameKana = 'ひらがなで入力してください。';
     isValid = false;
   }
 

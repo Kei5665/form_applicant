@@ -2,21 +2,15 @@ export type PeopleImageVariant = 'A' | 'B';
 
 export type FormOrigin = 'coupang' | 'default';
 
-export type BirthDate = {
-  year: string;
-  month: string;
-  day: string;
-};
+export type BirthDate = string;
 
 export type JobTimingOption = 'asap' | 'no_plan';
 
 export type FormData = {
   jobTiming: JobTimingOption | '';
   birthDate: BirthDate;
-  lastName: string;
-  firstName: string;
-  lastNameKana: string;
-  firstNameKana: string;
+  fullName: string;
+  fullNameKana: string;
   postalCode: string;
   prefectureId: string;
   municipalityId: string;
@@ -26,10 +20,8 @@ export type FormData = {
 export type FormErrors = {
   jobTiming?: string;
   birthDate?: string;
-  lastName?: string;
-  firstName?: string;
-  lastNameKana?: string;
-  firstNameKana?: string;
+  fullName?: string;
+  fullNameKana?: string;
   postalCode?: string;
   prefectureId?: string;
   municipalityId?: string;

@@ -98,11 +98,9 @@ src/
 **リクエストボディ:**
 ```json
 {
-  "birthYear": "1990",
-  "lastName": "田中",
-  "firstName": "太郎",
-  "lastNameKana": "たなか",
-  "firstNameKana": "たろう",
+  "birthDate": "19900101",
+  "fullName": "田中 太郎",
+  "fullNameKana": "たなか たろう",
   "postalCode": "1234567",
   "phoneNumber": "09012345678"
 }
