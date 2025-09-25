@@ -1,12 +1,9 @@
 'use client';
 
-import Image from 'next/image';
-
 import FormCard from './FormCard';
 import type { FormData, FormErrors } from '../types';
 
 type JobTimingCardProps = {
-  stepImageSrc: string;
   selectedTiming: FormData['jobTiming'];
   errors: FormErrors;
   onSelect: (value: FormData['jobTiming']) => void;
@@ -32,7 +29,7 @@ const options: Array<{
   },
 ];
 
-export default function JobTimingCard({ stepImageSrc, selectedTiming, errors, onSelect, isActive }: JobTimingCardProps) {
+export default function JobTimingCard({ selectedTiming, errors, onSelect, isActive }: JobTimingCardProps) {
   const handleClick = (value: FormData['jobTiming']) => {
     onSelect(value);
   };
@@ -40,7 +37,6 @@ export default function JobTimingCard({ stepImageSrc, selectedTiming, errors, on
   return (
     <FormCard isActive={isActive} className="min-h-[380px]">
       <div className="mb-6 text-left">
-        <Image className="mb-4 w-full" src={stepImageSrc} alt="Step 1" width={300} height={50} priority />
         <h2 className="mb-2 text-lg font-bold text-gray-900">転職時期は決まっていますか？</h2>
         <p className="text-sm text-gray-600">状況に合わせて最適なサポートをご案内します</p>
       </div>

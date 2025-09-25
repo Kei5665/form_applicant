@@ -18,6 +18,10 @@ export default function CoupangPage() {
         showLoadingScreen={false}
         showFooterLogo={false}
         footerBgClassName="bg-[#212e4a]"
+        enableJobTimingStep={false}
+        useModal={false}
+        peopleImageAlt="クーパン求⼈特設フォーム"
+        showPeopleImage
       />
     </div>
   );

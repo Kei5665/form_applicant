@@ -17,6 +17,7 @@ type UseApplicationFormStateParams = {
   imagesToPreload: string[];
   variant: PeopleImageVariant;
   formOrigin: FormOrigin;
+  enableJobTimingStep: boolean;
 };
 
 const initialFormData: FormData = {
@@ -32,7 +33,7 @@ const initialFormData: FormData = {
   phoneNumber: '',
 };
 
-export function useApplicationFormState({ showLoadingScreen, imagesToPreload, variant, formOrigin }: UseApplicationFormStateParams) {
+export function useApplicationFormState({ showLoadingScreen, imagesToPreload, variant, formOrigin, enableJobTimingStep }: UseApplicationFormStateParams) {
   const router = useRouter();
   const [loading, setLoading] = useState(showLoadingScreen);
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
@@ -224,20 +225,31 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
   const handleNextCard1 = useCallback(
     (jobTimingValue?: FormData['jobTiming']) => {
-      const value = jobTimingValue ?? formData.jobTiming;
-      const result = validateJobTiming(value);
-      setErrors(result.errors);
-      if (result.isValid) {
-        trackEvent('step_complete', { step_name: 'step_1', step_number: 1 });
-        setCurrentCardIndex(2);
-        trackEvent('step_view', { step_name: 'step_2', step_number: 2 });
+      if (enableJobTimingStep) {
+        const value = jobTimingValue ?? formData.jobTiming;
+        const result = validateJobTiming(value);
+        setErrors(result.errors);
+        if (result.isValid) {
+          trackEvent('step_complete', { step_name: 'step_1', step_number: 1 });
+          setCurrentCardIndex(2);
+          trackEvent('step_view', { step_name: 'step_2', step_number: 2 });
+        }
+      } else {
+        const result = validateBirthDateCard(formData.birthDate);
+        setErrors(result.errors);
+        if (result.isValid) {
+          trackEvent('step_complete', { step_name: 'step_1', step_number: 1 });
+          setCurrentCardIndex(2);
+          trackEvent('step_view', { step_name: 'step_2', step_number: 2 });
+        }
       }
     },
-    [formData.jobTiming]
+    [enableJobTimingStep, formData.birthDate, formData.jobTiming]
   );
 
   const handleJobTimingSelect = useCallback(
     (value: FormData['jobTiming']) => {
+      if (!enableJobTimingStep) return;
       setFormData((prev) => ({ ...prev, jobTiming: value }));
       setErrors((prev) => ({ ...prev, jobTiming: '' }));
       if (!isFormDirty) {
@@ -245,26 +257,26 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       }
       handleNextCard1(value);
     },
-    [handleNextCard1, isFormDirty]
+    [enableJobTimingStep, handleNextCard1, isFormDirty]
   );
 
   const handleNextCard2 = useCallback(() => {
     const result = validateBirthDateCard(formData.birthDate);
     setErrors(result.errors);
     if (result.isValid) {
-      trackEvent('step_complete', { step_name: 'step_2', step_number: 2 });
-      setCurrentCardIndex(3);
-      trackEvent('step_view', { step_name: 'step_3', step_number: 3 });
+      trackEvent('step_complete', { step_name: enableJobTimingStep ? 'step_2' : 'step_1', step_number: enableJobTimingStep ? 2 : 1 });
+      setCurrentCardIndex((prev) => prev + 1);
+      trackEvent('step_view', { step_name: enableJobTimingStep ? 'step_3' : 'step_2', step_number: enableJobTimingStep ? 3 : 2 });
     }
-  }, [formData.birthDate]);
+  }, [enableJobTimingStep, formData.birthDate]);
 
   const handleNextCard3 = useCallback(() => {
     const result = validateCard2(formData);
     setErrors(result.errors);
     if (result.isValid) {
-      trackEvent('step_complete', { step_name: 'step_3', step_number: 3 });
-      setCurrentCardIndex(4);
-      trackEvent('step_view', { step_name: 'step_4', step_number: 4 });
+      trackEvent('step_complete', { step_name: enableJobTimingStep ? 'step_3' : 'step_2', step_number: enableJobTimingStep ? 3 : 2 });
+      setCurrentCardIndex((prev) => prev + 1);
+      trackEvent('step_view', { step_name: enableJobTimingStep ? 'step_4' : 'step_3', step_number: enableJobTimingStep ? 4 : 3 });
       if (formOrigin !== 'coupang') {
         if (formData.municipalityId) {
           loadJobCount({ municipalityId: formData.municipalityId });
@@ -275,7 +287,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         }
       }
     }
-  }, [formData, formOrigin, loadJobCount]);
+  }, [enableJobTimingStep, formData, formOrigin, loadJobCount]);
 
   const handlePreviousCard = useCallback(() => {
     setCurrentCardIndex((prev) => {
@@ -359,13 +371,24 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   );
 
   const cardStates = useMemo(
-    () => ({
-      isCard1Active: currentCardIndex === 1,
-      isCard2Active: currentCardIndex === 2,
-      isCard3Active: currentCardIndex === 3,
-      isCard4Active: currentCardIndex === 4,
-    }),
-    [currentCardIndex]
+    () => {
+      if (enableJobTimingStep) {
+        return {
+          isCard1Active: currentCardIndex === 1,
+          isCard2Active: currentCardIndex === 2,
+          isCard3Active: currentCardIndex === 3,
+          isCard4Active: currentCardIndex === 4,
+        };
+      }
+
+      return {
+        isCard1Active: currentCardIndex === 1,
+        isCard2Active: currentCardIndex === 2,
+        isCard3Active: currentCardIndex === 3,
+        isCard4Active: false,
+      };
+    },
+    [currentCardIndex, enableJobTimingStep]
   );
 
   return {
@@ -382,7 +405,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
-    handleNextCard3,
+    ...(enableJobTimingStep
+      ? { handleNextCard3 }
+      : {}),
     handlePreviousCard,
     handleSubmit,
     setShowExitModal,

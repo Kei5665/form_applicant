@@ -16,6 +16,8 @@ declare global {
 
 interface ApplicationFormProps {
   peopleImageSrc: string;
+  peopleImageAlt?: string;
+  showPeopleImage?: boolean;
   variant: PeopleImageVariant;
   formOrigin?: 'coupang' | 'default';
   headerLogoSrc?: string;
@@ -26,7 +28,6 @@ interface ApplicationFormProps {
   step1ImageSrc?: string;
   step2ImageSrc?: string;
   step3ImageSrc?: string;
-  step4ImageSrc?: string;
   footerLogoSrc?: string;
   bottomImageSrc?: string;
   showBottomImage?: boolean;
@@ -34,9 +35,12 @@ interface ApplicationFormProps {
   footerBgClassName?: string;
   showLoadingScreen?: boolean;
   showFooterLogo?: boolean;
+  enableJobTimingStep?: boolean;
+  useModal?: boolean;
 }
 
 function ApplicationFormInner({
+  peopleImageSrc,
   variant,
   formOrigin = 'default',
   containerClassName = '',
@@ -47,14 +51,14 @@ function ApplicationFormInner({
   step1ImageSrc = '/images/STEP1.png',
   step2ImageSrc = '/images/STEP2.png',
   step3ImageSrc = '/images/STEP3.png',
-  step4ImageSrc = '/images/STEP4.png',
   showHeader = true,
   showLoadingScreen = true,
+  enableJobTimingStep = true,
+  useModal = true,
+  peopleImageAlt = '応募フォームイメージ',
+  showPeopleImage = true,
 }: ApplicationFormProps) {
-  const imagesToPreload = useMemo(
-    () => [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc, step4ImageSrc],
-    [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc, step4ImageSrc]
-  );
+  const imagesToPreload = useMemo(() => [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc], [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc]);
 
   const {
     loading,
@@ -77,19 +81,82 @@ function ApplicationFormInner({
     imagesToPreload,
     variant,
     formOrigin,
+    enableJobTimingStep,
   });
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const modalContentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!useModal) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, []);
+  }, [useModal]);
+
+  const formWrapperClassName = useModal
+    ? 'relative w-full max-w-sm max-h-[calc(100vh-112px)] overflow-y-auto px-1'
+    : 'relative w-full max-w-sm px-1 mx-auto';
+
+  const formContent = (
+    <form onSubmit={handleSubmit} id="form" noValidate className="relative min-h-[720px] pb-4">
+      {showPeopleImage && peopleImageSrc && (
+        <div className="mb-6 flex justify-center">
+          <Image src={peopleImageSrc} alt={peopleImageAlt} width={320} height={180} className="h-auto w-full max-w-[320px]" priority={formOrigin === 'coupang'} />
+        </div>
+      )}
+
+      {enableJobTimingStep && (
+        <JobTimingCard
+          selectedTiming={formData.jobTiming}
+          errors={errors}
+          onSelect={handleJobTimingSelect}
+          isActive={cardStates.isCard1Active}
+        />
+      )}
+
+      <BirthDateCard
+        stepImageSrc={step1ImageSrc}
+        birthDate={formData.birthDate}
+        errors={errors}
+        onChange={handleInputChange}
+        onNext={enableJobTimingStep ? handleNextCard2 : handleNextCard1}
+        onPrevious={enableJobTimingStep ? handlePreviousCard : undefined}
+        isActive={enableJobTimingStep ? cardStates.isCard2Active : cardStates.isCard1Active}
+      />
+
+      <NameCard
+        stepImageSrc={step2ImageSrc}
+        postalCode={formData.postalCode}
+        prefectureId={formData.prefectureId}
+        municipalityId={formData.municipalityId}
+        errors={errors}
+        onChange={handleInputChange}
+        onPrevious={handlePreviousCard}
+        onNext={enableJobTimingStep && handleNextCard3 ? handleNextCard3 : handleNextCard2}
+        isActive={enableJobTimingStep ? cardStates.isCard3Active : cardStates.isCard2Active}
+      />
+
+      <PhoneNumberCard
+        stepImageSrc={step3ImageSrc}
+        jobResult={jobResult}
+        showJobCount={formOrigin !== 'coupang'}
+        postalCode={formData.postalCode}
+        formData={formData}
+        errors={errors}
+        phoneError={phoneError}
+        phoneNumber={formData.phoneNumber}
+        onChange={handleInputChange}
+        onBlur={handleNameBlur}
+        onPrevious={handlePreviousCard}
+        isSubmitDisabled={isSubmitDisabled}
+        isActive={enableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
+      />
+    </form>
+  );
 
   const modal = (
     <div
@@ -127,69 +194,31 @@ function ApplicationFormInner({
         </div>
       )}
 
-      <div ref={modalContentRef} className="relative w-full max-w-sm max-h-[calc(100vh-112px)] overflow-y-auto px-1">
-          <form onSubmit={handleSubmit} id="form" noValidate className="relative min-h-[720px] pb-4">
-            <JobTimingCard
-              stepImageSrc={step1ImageSrc}
-              selectedTiming={formData.jobTiming}
-              errors={errors}
-              onSelect={handleJobTimingSelect}
-              isActive={cardStates.isCard1Active}
-            />
-
-            <BirthDateCard
-              stepImageSrc={step2ImageSrc}
-              birthDate={formData.birthDate}
-              errors={errors}
-              onChange={handleInputChange}
-              onNext={handleNextCard2}
-              onPrevious={handlePreviousCard}
-              isActive={cardStates.isCard2Active}
-            />
-
-            <NameCard
-              stepImageSrc={step3ImageSrc}
-              postalCode={formData.postalCode}
-              prefectureId={formData.prefectureId}
-              municipalityId={formData.municipalityId}
-              errors={errors}
-              onChange={handleInputChange}
-              onPrevious={handlePreviousCard}
-              onNext={handleNextCard3}
-              isActive={cardStates.isCard3Active}
-            />
-
-            <PhoneNumberCard
-              stepImageSrc={step4ImageSrc}
-              jobResult={jobResult}
-              showJobCount={formOrigin !== 'coupang'}
-              postalCode={formData.postalCode}
-              formData={formData}
-              errors={errors}
-              phoneError={phoneError}
-              phoneNumber={formData.phoneNumber}
-              onChange={handleInputChange}
-              onBlur={handleNameBlur}
-              onPrevious={handlePreviousCard}
-              isSubmitDisabled={isSubmitDisabled}
-              isActive={cardStates.isCard4Active}
-            />
-          </form>
+      <div ref={modalContentRef} className={formWrapperClassName}>
+          {formContent}
       </div>
     </div>
   );
 
-  if (typeof window === 'undefined') {
+  if (useModal) {
+    if (typeof window === 'undefined') {
+      return modal;
+    }
+
+    const portalRoot = document.getElementById('modal-root');
+
+    if (portalRoot) {
+      return createPortal(modal, portalRoot);
+    }
+
     return modal;
   }
 
-  const portalRoot = document.getElementById('modal-root');
-
-  if (portalRoot) {
-    return createPortal(modal, portalRoot);
-  }
-
-  return modal;
+  return (
+    <div className={`flex justify-center px-4 ${containerClassName}`.trim()}>
+      <div className={formWrapperClassName}>{formContent}</div>
+    </div>
+  );
 }
 
 export default function ApplicationForm(props: ApplicationFormProps) {
