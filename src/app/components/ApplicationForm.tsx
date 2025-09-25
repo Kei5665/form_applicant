@@ -79,6 +79,7 @@ function ApplicationFormInner({
     handleSubmit,
     hideExitModal,
     confirmExit,
+    exitModalVariant,
   } = useApplicationFormState({
     showLoadingScreen,
     imagesToPreload,
@@ -200,7 +201,7 @@ function ApplicationFormInner({
       <div ref={modalContentRef} className={formWrapperClassName}>
         {formContent}
       </div>
-      <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} />
+      <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} variant={exitModalVariant} />
     </div>
   );
 
@@ -221,7 +222,7 @@ function ApplicationFormInner({
   return (
     <div className={`flex justify-center px-4 ${containerClassName}`.trim()}>
       <div className={formWrapperClassName}>{formContent}</div>
-      <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} />
+      <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} variant={exitModalVariant} />
     </div>
   );
 }

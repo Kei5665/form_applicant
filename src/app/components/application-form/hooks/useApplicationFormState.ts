@@ -42,6 +42,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{ type: 'history-back' } | null>(null);
+  const [exitModalVariant, setExitModalVariant] = useState<'default' | 'phone'>('default');
   const [jobResult, setJobResult] = useState<JobCountResult>({ jobCount: null, message: '', isLoading: false, error: '' });
 
   const markFormClean = useCallback(() => {
@@ -49,11 +50,20 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   }, []);
 
   useImagePreloader({ images: imagesToPreload, onComplete: () => setLoading(false), enable: showLoadingScreen });
-  useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitModal, markFormClean, setPendingNavigation });
+  useFormExitGuard({
+    isFormDirty,
+    currentCardIndex,
+    setShowExitModal,
+    markFormClean,
+    setPendingNavigation,
+    setExitModalVariant,
+    phoneCardIndex: enableJobTimingStep ? 4 : 3,
+  });
 
   const hideExitModal = useCallback(() => {
     setShowExitModal(false);
     setPendingNavigation(null);
+    setExitModalVariant('default');
   }, []);
 
   const confirmExit = useCallback(() => {
@@ -66,13 +76,14 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     markFormClean();
     const navigation = pendingNavigation;
     setPendingNavigation(null);
+    setExitModalVariant('default');
 
     if (navigation.type === 'history-back') {
       if (typeof window !== 'undefined') {
         window.history.back();
       }
     }
-  }, [pendingNavigation, markFormClean]);
+  }, [pendingNavigation, markFormClean, setExitModalVariant]);
 
   useEffect(() => {
     trackEvent('experiment_impression', { experiment: 'people_image', variant });
@@ -443,6 +454,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     handleSubmit,
     hideExitModal,
     confirmExit,
+    exitModalVariant,
     markFormClean,
   };
 }

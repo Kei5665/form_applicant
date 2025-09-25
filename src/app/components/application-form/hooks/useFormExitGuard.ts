@@ -8,9 +8,11 @@ type UseFormExitGuardParams = {
   setShowExitModal: (value: boolean) => void;
   markFormClean: () => void;
   setPendingNavigation: (value: { type: 'history-back' } | null) => void;
+  setExitModalVariant: (variant: 'default' | 'phone') => void;
+  phoneCardIndex: number;
 };
 
-export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitModal, markFormClean, setPendingNavigation }: UseFormExitGuardParams) {
+export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitModal, markFormClean, setPendingNavigation, setExitModalVariant, phoneCardIndex }: UseFormExitGuardParams) {
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (isFormDirty) {
@@ -25,10 +27,12 @@ export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitMod
       if (isFormDirty) {
         event.preventDefault();
         setShowExitModal(true);
+        setExitModalVariant(currentCardIndex === phoneCardIndex ? 'phone' : 'default');
         setPendingNavigation({ type: 'history-back' });
         window.history.pushState(null, '', window.location.pathname + window.location.search);
       } else {
         markFormClean();
+        setExitModalVariant('default');
         setPendingNavigation(null);
       }
     };
@@ -43,7 +47,7 @@ export function useFormExitGuard({ isFormDirty, currentCardIndex, setShowExitMod
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isFormDirty, setShowExitModal, markFormClean, setPendingNavigation]);
+  }, [isFormDirty, setShowExitModal, markFormClean, setPendingNavigation, setExitModalVariant, currentCardIndex, phoneCardIndex]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
