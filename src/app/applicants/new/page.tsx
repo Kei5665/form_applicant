@@ -75,6 +75,28 @@ export default function ApplicationComplete() {
         <section className="mt-12">
           <div className="flex items-center pl-2">
             <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
+            <h2 className="text-xl font-semibold text-gray-900">すぐに求人情報がほしい方</h2>
+          </div>
+          <div className="px-4">
+            <p className="mt-4 text-base leading-relaxed text-gray-900">
+              高年収の求人から採用枠が埋まります。少しでも早く知りたい方は、こちらから面談日程のご予約が可能です。
+            </p>
+            <div className="mt-6">
+              <Link
+                href="https://meeting.eeasy.jp/ridejob./general"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-2xl bg-[#2205D9] py-4 text-center text-lg font-semibold text-white shadow-[0_6px_0_rgba(0,0,0,0.15)] transition-transform hover:translate-y-[1px]"
+              >
+                面談予約へ
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-12">
+          <div className="flex items-center pl-2">
+            <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
             <h2 className="text-xl font-semibold text-gray-900">LINEでのご連絡を希望される方</h2>
           </div>
           <div className="mt-4">
@@ -100,7 +122,7 @@ export default function ApplicationComplete() {
             <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
             <h2 className="text-xl font-semibold text-gray-900">RIDE JOBが大切にしていること</h2>
           </div>
-          <div className="px-2">
+          <div className="px-4">
             <p className="mt-4 text-base leading-relaxed text-gray-900">
               私たちはおもてなしの心あふれるサポートを通して、求職者様の感動を作り出す転職支援をモットーにしています。
             </p>
@@ -126,7 +148,7 @@ export default function ApplicationComplete() {
             <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
             <h2 className="text-xl font-semibold text-gray-900">RIDE JOB公式サイトで求人を探す</h2>
           </div>
-          <div className="px-2">
+          <div className="px-4">
             <p className="mt-4 text-base leading-relaxed text-gray-900">
               地域・職種を選んで求人検索のできる公式サイトをご用意しました。
             </p>
