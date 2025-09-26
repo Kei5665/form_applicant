@@ -102,11 +102,11 @@ function ApplicationFormInner({
   }, [useModal]);
 
   const formWrapperClassName = useModal
-    ? 'relative w-full max-w-sm max-h-[calc(100vh-112px)] overflow-y-auto px-1'
+    ? 'relative w-full max-w-sm px-1 py-6 max-h-[calc(100vh-3rem)] overflow-y-auto'
     : 'relative w-full max-w-sm px-1 mx-auto';
 
   const formContent = (
-    <form onSubmit={handleSubmit} id="form" noValidate className="relative min-h-[720px] pb-4">
+    <form onSubmit={handleSubmit} id="form" noValidate className="relative pb-4">
       {showPeopleImage && peopleImageSrc && (
         <div className="mb-6 flex justify-center">
           <Image src={peopleImageSrc} alt={peopleImageAlt} width={320} height={180} className="h-auto w-full max-w-[320px]" priority={formOrigin === 'coupang'} />
@@ -171,8 +171,8 @@ function ApplicationFormInner({
       aria-labelledby="application-form-title"
     >
       {showHeader && (
-        <header className="fixed top-0 left-0 right-0 z-[10001] flex w-full justify-center px-4 pt-3">
-          <div className="flex w-[95%] max-w-md items-center justify-between rounded-lg bg-white px-4 py-2 shadow-lg">
+        <header className="fixed top-0 z-[10001] flex w-full justify-center">
+          <div className="flex w-full max-w-md items-center justify-between bg-white px-4 py-4">
             <Image src={headerLogoSrc} alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" priority loading="eager" />
             <div className="text-right">
               <p className="text-[11px] text-gray-700 leading-tight">{headerUpperText}</p>

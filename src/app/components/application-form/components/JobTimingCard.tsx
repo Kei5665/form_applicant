@@ -20,7 +20,6 @@ const options: Array<{
   {
     value: 'asap',
     label: '決まれば早く転職したい',
-    description: '今のうちに求人を確認したい',
     className: 'bg-[#ff702a] text-white shadow-[0_6px_0_0_rgba(255,112,42,0.4)]',
   },
   {
@@ -39,10 +38,9 @@ export default function JobTimingCard({ selectedTiming, errors, onSelect, isActi
   const shouldShowInitialHint = !selectedTiming;
 
   return (
-    <FormCard isActive={isActive} className="min-h-[380px]">
-      <div className="mb-6 text-left">
+    <FormCard isActive={isActive} className="min-h-[280px]">
+      <div className="mb-6 text-center">
         <h2 className="mb-2 text-lg font-bold text-gray-900">転職時期は決まっていますか？</h2>
-        <p className="text-sm text-gray-600">状況に合わせて最適なサポートをご案内します</p>
       </div>
 
       <div className="space-y-4">
@@ -52,12 +50,12 @@ export default function JobTimingCard({ selectedTiming, errors, onSelect, isActi
             <button
               key={option.value}
               type="button"
-              className={`relative w-full rounded-2xl px-5 py-4 text-left transition-transform duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-orange-200 ${
+              className={`relative w-full rounded-2xl px-5 py-8 text-center transition-transform duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-orange-200 ${
                 option.className
               } ${isSelected ? 'ring-4 ring-[#ffb48a]' : ''}`}
               onClick={() => handleClick(option.value)}
             >
-              <span className="block text-base font-bold">{option.label}</span>
+              <span className="block text-xl font-bold">{option.label}</span>
               {option.description && <span className="mt-1 block text-sm opacity-90">{option.description}</span>}
               {isSelected && (
                 <span className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-[#ff702a]">
