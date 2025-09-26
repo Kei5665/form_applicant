@@ -102,8 +102,8 @@ function ApplicationFormInner({
   }, [useModal]);
 
   const formWrapperClassName = useModal
-    ? 'relative w-full max-w-sm px-1 py-6 max-h-[calc(100vh-3rem)] overflow-y-auto'
-    : 'relative w-full max-w-sm px-1 mx-auto';
+    ? 'relative w-full max-w-sm px-1 py-6 max-h-[calc(100vh-3rem)] overflow-y-auto no-scrollbar'
+    : 'relative w-full max-w-sm px-1 mx-auto no-scrollbar';
 
   const formContent = (
     <form onSubmit={handleSubmit} id="form" noValidate className="relative pb-4">
@@ -148,7 +148,6 @@ function ApplicationFormInner({
         stepImageSrc={step3ImageSrc}
         jobResult={jobResult}
         showJobCount={formOrigin !== 'coupang'}
-        postalCode={formData.postalCode}
         formData={formData}
         errors={errors}
         phoneError={phoneError}

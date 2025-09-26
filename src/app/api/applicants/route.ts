@@ -145,7 +145,8 @@ export async function POST(request: NextRequest) {
     
     // Get media name from UTM parameters (coupangはMeta固定)
     const mediaName = isCoupang ? 'Meta広告' : getMediaName(utmParams || {});
-    const jobTimingLabel = mapJobTimingLabel(submissionData.jobTiming ?? '');
+    const submissionJobTiming = (submissionData as { jobTiming?: FormData['jobTiming'] }).jobTiming ?? formData.jobTiming ?? '';
+    const jobTimingLabel = mapJobTimingLabel(submissionJobTiming);
     console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
     
     // 並列送信（Baseのみテスト中は直下の単独送信へ）
@@ -217,7 +218,6 @@ ${title}
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
           job_timing: jobTimingLabel,
-          job_timing: mapJobTimingLabel((submissionData as { jobTiming?: FormData['jobTiming'] }).jobTiming ?? ''),
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),
@@ -270,7 +270,6 @@ ${title}
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
           job_timing: jobTimingLabel,
-          job_timing: mapJobTimingLabel((submissionData as { jobTiming?: FormData['jobTiming'] }).jobTiming ?? ''),
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),

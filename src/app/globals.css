@@ -33,6 +33,14 @@ body {
   min-height: 100vh; /* Use min-height for full viewport height */
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @media (min-width: 768px) {
   body {
     background-image: url('/images/pc-bg.png');

@@ -10,7 +10,6 @@ type PhoneNumberCardProps = {
   stepImageSrc: string;
   jobResult: JobCountResult;
   showJobCount: boolean;
-  postalCode: string;
   formData: FormData;
   errors: FormErrors;
   phoneError: string | null;
@@ -26,7 +25,6 @@ export default function PhoneNumberCard({
   stepImageSrc,
   jobResult,
   showJobCount,
-  postalCode,
   formData,
   errors,
   phoneError,
