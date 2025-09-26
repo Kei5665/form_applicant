@@ -23,6 +23,7 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
     <FormCard isActive={isActive} className="h-full">
       <div className="mb-6 text-left">
         <Image className="w-full mb-4" src={stepImageSrc} alt="Step 2" width={300} height={50} priority />
+        <h1 className="text-lg text-center font-bold mb-4 text-gray-700">条件に合った求人を検索します</h1>
         <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
         <div className="flex items-center gap-3">
           <input

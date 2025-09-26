@@ -137,14 +137,14 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
   return (
     <FormCard isActive={isActive} className="h-full">
       <Image className="w-full mb-4" src={stepImageSrc} alt="Step 3" width={300} height={50} />
+      <h1 className="text-lg text-center font-bold mb-4 text-gray-700">条件に合った求人を検索します</h1>
       <div>
-        <h3 className="mb-2 text-base font-semibold text-gray-900">郵便番号を入力してください</h3>
-        <p className="mb-4 text-xs text-gray-500">該当地域の求人件数を確認します</p>
+        <h3 className="mb-2 text-base font-semibold text-gray-900">お住まいの郵便番号</h3>
 
         {!isLocationMode && (
           <>
-            <label htmlFor="postalCode" className="mb-1 block text-gray-900">
-              郵便番号（ハイフンなし7桁）
+            <label htmlFor="postalCode" className="mb-1 block text-sm text-gray-900">
+              半角数字で入力してください
             </label>
             <div className="flex items-center gap-3">
               <input
