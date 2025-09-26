@@ -55,77 +55,43 @@ export default function PhoneNumberCard({
   })();
 
   const isSubmitEncouraged = !isSubmitDisabled && firstIncompleteField === null;
+  const primaryArea = jobResult.prefectureName?.trim() || jobResult.searchArea?.trim();
+  const secondaryArea = jobResult.municipalityName?.trim() || jobResult.townName?.trim();
+  const displayAreaName = [primaryArea, secondaryArea].filter(Boolean).join(' ') || 'ご希望のエリア';
+  const isJobCountAvailable = typeof jobResult.jobCount === 'number';
+  const isPositiveJobCount = Boolean(jobResult.jobCount && jobResult.jobCount > 0);
 
   return (
-    <FormCard isActive={isActive} className="pb-6">
+    <FormCard isActive={isActive} className="pb-6 mt-10">
       <Image className="w-full mb-4" src={stepImageSrc} alt="Step 4" width={300} height={50} />
 
       {showJobCount && (
-        <div className="mb-6">
-          <div className={`rounded-lg border ${jobResult.jobCount !== null ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-gray-200 bg-gray-50 text-gray-600'} p-4 text-center text-sm`}>
+          <div className="text-center mb-6">
             {jobResult.isLoading ? (
-              <div className="flex items-center justify-center text-blue-700">
-                <div className="mr-2 h-4 w-4 animate-bounce rounded-full bg-blue-500" />
-                <span>求人件数を確認中...</span>
+              <div className="flex items-center justify-center text-[#2C32FF]">
+                <div className="mr-2 h-4 w-4 animate-bounce rounded-full bg-[#2C32FF]" />
+                <span className="text-sm font-semibold">求人件数を確認中...</span>
               </div>
             ) : jobResult.error ? (
-              <p className="text-red-600">{jobResult.error}</p>
-            ) : jobResult.jobCount !== null ? (
-              <div>
-                <table className="mx-auto w-full max-w-[260px] table-fixed text-left text-blue-900" role="presentation">
-                  <tbody>
-                    {(jobResult.prefectureName || jobResult.searchArea) && (
-                      <tr>
-                        <th scope="row" className="w-[40%] pr-2 text-xs font-semibold text-blue-700">
-                          都道府県
-                        </th>
-                        <td className="text-sm font-semibold">
-                          {jobResult.prefectureName?.trim() || jobResult.searchArea || '—'}
-                        </td>
-                      </tr>
-                    )}
-                    {(jobResult.municipalityName || jobResult.townName || jobResult.searchArea) && (
-                      <tr>
-                        <th scope="row" className="w-[40%] pr-2 pt-1 text-xs font-semibold text-blue-700">
-                          市区町村
-                        </th>
-                        <td className="pt-1 text-sm">
-                          {jobResult.municipalityName?.trim()
-                            || jobResult.townName?.trim()
-                            || (jobResult.searchMethod === 'postal_code' ? '郵便番号から検索' : jobResult.searchArea)
-                            || '—'}
-                        </td>
-                      </tr>
-                    )}
-                    {jobResult.townName && (
-                      <tr>
-                        <th scope="row" className="w-[40%] pr-2 pt-1 text-xs font-semibold text-blue-700">
-                          町域
-                        </th>
-                        <td className="pt-1 text-sm">
-                          {jobResult.townName}
-                        </td>
-                      </tr>
-                    )}
-                    <tr>
-                      <th scope="row" className="w-[40%] pr-2 pt-2 text-xs font-semibold text-blue-700 align-top">
-                        求人件数
-                      </th>
-                      <td className="pt-2 text-lg font-bold text-blue-900">
-                        <span className="text-2xl">{jobResult.jobCount}</span>
-                        <span className="ml-1 text-base">件</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p className="mt-3 text-sm text-blue-800">{jobResult.message}</p>
-                {jobResult.jobCount > 0 && <p className="mt-2 font-medium text-green-700">✅ お近くの求人をご案内できます！</p>}
+              <p className="text-sm font-semibold text-red-600">{jobResult.error}</p>
+            ) : isJobCountAvailable ? (
+              <div className="space-y-2 text-[#2C32FF]">
+                <p className="text-xs font-semibold tracking-wide text-[#7A83FF]">
+                  {jobResult.searchMethod === 'postal_code' ? '郵便番号からの検索結果' : 'ご希望エリアの検索結果'}
+                </p>
+                <p className="text-2xl font-bold">
+                  <span>{displayAreaName}の求人</span>
+                  <span className="ml-2 text-3xl leading-none">{jobResult.jobCount}</span>
+                  <span className="ml-1 text-base">件</span>
+                </p>
+                <p className={`text-base font-semibold ${isPositiveJobCount ? 'text-gray-900' : 'text-gray-600'}`}>
+                  {isPositiveJobCount ? 'すぐにご案内できます！' : '現在ご案内できる求人が見つかりませんでした。'}
+                </p>
               </div>
             ) : (
-              <p>郵便番号を入力するか地域を選択して求人を検索してください</p>
+              <p className="text-sm text-gray-600">郵便番号を入力するか地域を選択して求人件数を表示してください</p>
             )}
           </div>
-        </div>
       )}
 
 
@@ -187,19 +153,19 @@ export default function PhoneNumberCard({
       </div>
 
       <div className="flex justify-around items-center">
-        <button type="button" className="py-2 px-4 font-bold cursor-pointer text-gray-800 mb-0" onClick={onPrevious}>
+        <button type="button" className="py-2 text-sm font-bold cursor-pointer text-gray-800 mb-0" onClick={onPrevious}>
           ＜ 戻る
         </button>
         <div className="relative flex w-[60%] items-center justify-end gap-2">
           <button
             type="submit"
-            className={`flex-1 py-2.5 px-5 rounded-md text-white font-bold cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
+            className={`flex-1 py-2.5 px-2 rounded-md text-white text-base font-bold cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
             disabled={isSubmitDisabled}
           >
-            送信
+            <span style={{ whiteSpace: 'nowrap' }}>求人を受け取る</span>
           </button>
-          <FingerHint isVisible={isSubmitEncouraged} size={44} className="sm:size-[60px]" />
         </div>
+        <FingerHint isVisible={isSubmitEncouraged} size={44} className="sm:size-[60px]" />
       </div>
     </FormCard>
   );

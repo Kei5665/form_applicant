@@ -43,15 +43,15 @@ export default function ApplicationComplete() {
       <main className="flex flex-1 flex-col pb-12">
         <section className="mt-8">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-gray-900">問い合わせありがとうございます</h1>
-            <p className="mt-6 text-xl font-bold leading-relaxed" style={{ color: '#2205D9' }}>
+            <h1 className="text-2xl font-bold text-gray-900">問い合わせありがとうございます</h1>
+            <p className="mt-6 text-2xl font-bold leading-relaxed" style={{ color: '#2205D9' }}>
               この度は、
               <br />
               RIDE JOBに問合せいただき、
               <br />
               誠にありがとうございました！
             </p>
-            <p className="mt-6 text-sm leading-relaxed font-bold text-gray-700">
+            <p className="mt-6 text-base leading-relaxed font-bold text-gray-700">
               担当者より、お電話またはメールにて
               <br />
               求人をご案内させていただきます。
@@ -78,7 +78,7 @@ export default function ApplicationComplete() {
             <h2 className="text-xl font-semibold text-gray-900">すぐに求人情報がほしい方</h2>
           </div>
           <div className="px-4">
-            <p className="mt-4 text-base leading-relaxed text-gray-900">
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
               高年収の求人から採用枠が埋まります。少しでも早く知りたい方は、こちらから面談日程のご予約が可能です。
             </p>
             <div className="mt-6">
@@ -123,10 +123,10 @@ export default function ApplicationComplete() {
             <h2 className="text-xl font-semibold text-gray-900">RIDE JOBが大切にしていること</h2>
           </div>
           <div className="px-4">
-            <p className="mt-4 text-base leading-relaxed text-gray-900">
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
               私たちはおもてなしの心あふれるサポートを通して、求職者様の感動を作り出す転職支援をモットーにしています。
             </p>
-            <p className="mt-4 text-base leading-relaxed text-gray-900">
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
               日本全国の移動を作り出すことを目指して、タクシー業界に特化した転職エージェント事業を行っています。
             </p>      
           </div>
@@ -149,10 +149,10 @@ export default function ApplicationComplete() {
             <h2 className="text-xl font-semibold text-gray-900">RIDE JOB公式サイトで求人を探す</h2>
           </div>
           <div className="px-4">
-            <p className="mt-4 text-base leading-relaxed text-gray-900">
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
               地域・職種を選んで求人検索のできる公式サイトをご用意しました。
             </p>
-            <p className="mt-4 text-base leading-relaxed text-gray-900">
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
               気になる求人がありましたら、ご連絡の際にお伝えください。
             </p>
           </div>

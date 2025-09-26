@@ -79,8 +79,8 @@ function PhoneExitContent({ onClose, onConfirm }: { onClose: () => void; onConfi
   return (
     <div className="w-full max-w-sm rounded-3xl bg-white px-6 py-8 text-center shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
       <h2 id="exit-guard-title" className="text-xl font-bold leading-snug text-gray-900">
-        <span className="block">未経験からの</span>
-        <span className="block text-[#FF7500]">タクシー転職で年収UP</span>
+        <span className="block text-2xl">未経験からの</span>
+        <span className="block text-[#FF7500] text-2xl">タクシー転職で年収UP</span>
       </h2>
 
       <div className="mt-4">
@@ -93,6 +93,8 @@ function PhoneExitContent({ onClose, onConfirm }: { onClose: () => void; onConfi
           priority
         />
       </div>
+
+      <h1 className="mt-6 text-xl font-bold leading-relaxed text-gray-900">あなたの年収が<br/>どれだけ上がるか判明</h1>
 
       <div className="mt-6 flex flex-col items-center gap-3">
         <button
