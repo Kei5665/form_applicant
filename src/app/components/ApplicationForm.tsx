@@ -185,7 +185,7 @@ function ApplicationFormInner({
       {showLoadingScreen && (
         <div
           id="loading-screen"
-          className={`absolute inset-0 flex flex-col items-center justify-center bg-white transition-all duration-700 ease-out ${
+          className={`absolute inset-0 flex flex-col items-center justify-center bg-white transition-all duration-700 ease-out z-[10001] ${
             loading ? 'opacity-100 visible' : 'opacity-0 invisible'
           }`}
         >
