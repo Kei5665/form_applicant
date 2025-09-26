@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getJobCountByMunicipality, getJobCountByPostalCode, getJobsByPrefectureId, fetchPrefectureById } from '@/lib/microcms';
+import { getJobCountByMunicipality, getJobCountByPostalCode, getJobsByPrefectureId, fetchPrefectureById, fetchMunicipalityById } from '@/lib/microcms';
 import { normalizePostcode } from '@/lib/postcode';
+import { fetchAddressByZipcode } from '@/lib/zipcloud';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,15 +12,24 @@ export async function GET(request: NextRequest) {
     const municipalityId = searchParams.get('municipalityId');
 
     if (municipalityId) {
+      const municipality = await fetchMunicipalityById(municipalityId);
+      if (!municipality) {
+        return NextResponse.json({ error: '市区町村の取得に失敗しました' }, { status: 404 });
+      }
       const jobCount = await getJobCountByMunicipality(municipalityId);
+      const prefectureName = municipality.prefecture.region;
+      const municipalityName = municipality.name;
+
       return NextResponse.json({
         jobCount,
         searchMethod: 'municipality',
-        searchArea: '選択した市区町村',
+        searchArea: `${prefectureName} ${municipalityName}`,
+        prefectureName,
+        municipalityName,
         message:
           jobCount > 0
-            ? `選択した市区町村で${jobCount}件の求人が見つかりました`
-            : '選択した市区町村では現在求人がありません',
+            ? `${prefectureName} ${municipalityName}で${jobCount}件の求人が見つかりました`
+            : `${prefectureName} ${municipalityName}では現在求人がありません`,
       });
     }
 
@@ -36,6 +46,8 @@ export async function GET(request: NextRequest) {
         jobCount,
         searchMethod: 'prefecture',
         searchArea,
+        prefectureName: prefecture.region,
+        municipalityName: '',
         message:
           jobCount > 0
             ? `${searchArea}で${jobCount}件の求人が見つかりました`
@@ -55,11 +67,16 @@ export async function GET(request: NextRequest) {
     const jobCount = await getJobCountByPostalCode(normalizedPostalCode);
     const searchArea = `郵便番号 ${normalizedPostalCode}`;
 
+    const location = await fetchAddressByZipcode(normalizedPostalCode);
+
     return NextResponse.json({
       postalCode: normalizedPostalCode,
       jobCount,
       searchMethod: 'postal_code',
       searchArea,
+      prefectureName: location?.prefectureName ?? '',
+      municipalityName: location?.municipalityName ?? '',
+      townName: location?.townName ?? '',
       message:
         jobCount > 0
           ? `${searchArea} のエリアで${jobCount}件の求人が見つかりました`

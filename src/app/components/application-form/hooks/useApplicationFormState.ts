@@ -117,6 +117,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         error: result.error ?? '',
         searchMethod: result.searchMethod,
         searchArea: result.searchArea,
+        prefectureName: result.prefectureName,
+        municipalityName: result.municipalityName,
+        townName: result.townName,
       });
     } catch (error) {
       console.error('Error fetching job count:', error);

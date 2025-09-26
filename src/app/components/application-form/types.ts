@@ -35,5 +35,8 @@ export type JobCountResult = {
   error: string;
   searchMethod?: 'postal_code' | 'prefecture' | 'municipality';
   searchArea?: string;
+  prefectureName?: string;
+  municipalityName?: string;
+  townName?: string;
 };
 

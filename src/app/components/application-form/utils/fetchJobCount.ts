@@ -3,6 +3,9 @@ type JobCountResponse = {
   message: string;
   searchMethod?: 'postal_code' | 'prefecture' | 'municipality';
   searchArea?: string;
+  prefectureName?: string;
+  municipalityName?: string;
+  townName?: string;
   error?: string;
 };
 

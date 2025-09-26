@@ -24,6 +24,7 @@ export interface MunicipalityEntry {
   name: string;
   prefecture: {
     id: string;
+    region: string;
   };
 }
 
@@ -138,8 +139,9 @@ export interface Job {
 
 export type JobsResponse = MicroCMSListResponse<Job>;
 
-export async function getJobsByPostalCode(postalCode: string): Promise<JobsResponse> {
+export async function getJobsByPostalCode(postalCode: string, limit = 1): Promise<JobsResponse> {
   const params = new URLSearchParams({ filters: `addressZip[equals]${postalCode}` });
+  params.set('limit', limit.toString());
   return fetchFromMicroCMS<Job>('jobs', params);
 }
 
