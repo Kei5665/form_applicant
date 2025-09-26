@@ -100,12 +100,12 @@ export async function POST(request: NextRequest) {
 
     // Determine the appropriate Lark webhook URLs based on environment (with sensible fallbacks)
     const larkWebhookUrlCommon = isProduction
-      ? process.env.LARK_WEBHOOK_URL_PROD
+      ? process.env.LARK_WEBHOOK_URL_TOP_PROD
           || process.env.LARK_WEBHOOK_URL
           || process.env.LARK_WEBHOOK_URL_TEST
       : process.env.LARK_WEBHOOK_URL_TEST
           || process.env.LARK_WEBHOOK_URL
-          || process.env.LARK_WEBHOOK_URL_PROD;
+          || process.env.LARK_WEBHOOK_URL_TOP_PROD;
     // Optional dedicated webhook for coupang
     const larkWebhookUrlCoupang = isProduction
       ? process.env.LARK_WEBHOOK_URL_COUPANG_PROD || process.env.LARK_WEBHOOK_URL_COUPANG
