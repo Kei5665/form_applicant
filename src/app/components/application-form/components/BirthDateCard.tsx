@@ -52,11 +52,11 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
         ) : (
           <span />
         )}
-        <div className="relative flex flex-1 items-center justify-end gap-2">
+        <div className="relative flex flex-1 items-center justify-end">
           <button type="button" className="flex-1 py-2.5 px-5 rounded-md bg-[#ff702a] text-white font-bold cursor-pointer" onClick={onNext}>
             次へ
           </button>
-          <FingerHint isVisible={isFilled} size={44} className="sm:size-[56px]" />
+          <FingerHint isVisible={isFilled} size={44} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[56px]" />
         </div>
       </div>
     </FormCard>

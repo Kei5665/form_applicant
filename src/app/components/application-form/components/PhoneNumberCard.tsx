@@ -166,16 +166,16 @@ export default function PhoneNumberCard({
         <button type="button" className="py-2 text-sm font-bold cursor-pointer text-gray-800 mb-0" onClick={onPrevious}>
           ＜ 戻る
         </button>
-        <div className="relative flex w-[60%] items-center justify-end gap-2">
+        <div className="relative ml-auto flex w-[70%] max-w-[320px] items-center justify-end">
           <button
             type="submit"
-            className={`flex-1 py-2.5 px-2 rounded-md text-white text-base font-bold cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
+            className={`w-full rounded-md py-3 px-12 text-base font-bold text-white cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
             disabled={isSubmitDisabled}
           >
             <span style={{ whiteSpace: 'nowrap' }}>求人を受け取る</span>
           </button>
+          <FingerHint isVisible={isSubmitEncouraged} size={44} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[60px]" />
         </div>
-        <FingerHint isVisible={isSubmitEncouraged} size={44} className="sm:size-[60px]" />
       </div>
     </FormCard>
   );

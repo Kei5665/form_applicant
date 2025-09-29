@@ -236,7 +236,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
           <button type="button" className="flex-1 rounded-md bg-[#ff702a] py-2.5 px-5 font-bold text-white" onClick={onNext}>
             次へ
           </button>
-          <FingerHint isVisible={isNextEnabled} size={44} className="sm:size-[56px]" />
+          <FingerHint isVisible={isNextEnabled} size={44} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[56px]" />
         </div>
       </div>
     </FormCard>
