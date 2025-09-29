@@ -154,7 +154,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
                 id="postalCode"
                 name="postalCode"
                 placeholder="例: 1234567"
-                className={`flex-1 rounded-lg border p-3 text-gray-900 placeholder-gray-500 ${errors.postalCode ? 'border-red-500' : 'border-gray-300'}`}
+                className={`flex-1 rounded-lg border p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.postalCode ? 'border-red-500' : 'border-gray-300'}`}
                 value={postalCode}
                 onChange={onChange}
                 maxLength={7}
@@ -175,7 +175,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
                 <select
                   id="prefectureId"
                   name="prefectureId"
-                  className={`flex-1 rounded-lg border p-4 text-gray-900 bg-white ${errors.prefectureId ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`flex-1 rounded-lg border p-4 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.prefectureId ? 'border-red-500' : 'border-gray-300'}`}
                   value={prefectureId}
                   onChange={onChange}
                   disabled={isPrefectureLoading}
@@ -200,7 +200,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
                 <select
                   id="municipalityId"
                   name="municipalityId"
-                  className={`flex-1 rounded-lg border p-4 text-gray-900 bg-white ${errors.municipalityId ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`flex-1 rounded-lg border p-4 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.municipalityId ? 'border-red-500' : 'border-gray-300'}`}
                   value={municipalityId}
                   onChange={onChange}
                   disabled={!prefectureId || isMunicipalityLoading}
