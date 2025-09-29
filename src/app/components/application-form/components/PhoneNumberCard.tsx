@@ -101,7 +101,7 @@ export default function PhoneNumberCard({
             id="fullName"
             name="fullName"
             placeholder="例: 田中 太郎"
-            className={`flex-1 p-3 border rounded text-gray-900 placeholder-gray-500 ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+            className={`flex-1 rounded border p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
             value={formData.fullName}
             onChange={onChange}
             onBlur={onBlur}
@@ -123,7 +123,7 @@ export default function PhoneNumberCard({
             id="fullNameKana"
             name="fullNameKana"
             placeholder="例: たなか たろう"
-            className={`flex-1 p-3 border rounded text-gray-900 placeholder-gray-500 ${errors.fullNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.fullNameKana && !errors.fullNameKana ? 'text-gray-900' : ''}`}
+            className={`flex-1 rounded border p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.fullNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.fullNameKana && !errors.fullNameKana ? 'text-gray-900' : ''}`}
             value={formData.fullNameKana}
             onChange={onChange}
           />
@@ -148,7 +148,7 @@ export default function PhoneNumberCard({
             id="phoneNumber"
             name="phoneNumber"
             placeholder="例: 09012345678"
-            className={`flex-1 p-2 border rounded text-gray-900 placeholder-gray-500 ${errors.phoneNumber || phoneError ? 'border-red-500' : 'border-gray-300'}`}
+            className={`flex-1 rounded border p-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.phoneNumber || phoneError ? 'border-red-500' : 'border-gray-300'}`}
             value={phoneNumber}
             onChange={onChange}
             maxLength={11}
