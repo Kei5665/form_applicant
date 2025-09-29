@@ -95,7 +95,7 @@ export default function PhoneNumberCard({
 
       <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
-        <div className="flex items-center gap-3">
+        <div className="relative flex items-center gap-3">
           <input
             type="text"
             id="fullName"
@@ -106,14 +106,18 @@ export default function PhoneNumberCard({
             onChange={onChange}
             onBlur={onBlur}
           />
-          <FingerHint isVisible={firstIncompleteField === 'fullName'} size={40} className="sm:size-[52px]" />
+          <FingerHint
+            isVisible={firstIncompleteField === 'fullName'}
+            size={40}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
+          />
         </div>
         {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
       </div>
 
       <div className="mb-6 text-left">
         <label className="font-bold mb-2.5 block text-gray-900">お名前（ふりがな）</label>
-        <div className="flex items-center gap-3">
+        <div className="relative flex items-center gap-3">
           <input
             type="text"
             id="fullNameKana"
@@ -123,7 +127,11 @@ export default function PhoneNumberCard({
             value={formData.fullNameKana}
             onChange={onChange}
           />
-          <FingerHint isVisible={firstIncompleteField === 'fullNameKana'} size={40} className="sm:size-[52px]" />
+          <FingerHint
+            isVisible={firstIncompleteField === 'fullNameKana'}
+            size={40}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
+          />
         </div>
         {errors.fullNameKana && <p className="text-red-500 text-xs mt-1">{errors.fullNameKana}</p>}
       </div>
@@ -134,7 +142,7 @@ export default function PhoneNumberCard({
           <br />
           ( ハイフンなし11桁 )
         </label>
-        <div className="flex items-center gap-3">
+        <div className="relative flex items-center gap-3">
           <input
             type="tel"
             id="phoneNumber"
@@ -145,7 +153,11 @@ export default function PhoneNumberCard({
             onChange={onChange}
             maxLength={11}
           />
-          <FingerHint isVisible={firstIncompleteField === 'phoneNumber'} size={40} className="sm:size-[52px]" />
+          <FingerHint
+            isVisible={firstIncompleteField === 'phoneNumber'}
+            size={40}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
+          />
         </div>
         {(errors.phoneNumber || phoneError) && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber || phoneError}</p>}
       </div>

@@ -25,7 +25,7 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
         <Image className="w-full mb-4" src={stepImageSrc} alt="Step 2" width={300} height={50} priority />
         <h1 className="text-lg text-center font-bold mb-4 text-gray-700">条件に合った求人を検索します</h1>
         <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
-        <div className="flex items-center gap-3">
+        <div className="relative flex items-center gap-3">
           <input
             type="text"
             inputMode="numeric"
@@ -40,7 +40,7 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
             onChange={onChange}
             maxLength={8}
           />
-          <FingerHint isVisible={!isFilled} size={40} className="sm:size-[52px]" />
+          <FingerHint isVisible={!isFilled} size={40} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]" />
         </div>
         {errors.birthDate && <p className="text-red-500 text-xs mt-1">{errors.birthDate}</p>}
       </div>

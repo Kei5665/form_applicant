@@ -146,7 +146,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
             <label htmlFor="postalCode" className="mb-1 block text-sm text-gray-900">
               半角数字で入力してください
             </label>
-            <div className="flex items-center gap-3">
+              <div className="relative flex items-center gap-3">
               <input
                 type="text"
                 inputMode="numeric"
@@ -159,7 +159,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
                 onChange={onChange}
                 maxLength={7}
               />
-              <FingerHint isVisible={!isPostalCodeFilled} size={40} className="sm:size-[52px]" />
+              <FingerHint isVisible={!isPostalCodeFilled} size={40} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]" />
             </div>
             {errors.postalCode && <p className="mt-2 text-xs text-red-500">{errors.postalCode}</p>}
           </>
@@ -171,11 +171,11 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
               <label htmlFor="prefectureId" className="mb-1 block text-gray-900">
                 都道府県
               </label>
-              <div className="flex items-center gap-3">
+              <div className="relative flex items-center gap-3">
                 <select
                   id="prefectureId"
                   name="prefectureId"
-                  className={`flex-1 rounded-lg border p-3 text-gray-900 bg-white ${errors.prefectureId ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`flex-1 rounded-lg border p-4 text-gray-900 bg-white ${errors.prefectureId ? 'border-red-500' : 'border-gray-300'}`}
                   value={prefectureId}
                   onChange={onChange}
                   disabled={isPrefectureLoading}
@@ -187,7 +187,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
                     </option>
                   ))}
                 </select>
-                <FingerHint isVisible={!isPrefectureSelected} size={40} className="sm:size-[52px]" />
+                <FingerHint isVisible={!isPrefectureSelected} size={40} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]" />
               </div>
               {errors.prefectureId && <p className="mt-2 text-xs text-red-500">{errors.prefectureId}</p>}
             </div>
@@ -196,11 +196,11 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
               <label htmlFor="municipalityId" className="mb-1 block text-gray-900">
                 市区町村
               </label>
-              <div className="flex items-center gap-3">
+              <div className="relative flex items-center gap-3">
                 <select
                   id="municipalityId"
                   name="municipalityId"
-                  className={`flex-1 rounded-lg border p-3 text-gray-900 bg-white ${errors.municipalityId ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`flex-1 rounded-lg border p-4 text-gray-900 bg-white ${errors.municipalityId ? 'border-red-500' : 'border-gray-300'}`}
                   value={municipalityId}
                   onChange={onChange}
                   disabled={!prefectureId || isMunicipalityLoading}
@@ -212,7 +212,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
                     </option>
                   ))}
                 </select>
-                <FingerHint isVisible={!isMunicipalitySelected && Boolean(prefectureId)} size={40} className="sm:size-[52px]" />
+                <FingerHint isVisible={!isMunicipalitySelected && Boolean(prefectureId)} size={40} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]" />
               </div>
               {errors.municipalityId && <p className="mt-2 text-xs text-red-500">{errors.municipalityId}</p>}
             </div>
