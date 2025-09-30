@@ -54,8 +54,7 @@ export default function PhoneNumberCard({
 
   const isSubmitEncouraged = !isSubmitDisabled && firstIncompleteField === null;
   const primaryArea = jobResult.prefectureName?.trim() || jobResult.searchArea?.trim();
-  const secondaryArea = jobResult.municipalityName?.trim() || jobResult.townName?.trim();
-  const displayAreaName = [primaryArea, secondaryArea].filter(Boolean).join(' ') || 'ご希望のエリア';
+  const displayAreaName = primaryArea || 'ご希望のエリア';
   const isJobCountAvailable = typeof jobResult.jobCount === 'number';
   const isPositiveJobCount = Boolean(jobResult.jobCount && jobResult.jobCount > 0);
 
@@ -75,7 +74,7 @@ export default function PhoneNumberCard({
             ) : isJobCountAvailable ? (
               <div className="space-y-2 text-[#2C32FF]">
                 <p className="text-xs font-semibold tracking-wide text-[#7A83FF]">
-                  {jobResult.searchMethod === 'postal_code' ? '郵便番号からの検索結果' : 'ご希望エリアの検索結果'}
+                  {jobResult.searchMethod === 'postal_code' ? '郵便番号からの検索結果' : '都道府県での検索結果'}
                 </p>
                 <p className="text-2xl font-bold">
                   <span>{displayAreaName}の求人</span>

@@ -93,11 +93,10 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const hiraganaConverter = useHiraganaConverter();
 
   const loadJobCount = useCallback(async (params: Partial<JobCountParams>) => {
-    const hasPostal = 'postalCode' in params && typeof params.postalCode === 'string';
-    const hasPref = 'prefectureId' in params && typeof params.prefectureId === 'string';
-    const hasMunicipality = 'municipalityId' in params && typeof params.municipalityId === 'string';
+    const hasPostal = typeof params.postalCode === 'string' && params.postalCode.trim().length > 0;
+    const hasPref = typeof params.prefectureId === 'string' && params.prefectureId.trim().length > 0;
 
-    if (!hasPostal && !hasPref && !hasMunicipality) {
+    if (!hasPostal && !hasPref) {
       setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
       return;
     }
@@ -106,9 +105,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       const result = await fetchJobCount(
         hasPostal
           ? { postalCode: params.postalCode as string }
-          : hasPref
-            ? { prefectureId: params.prefectureId as string }
-            : { municipalityId: params.municipalityId as string }
+          : { prefectureId: params.prefectureId as string }
       );
       setJobResult({
         jobCount: result.jobCount,
@@ -118,8 +115,6 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         searchMethod: result.searchMethod,
         searchArea: result.searchArea,
         prefectureName: result.prefectureName,
-        municipalityName: result.municipalityName,
-        townName: result.townName,
       });
     } catch (error) {
       console.error('Error fetching job count:', error);
@@ -242,17 +237,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         } else {
           setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
         }
-      } else if (name === 'municipalityId') {
-        if (value) {
-          loadJobCount({ municipalityId: value });
-        } else if (formData.prefectureId) {
-          loadJobCount({ prefectureId: formData.prefectureId });
-        } else {
-          setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
-        }
       }
     },
-    [formData.prefectureId, formOrigin, isFormDirty, loadJobCount, validatePhoneNumberInput]
+    [formOrigin, isFormDirty, loadJobCount, validatePhoneNumberInput]
   );
 
   const handleNameBlur = useCallback(
@@ -323,9 +310,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       setCurrentCardIndex((prev) => prev + 1);
       trackEvent('step_view', { step_name: enableJobTimingStep ? 'step_4' : 'step_3', step_number: enableJobTimingStep ? 4 : 3 });
       if (formOrigin !== 'coupang') {
-        if (formData.municipalityId) {
-          loadJobCount({ municipalityId: formData.municipalityId });
-        } else if (formData.prefectureId) {
+        if (formData.prefectureId) {
           loadJobCount({ prefectureId: formData.prefectureId });
         } else if (formData.postalCode.length === 7) {
           loadJobCount({ postalCode: formData.postalCode });

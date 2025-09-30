@@ -1,18 +1,15 @@
 type JobCountResponse = {
   jobCount: number | null;
   message: string;
-  searchMethod?: 'postal_code' | 'prefecture' | 'municipality';
+  searchMethod?: 'postal_code' | 'prefecture';
   searchArea?: string;
   prefectureName?: string;
-  municipalityName?: string;
-  townName?: string;
   error?: string;
 };
 
 export type JobCountParams =
   | { postalCode: string; prefectureId?: never; municipalityId?: never }
-  | { postalCode?: never; prefectureId: string; municipalityId?: never }
-  | { postalCode?: never; prefectureId?: never; municipalityId: string };
+  | { postalCode?: never; prefectureId: string };
 
 export async function fetchJobCount(params: JobCountParams): Promise<JobCountResponse> {
   const query = new URLSearchParams();
@@ -21,9 +18,6 @@ export async function fetchJobCount(params: JobCountParams): Promise<JobCountRes
   }
   if (params.prefectureId) {
     query.set('prefectureId', params.prefectureId);
-  }
-  if (params.municipalityId) {
-    query.set('municipalityId', params.municipalityId);
   }
 
   const response = await fetch(`/api/jobs-count?${query.toString()}`);

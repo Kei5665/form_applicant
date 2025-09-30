@@ -33,10 +33,8 @@ export type JobCountResult = {
   message: string;
   isLoading: boolean;
   error: string;
-  searchMethod?: 'postal_code' | 'prefecture' | 'municipality';
+  searchMethod?: 'postal_code' | 'prefecture';
   searchArea?: string;
   prefectureName?: string;
-  municipalityName?: string;
-  townName?: string;
 };
 

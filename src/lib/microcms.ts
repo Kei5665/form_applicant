@@ -139,19 +139,8 @@ export interface Job {
 
 export type JobsResponse = MicroCMSListResponse<Job>;
 
-export async function getJobsByPostalCode(postalCode: string, limit = 1): Promise<JobsResponse> {
-  const params = new URLSearchParams({ filters: `addressZip[equals]${postalCode}` });
-  params.set('limit', limit.toString());
-  return fetchFromMicroCMS<Job>('jobs', params);
-}
-
-export async function getJobCountByPostalCode(postalCode: string): Promise<number> {
-  const response = await getJobsByPostalCode(postalCode);
-  return response.totalCount;
-}
-
 export async function getPrefectureByRegion(regionName: string): Promise<PrefectureEntry | null> {
-  const params = new URLSearchParams({ filters: `region[equals]${encodeURIComponent(regionName)}` });
+  const params = new URLSearchParams({ filters: `region[equals]${regionName}` });
   const data = await fetchFromMicroCMS<PrefectureEntry>('prefectures', params);
   return data.contents[0] ?? null;
 }
