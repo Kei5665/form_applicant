@@ -1,0 +1,1 @@
+{"apiFields":[{"fieldId":"region","name":"都道府県名","kind":"text","required":false},{"fieldId":"area","name":"地方","kind":"text","required":false}],"customFields":[]}

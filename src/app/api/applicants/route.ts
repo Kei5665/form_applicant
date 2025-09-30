@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { FormData } from '@/app/components/application-form/types';
+import { mapJobTimingLabel } from '@/app/components/application-form/utils/mapJobTimingLabel';
 
 // Types for submission payload
 type ExperimentInfo = {
@@ -15,12 +17,15 @@ type UTMParams = {
 
 type ApplicantFormData = {
   birthDate?: string;
-  lastName?: string;
-  firstName?: string;
-  lastNameKana?: string;
-  firstNameKana?: string;
+  fullName?: string;
+  fullNameKana?: string;
   postalCode?: string;
+  prefectureId?: string;
+  prefectureName?: string;
+  municipalityId?: string;
+  municipalityName?: string;
   phoneNumber?: string;
+  jobTiming?: FormData['jobTiming'];
 };
 
 type ApplicantSubmission = ApplicantFormData & {
@@ -95,12 +100,10 @@ export async function POST(request: NextRequest) {
 
     // Determine the appropriate Lark webhook URLs based on environment (with sensible fallbacks)
     const larkWebhookUrlCommon = isProduction
-      ? process.env.LARK_WEBHOOK_URL_PROD
-          || process.env.LARK_WEBHOOK_URL
+      ? process.env.LARK_WEBHOOK_URL
           || process.env.LARK_WEBHOOK_URL_TEST
       : process.env.LARK_WEBHOOK_URL_TEST
-          || process.env.LARK_WEBHOOK_URL
-          || process.env.LARK_WEBHOOK_URL_PROD;
+          || process.env.LARK_WEBHOOK_URL;
     // Optional dedicated webhook for coupang
     const larkWebhookUrlCoupang = isProduction
       ? process.env.LARK_WEBHOOK_URL_COUPANG_PROD || process.env.LARK_WEBHOOK_URL_COUPANG
@@ -140,6 +143,8 @@ export async function POST(request: NextRequest) {
     
     // Get media name from UTM parameters (coupangはMeta固定)
     const mediaName = isCoupang ? 'Meta広告' : getMediaName(utmParams || {});
+    const submissionJobTiming = (submissionData as { jobTiming?: FormData['jobTiming'] }).jobTiming ?? formData.jobTiming ?? '';
+    const jobTimingLabel = mapJobTimingLabel(submissionJobTiming);
     console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
     
     // 並列送信（Baseのみテスト中は直下の単独送信へ）
@@ -152,13 +157,18 @@ export async function POST(request: NextRequest) {
         const utmDisplay = utmParams?.utm_source
           ? `${utmParams.utm_source}${utmParams.utm_medium ? `(${utmParams.utm_medium})` : ''}`
           : 'RIDEJOB HP';
+        const locationDisplay = formData.prefectureName || formData.municipalityName
+          ? `${formData.prefectureName || ''} ${formData.municipalityName || ''}`.trim()
+          : '未入力';
         const messageContent = `
 ${title}
 -------------------------
 流入元: ${utmDisplay}
 生年月日: ${formData.birthDate || '未入力'}
-氏名: ${formData.lastName || ''} ${formData.firstName || ''} (${formData.lastNameKana || ''} ${formData.firstNameKana || ''})
+氏名: ${formData.fullName || '未入力'} (${formData.fullNameKana || '未入力'})
 郵便番号: ${formData.postalCode || '未入力'}
+地域: ${locationDisplay}
+転職時期: ${jobTimingLabel || '未選択'}
 電話番号: ${formData.phoneNumber || '未入力'}
 -------------------------
         `.trim();
@@ -197,12 +207,15 @@ ${title}
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           birth_date: formData.birthDate || '',
-          last_name: formData.lastName || '',
-          first_name: formData.firstName || '',
-          last_name_kana: formData.lastNameKana || '',
-          first_name_kana: formData.firstNameKana || '',
+          full_name: formData.fullName || '',
+          full_name_kana: formData.fullNameKana || '',
           postal_code: formData.postalCode || '',
+          prefecture_id: formData.prefectureId || '',
+          prefecture_name: formData.prefectureName || '',
+          municipality_id: formData.municipalityId || '',
+          municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
+          job_timing: jobTimingLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),
@@ -246,12 +259,15 @@ ${title}
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           birth_date: formData.birthDate || '',
-          last_name: formData.lastName || '',
-          first_name: formData.firstName || '',
-          last_name_kana: formData.lastNameKana || '',
-          first_name_kana: formData.firstNameKana || '',
+          full_name: formData.fullName || '',
+          full_name_kana: formData.fullNameKana || '',
           postal_code: formData.postalCode || '',
+          prefecture_id: formData.prefectureId || '',
+          prefecture_name: formData.prefectureName || '',
+          municipality_id: formData.municipalityId || '',
+          municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
+          job_timing: jobTimingLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),

@@ -1,0 +1,1 @@
+{"apiFields":[{"fieldId":"name","name":"表示名","kind":"text","required":false},{"fieldId":"prefecture","name":"都道府県","kind":"relation","required":false}],"customFields":[]}
