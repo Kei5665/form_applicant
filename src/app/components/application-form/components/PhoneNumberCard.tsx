@@ -18,6 +18,7 @@ type PhoneNumberCardProps = {
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   onPrevious: () => void;
   isSubmitDisabled: boolean;
+  isSubmitting: boolean;
   isActive: boolean;
 };
 
@@ -33,6 +34,7 @@ export default function PhoneNumberCard({
   onBlur,
   onPrevious,
   isSubmitDisabled,
+  isSubmitting,
   isActive,
 }: PhoneNumberCardProps) {
   const isFullNameFilled = formData.fullName.trim().length > 0;
@@ -52,7 +54,8 @@ export default function PhoneNumberCard({
     return null;
   })();
 
-  const isSubmitEncouraged = !isSubmitDisabled && firstIncompleteField === null;
+  const isSubmitEncouraged = !isSubmitDisabled && !isSubmitting && firstIncompleteField === null;
+  const isSubmitButtonDisabled = isSubmitDisabled || isSubmitting;
   const primaryArea = jobResult.prefectureName?.trim() || jobResult.searchArea?.trim();
   const displayAreaName = primaryArea || 'ご希望のエリア';
   const isJobCountAvailable = typeof jobResult.jobCount === 'number';
@@ -168,10 +171,10 @@ export default function PhoneNumberCard({
         <div className="relative ml-auto flex w-[70%] max-w-[320px] items-center justify-end">
           <button
             type="submit"
-            className={`w-full rounded-md py-3 px-12 text-base font-bold text-white cursor-pointer ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a]'}`}
-            disabled={isSubmitDisabled}
+            className={`w-full rounded-md py-3 px-12 text-base font-bold text-white ${isSubmitButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a] cursor-pointer'}`}
+            disabled={isSubmitButtonDisabled}
           >
-            <span style={{ whiteSpace: 'nowrap' }}>求人を受け取る</span>
+            <span style={{ whiteSpace: 'nowrap' }}>{isSubmitting ? '送信中...' : '求人を受け取る'}</span>
           </button>
           <FingerHint isVisible={isSubmitEncouraged} size={44} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[60px]" />
         </div>

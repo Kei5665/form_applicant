@@ -67,6 +67,7 @@ function ApplicationFormInner({
     errors,
     phoneError,
     isSubmitDisabled,
+    isSubmitting,
     jobResult,
     showExitModal,
     handleInputChange,
@@ -156,6 +157,7 @@ function ApplicationFormInner({
         onBlur={handleNameBlur}
         onPrevious={handlePreviousCard}
         isSubmitDisabled={isSubmitDisabled}
+        isSubmitting={isSubmitting}
         isActive={enableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
       />
     </form>

@@ -39,6 +39,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const [errors, setErrors] = useState<FormErrors>({});
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<{ type: 'history-back' } | null>(null);
@@ -346,6 +347,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (isSubmitting) {
+        return;
+      }
       const nameValidation = validateNameFields(formData);
       if (!nameValidation.isValid) {
         setErrors((prev) => ({ ...prev, ...nameValidation.errors }));
@@ -358,7 +362,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         setIsSubmitDisabled(true);
         return;
       }
-      setIsSubmitDisabled(false);
+      setIsSubmitting(true);
       trackEvent('form_submit', { form_name: 'ridejob_application' });
 
       try {
@@ -399,6 +403,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         if (!response.ok) {
           const errorResult = await response.json();
           alert(`エラーが発生しました: ${errorResult.message || 'サーバーエラー'}`);
+          setIsSubmitting(false);
           return;
         }
 
@@ -409,9 +414,10 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       } catch (error) {
         console.error('Error submitting form:', error);
         alert('フォームの送信中にエラーが発生しました。ネットワーク接続を確認してください。');
+        setIsSubmitting(false);
       }
     },
-    [formData, formOrigin, router, variant]
+    [formData, formOrigin, router, variant, isSubmitting]
   );
 
   const cardStates = useMemo(
@@ -442,6 +448,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     errors,
     phoneError,
     isSubmitDisabled,
+    isSubmitting,
     showExitModal,
     jobResult,
     handleInputChange,
