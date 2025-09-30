@@ -41,17 +41,14 @@ export default function ApplicationComplete() {
       </header>
 
       <main className="flex flex-1 flex-col pb-12">
-        <section className="mt-8">
+        <section className="mt-2">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">問い合わせありがとうございます</h1>
             <p className="mt-6 text-2xl font-bold leading-relaxed" style={{ color: '#2205D9' }}>
-              この度は、
-              <br />
-              RIDE JOBに問合せいただき、
+              RIDE JOBに問合せいただき
               <br />
               誠にありがとうございました！
             </p>
-            <p className="mt-6 text-base leading-relaxed font-bold text-gray-700">
+            <p className="mt-6 text-lg leading-relaxed font-bold text-gray-700">
               担当者より、お電話またはメールにて
               <br />
               求人をご案内させていただきます。
@@ -61,14 +58,14 @@ export default function ApplicationComplete() {
           </div>
         </section>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-6 flex justify-center">
           <Image
             src="/images/thanks-banner.png"
             alt="転職サポートのご案内バナー"
             width={680}
             height={227}
             priority
-            className="h-auto w-full max-w-[420px]"
+            className="h-auto w-full"
           />
         </div>
 
