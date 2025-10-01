@@ -173,7 +173,13 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       }
 
       if (name === 'fullNameKana') {
-        value = value.replace(/[^ぁ-んー\s]/g, '');
+        const nativeEvent = event.nativeEvent as (InputEvent & { isComposing?: boolean }) | undefined;
+        const isComposing = nativeEvent?.isComposing ?? false;
+        const isInsertCompositionText = nativeEvent?.inputType === 'insertCompositionText';
+
+        if (!isComposing && !isInsertCompositionText) {
+          value = value.replace(/[^ぁ-んー\s]/g, '');
+        }
       }
 
       setFormData((prev) => {
