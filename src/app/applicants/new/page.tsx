@@ -23,7 +23,8 @@ export default function ApplicationComplete() {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-[480px] flex-col bg-white">
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto flex w-full max-w-[480px] flex-col bg-white">
       <header className="px-6 pb-5 pt-8">
         <div className="flex items-start justify-between gap-4">
             <Image
@@ -188,6 +189,7 @@ export default function ApplicationComplete() {
           <p className="text-xs">© 2025 株式会社PMAgent</p>
         </div>
       </footer>
+      </div>
     </div>
   );
 }
