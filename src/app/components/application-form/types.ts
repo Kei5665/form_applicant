@@ -15,6 +15,7 @@ export type FormData = {
   prefectureId: string;
   municipalityId: string;
   phoneNumber: string;
+  email: string;
 };
 
 export type FormErrors = {
@@ -26,6 +27,7 @@ export type FormErrors = {
   prefectureId?: string;
   municipalityId?: string;
   phoneNumber?: string;
+  email?: string;
 };
 
 export type JobCountResult = {

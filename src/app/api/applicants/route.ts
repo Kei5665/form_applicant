@@ -25,6 +25,7 @@ type ApplicantFormData = {
   municipalityId?: string;
   municipalityName?: string;
   phoneNumber?: string;
+  email?: string;
   jobTiming?: FormData['jobTiming'];
 };
 
@@ -170,6 +171,7 @@ ${title}
 地域: ${locationDisplay}
 転職時期: ${jobTimingLabel || '未選択'}
 電話番号: ${formData.phoneNumber || '未入力'}
+メールアドレス: ${formData.email || '未入力'}
 -------------------------
         `.trim();
 
@@ -215,6 +217,7 @@ ${title}
           municipality_id: formData.municipalityId || '',
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
+          email: formData.email || '',
           job_timing: jobTimingLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
@@ -267,6 +270,7 @@ ${title}
           municipality_id: formData.municipalityId || '',
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
+          email: formData.email || '',
           job_timing: jobTimingLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',

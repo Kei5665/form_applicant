@@ -13,6 +13,7 @@ type PhoneNumberCardProps = {
   formData: FormData;
   errors: FormErrors;
   phoneError: string | null;
+  emailError: string | null;
   phoneNumber: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
@@ -20,6 +21,7 @@ type PhoneNumberCardProps = {
   isSubmitDisabled: boolean;
   isSubmitting: boolean;
   isActive: boolean;
+  showEmailField?: boolean;
 };
 
 export default function PhoneNumberCard({
@@ -29,6 +31,7 @@ export default function PhoneNumberCard({
   formData,
   errors,
   phoneError,
+  emailError,
   phoneNumber,
   onChange,
   onBlur,
@@ -36,10 +39,12 @@ export default function PhoneNumberCard({
   isSubmitDisabled,
   isSubmitting,
   isActive,
+  showEmailField = false,
 }: PhoneNumberCardProps) {
   const isFullNameFilled = formData.fullName.trim().length > 0;
   const isFullNameKanaFilled = formData.fullNameKana.trim().length > 0;
   const isPhoneFilled = phoneNumber.trim().length === 11;
+  const isEmailFilled = formData.email.trim().length > 0;
 
   const firstIncompleteField = (() => {
     if (!isFullNameFilled) {
@@ -50,6 +55,9 @@ export default function PhoneNumberCard({
     }
     if (!isPhoneFilled) {
       return 'phoneNumber';
+    }
+    if (showEmailField && !isEmailFilled) {
+      return 'email';
     }
     return null;
   })();
@@ -163,6 +171,31 @@ export default function PhoneNumberCard({
         </div>
         {(errors.phoneNumber || phoneError) && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber || phoneError}</p>}
       </div>
+
+      {showEmailField && (
+        <div className="mb-6 text-left">
+          <label htmlFor="email" className="block mb-1 text-gray-900">
+            メールアドレス
+          </label>
+          <div className="relative flex items-center gap-3">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="例: example@ridejob.jp"
+              className={`flex-1 rounded border p-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${(errors.email || emailError) ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.email}
+              onChange={onChange}
+            />
+            <FingerHint
+              isVisible={firstIncompleteField === 'email'}
+              size={40}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
+            />
+          </div>
+          {(errors.email || emailError) && <p className="text-red-500 text-xs mt-1">{errors.email || emailError}</p>}
+        </div>
+      )}
 
       <div className="flex justify-around items-center">
         <button type="button" className="py-2 text-sm font-bold cursor-pointer text-gray-800 mb-0" onClick={onPrevious}>

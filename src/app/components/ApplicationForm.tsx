@@ -66,6 +66,7 @@ function ApplicationFormInner({
     formData,
     errors,
     phoneError,
+    emailError,
     isSubmitDisabled,
     isSubmitting,
     jobResult,
@@ -152,6 +153,7 @@ function ApplicationFormInner({
         formData={formData}
         errors={errors}
         phoneError={phoneError}
+        emailError={emailError}
         phoneNumber={formData.phoneNumber}
         onChange={handleInputChange}
         onBlur={handleNameBlur}
@@ -159,6 +161,7 @@ function ApplicationFormInner({
         isSubmitDisabled={isSubmitDisabled}
         isSubmitting={isSubmitting}
         isActive={enableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
+        showEmailField={formOrigin === 'coupang'}
       />
     </form>
   );

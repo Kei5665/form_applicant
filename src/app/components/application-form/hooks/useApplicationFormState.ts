@@ -8,7 +8,7 @@ import { useHiraganaConverter } from './useHiraganaConverter';
 import { useFormExitGuard } from './useFormExitGuard';
 import { useImagePreloader } from './useImagePreloader';
 import { trackEvent } from '../utils/trackEvent';
-import { isValidPhoneNumber, validateBirthDateCard, validateCard2, validateFinalStep, validateJobTiming, validateNameFields } from '../utils/validators';
+import { isValidEmail, isValidPhoneNumber, validateBirthDateCard, validateCard2, validateFinalStep, validateJobTiming, validateNameFields } from '../utils/validators';
 import { fetchJobCount, type JobCountParams } from '../utils/fetchJobCount';
 import { notifyInvalidPhoneNumber } from '../utils/notifyInvalidPhoneNumber';
 
@@ -29,6 +29,7 @@ const initialFormData: FormData = {
   prefectureId: '',
   municipalityId: '',
   phoneNumber: '',
+  email: '',
 };
 
 export function useApplicationFormState({ showLoadingScreen, imagesToPreload, variant, formOrigin, enableJobTimingStep }: UseApplicationFormStateParams) {
@@ -38,6 +39,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<FormErrors>({});
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
@@ -139,6 +141,24 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     }
   }, []);
 
+  const isSubmitReady = useCallback(
+    (phoneNumber: string, email: string) => {
+      const trimmedPhone = phoneNumber.trim();
+      if (trimmedPhone.length !== 11 || !isValidPhoneNumber(trimmedPhone)) {
+        return false;
+      }
+      if (formOrigin !== 'coupang') {
+        return true;
+      }
+      const trimmedEmail = email.trim();
+      if (!trimmedEmail) {
+        return false;
+      }
+      return isValidEmail(trimmedEmail);
+    },
+    [formOrigin]
+  );
+
   const validatePhoneNumberInput = useCallback(
     (phoneNumber: string) => {
       const trimmed = phoneNumber.trim();
@@ -153,10 +173,34 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         notifyInvalidPhoneNumber({ fullName: formData.fullName, phoneNumber: trimmed });
       } else {
         setPhoneError(null);
-        setIsSubmitDisabled(false);
+        const submitReady = isSubmitReady(trimmed, formData.email);
+        setIsSubmitDisabled(!submitReady);
       }
     },
-    [formData]
+    [formData.email, formData.fullName, isSubmitReady]
+  );
+
+  const validateEmailInput = useCallback(
+    (email: string) => {
+      if (formOrigin !== 'coupang') {
+        return;
+      }
+      const trimmed = email.trim();
+      if (!trimmed) {
+        setEmailError('メールアドレスを入力してください。');
+        setIsSubmitDisabled(true);
+        return;
+      }
+      if (!isValidEmail(trimmed)) {
+        setEmailError('有効なメールアドレスを入力してください。');
+        setIsSubmitDisabled(true);
+        return;
+      }
+      setEmailError(null);
+      const submitReady = isSubmitReady(formData.phoneNumber, trimmed);
+      setIsSubmitDisabled(!submitReady);
+    },
+    [formData.phoneNumber, formOrigin, isSubmitReady]
   );
 
   const handleInputChange = useCallback(
@@ -166,6 +210,10 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
       if (name === 'phoneNumber') {
         value = value.replace(/[-－ー]/g, '');
+      }
+
+      if (name === 'email') {
+        value = value.replace(/\s/g, '').toLowerCase();
       }
 
       if (name === 'birthDate') {
@@ -187,6 +235,13 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           return {
             ...prev,
             jobTiming: value as FormData['jobTiming'],
+          };
+        }
+
+        if (name === 'email') {
+          return {
+            ...prev,
+            email: value,
           };
         }
 
@@ -227,6 +282,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           next.birthDate = '';
         } else if (name === 'jobTiming') {
           next.jobTiming = '';
+        } else if (name === 'email') {
+          next.email = '';
         } else if (name === 'prefectureId') {
           next.prefectureId = '';
           next.municipalityId = '';
@@ -248,6 +305,10 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         validatePhoneNumberInput(value);
       }
 
+      if (name === 'email') {
+        validateEmailInput(value);
+      }
+
       if (name === 'postalCode') {
         if (value.length === 7 && formOrigin !== 'coupang') {
           loadJobCount({ postalCode: value });
@@ -262,7 +323,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         }
       }
     },
-    [formOrigin, isFormDirty, loadJobCount, validatePhoneNumberInput]
+    [formOrigin, isFormDirty, loadJobCount, validateEmailInput, validatePhoneNumberInput]
   );
 
   const handleNameBlur = useCallback(
@@ -362,9 +423,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         setIsSubmitDisabled(true);
         return;
       }
-      const phoneValidation = validateFinalStep(formData.phoneNumber);
-      if (!phoneValidation.isValid) {
-        setErrors((prev) => ({ ...prev, ...phoneValidation.errors }));
+      const finalValidation = validateFinalStep(formData, formOrigin === 'coupang');
+      if (!finalValidation.isValid) {
+        setErrors((prev) => ({ ...prev, ...finalValidation.errors }));
         setIsSubmitDisabled(true);
         return;
       }
@@ -453,6 +514,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     formData,
     errors,
     phoneError,
+    emailError,
     isSubmitDisabled,
     isSubmitting,
     showExitModal,

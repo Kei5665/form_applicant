@@ -9,6 +9,12 @@ const isValidPhoneNumber = (phoneNumber: string): boolean => {
   return true;
 };
 
+const isValidEmail = (email: string): boolean => {
+  if (!email) return false;
+  const trimmed = email.trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+};
+
 export const validateJobTiming = (jobTiming: FormData['jobTiming']) => {
   const errors: FormErrors = {};
   if (!jobTiming) {
@@ -115,14 +121,25 @@ export const validateNameFields = (formData: FormData) => {
   return { isValid, errors };
 };
 
-export const validateFinalStep = (phoneNumber: string) => {
+export const validateFinalStep = (formData: FormData, requireEmail: boolean) => {
   const errors: FormErrors = {};
+  const phoneNumber = formData.phoneNumber.trim();
   if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
     errors.phoneNumber = '有効な携帯番号を入力してください。';
-    return { isValid: false, errors };
   }
-  return { isValid: true, errors };
+
+  if (requireEmail) {
+    const email = formData.email.trim();
+    if (!email) {
+      errors.email = 'メールアドレスを入力してください。';
+    } else if (!isValidEmail(email)) {
+      errors.email = '有効なメールアドレスを入力してください。';
+    }
+  }
+
+  const isValid = Object.keys(errors).length === 0;
+  return { isValid, errors };
 };
 
-export { isValidPhoneNumber };
+export { isValidPhoneNumber, isValidEmail };
 
