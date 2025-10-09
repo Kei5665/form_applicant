@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import JobCard from "@/app/components/JobCard";
+import type { Job } from "@/lib/microcms";
 
 // Extend Window interface for GTM dataLayer
 declare global {
@@ -12,6 +14,9 @@ declare global {
 }
 
 export default function ApplicationComplete() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+
   // Track form completion on page load
   useEffect(() => {
     if (typeof window !== 'undefined' && window.dataLayer) {
@@ -20,6 +25,35 @@ export default function ApplicationComplete() {
         'form_name': 'ridejob_application'
       });
     }
+  }, []);
+
+  // 求人情報を取得
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const prefectureId = localStorage.getItem('ridejob_prefecture_id');
+        if (!prefectureId) {
+          setIsLoadingJobs(false);
+          return;
+        }
+
+        const response = await fetch(`/api/jobs/random?prefectureId=${prefectureId}&count=3`);
+        if (!response.ok) {
+          console.error('Failed to fetch jobs');
+          setIsLoadingJobs(false);
+          return;
+        }
+
+        const data = await response.json();
+        setJobs(data.jobs);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      } finally {
+        setIsLoadingJobs(false);
+      }
+    };
+
+    fetchJobs();
   }, []);
 
   return (
@@ -42,7 +76,22 @@ export default function ApplicationComplete() {
       </header>
 
       <main className="flex flex-1 flex-col pb-12">
-        <section className="mt-2">
+        {/* 求人カード表示 */}
+        {!isLoadingJobs && jobs.length > 0 && (
+          <section className="mt-6 px-4">
+            <div className="flex items-center pl-2 mb-4">
+              <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
+              <h2 className="text-xl font-semibold text-gray-900">あなたにおすすめの求人</h2>
+            </div>
+            <div className="space-y-4">
+              {jobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="mt-6">
           <div className="text-center">
             <p className="mt-6 text-2xl font-bold leading-relaxed" style={{ color: '#2205D9' }}>
               RIDE JOBに問合せいただき

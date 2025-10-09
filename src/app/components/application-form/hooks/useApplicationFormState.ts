@@ -476,6 +476,12 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
         await response.json();
         setIsFormDirty(false);
+        
+        // 都道府県IDをlocalStorageに保存（サンクスページで求人表示用）
+        if (formData.prefectureId && typeof window !== 'undefined') {
+          localStorage.setItem('ridejob_prefecture_id', formData.prefectureId);
+        }
+        
         const targetPath = formOrigin === 'coupang' ? '/coupang/applicants/new' : '/applicants/new';
         router.push(targetPath);
       } catch (error) {

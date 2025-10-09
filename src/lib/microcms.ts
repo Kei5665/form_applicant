@@ -98,6 +98,12 @@ export async function fetchMunicipalityById(municipalityId: string): Promise<Mun
   return data.contents[0] ?? null;
 }
 
+export interface MediaImage {
+  url: string;
+  height: number;
+  width: number;
+}
+
 export interface Job {
   id: string;
   title?: string;
@@ -131,6 +137,7 @@ export interface Job {
   wageType?: string;
   salaryMin?: number;
   salaryMax?: number;
+  images?: MediaImage[];
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -167,4 +174,17 @@ export async function getJobsByMunicipalityId(municipalityId: string): Promise<J
 export async function getJobCountByMunicipality(municipalityId: string): Promise<number> {
   const response = await getJobsByMunicipalityId(municipalityId);
   return response.totalCount;
+}
+
+export async function getRandomJobsByPrefectureId(prefectureId: string, count: number = 3): Promise<Job[]> {
+  const response = await getJobsByPrefectureId(prefectureId);
+  if (response.contents.length === 0) {
+    return [];
+  }
+  
+  // シャッフルしてランダムに取得
+  const shuffled = [...response.contents].sort(() => Math.random() - 0.5);
+  
+  // 指定件数または利用可能な求人数の少ない方を返す
+  return shuffled.slice(0, Math.min(count, shuffled.length));
 }
