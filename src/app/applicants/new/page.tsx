@@ -16,6 +16,7 @@ declare global {
 export default function ApplicationComplete() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+  const [userName, setUserName] = useState<string>('');
 
   // Track form completion on page load
   useEffect(() => {
@@ -24,6 +25,16 @@ export default function ApplicationComplete() {
         'event': 'form_complete',
         'form_name': 'ridejob_application'
       });
+    }
+  }, []);
+
+  // お名前を取得してlocalStorageから削除（プライバシー保護）
+  useEffect(() => {
+    const name = localStorage.getItem('ridejob_user_name');
+    if (name) {
+      setUserName(name);
+      // プライバシー保護のため、取得後すぐに削除
+      localStorage.removeItem('ridejob_user_name');
     }
   }, []);
 
@@ -81,7 +92,9 @@ export default function ApplicationComplete() {
           <section className="mt-6 px-4">
             <div className="flex items-center pl-2 mb-4">
               <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
-              <h2 className="text-xl font-semibold text-gray-900">あなたにおすすめの求人</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {userName ? `${userName}さんへのおすすめ求人情報` : 'あなたにおすすめの求人'}
+              </h2>
             </div>
             <div className="space-y-4">
               {jobs.map((job) => (

@@ -477,9 +477,14 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         await response.json();
         setIsFormDirty(false);
         
-        // 都道府県IDをlocalStorageに保存（サンクスページで求人表示用）
-        if (formData.prefectureId && typeof window !== 'undefined') {
-          localStorage.setItem('ridejob_prefecture_id', formData.prefectureId);
+        // 都道府県IDとお名前をlocalStorageに保存（サンクスページで求人表示・パーソナライズ用）
+        if (typeof window !== 'undefined') {
+          if (formData.prefectureId) {
+            localStorage.setItem('ridejob_prefecture_id', formData.prefectureId);
+          }
+          if (formData.fullName) {
+            localStorage.setItem('ridejob_user_name', formData.fullName);
+          }
         }
         
         const targetPath = formOrigin === 'coupang' ? '/coupang/applicants/new' : '/applicants/new';
