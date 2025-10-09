@@ -93,7 +93,7 @@ export default function PhoneNumberCard({
                   <span className="ml-1 text-base">件</span>
                 </p>
                 <p className={`text-base font-semibold ${isPositiveJobCount ? 'text-gray-900' : 'text-gray-600'}`}>
-                  {isPositiveJobCount ? 'すぐにご案内できます！' : '現在ご案内できる求人が見つかりませんでした。'}
+                  {isPositiveJobCount ? 'すぐにご覧いただけます！' : '現在ご案内できる求人が見つかりませんでした。'}
                 </p>
               </div>
             ) : (
@@ -207,7 +207,7 @@ export default function PhoneNumberCard({
             className={`w-full rounded-md py-3 px-12 text-base font-bold text-white ${isSubmitButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a] cursor-pointer'}`}
             disabled={isSubmitButtonDisabled}
           >
-            <span style={{ whiteSpace: 'nowrap' }}>{isSubmitting ? '送信中...' : '求人を受け取る'}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>{isSubmitting ? '送信中...' : '求人情報を見る'}</span>
           </button>
           <FingerHint isVisible={isSubmitEncouraged} size={44} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[60px]" />
         </div>
