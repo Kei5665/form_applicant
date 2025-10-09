@@ -15,6 +15,19 @@ export default function JobCard({ job }: JobCardProps) {
   const employmentType = job.employmentType || '雇用形態未設定';
   const jobUrl = `https://ridejob.jp/job/${job.id}`;
 
+  // job.idをシードにして10〜100の範囲で決定的な閲覧数を生成
+  const generateViewCount = (id: string): number => {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      const char = id.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash % 91) + 10; // 10〜100の範囲
+  };
+
+  const viewCount = generateViewCount(job.id);
+
   // 給与の表示形式を整形
   const formatSalary = () => {
     if (!salaryMin && !salaryMax) {
@@ -67,9 +80,14 @@ export default function JobCard({ job }: JobCardProps) {
           <p className="text-sm text-gray-900 font-semibold mb-1">
             💰 {formatSalary()}
           </p>
-          <p className="text-sm text-gray-600">
-            {employmentType}
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm text-gray-600">
+              💼 {employmentType}
+            </p>
+            <p className="text-xs text-gray-500 whitespace-nowrap">
+              👀 {viewCount}人が見ました
+            </p>
+          </div>
         </div>
       </div>
     </Link>
