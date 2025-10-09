@@ -135,6 +135,41 @@ export default function ApplicationComplete() {
         <section className="mt-12">
           <div className="flex items-center pl-2">
             <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
+            <h2 className="text-xl font-semibold text-gray-900">LINEでのご連絡を希望される方</h2>
+          </div>
+          <div className="px-4">
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
+              LINEからもあなたにぴったりの求人をご紹介できます。
+            </p>
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
+              ハローワークには掲載されていない非公開求人をLINE限定で案内しています。
+            </p>
+            <p className="mt-4 text-lg leading-relaxed text-gray-900">
+              下のボタンをタップして、友だち追加からご連絡してください。
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <Link
+              href="https://lin.ee/4bLPZ5w"
+              className="block"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                src="/images/line-section.png"
+                alt="LINE公式アカウント登録バナー"
+                width={750}
+                height={516}
+                className="h-auto w-full"
+              />
+            </Link>
+          </div>
+        </section>
+
+        <section className="mt-12">
+          <div className="flex items-center pl-2">
+            <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
             <h2 className="text-xl font-semibold text-gray-900">すぐに求人情報がほしい方</h2>
           </div>
           <div className="px-4">
@@ -151,29 +186,6 @@ export default function ApplicationComplete() {
                 面談予約へ
               </Link>
             </div>
-          </div>
-        </section>
-
-        <section className="mt-12">
-          <div className="flex items-center pl-2">
-            <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
-            <h2 className="text-xl font-semibold text-gray-900">LINEでのご連絡を希望される方</h2>
-          </div>
-          <div className="mt-4">
-            <Link
-              href="https://lin.ee/4bLPZ5w"
-              className="block"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image
-                src="/images/line-section.png"
-                alt="LINE公式アカウント登録バナー"
-                width={750}
-                height={516}
-                className="h-auto w-full"
-              />
-            </Link>
           </div>
         </section>
 
