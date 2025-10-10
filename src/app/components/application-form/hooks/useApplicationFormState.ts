@@ -134,6 +134,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         searchMethod: result.searchMethod,
         searchArea: result.searchArea,
         prefectureName: result.prefectureName,
+        prefectureId: result.prefectureId,
       });
     } catch (error) {
       console.error('Error fetching job count:', error);
@@ -479,25 +480,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
         // 都道府県IDとお名前をlocalStorageに保存（サンクスページで求人表示・パーソナライズ用）
         if (typeof window !== 'undefined') {
-          // 都道府県IDを保存（郵便番号のみの場合は逆引き）
-          let prefectureIdToSave = formData.prefectureId;
-
-          if (!prefectureIdToSave && formData.postalCode) {
-            // 郵便番号から都道府県IDを逆引き
-            try {
-              const { fetchAddressByZipcode } = await import('@/lib/zipcloud');
-              const { getPrefectureByRegion } = await import('@/lib/microcms');
-              const location = await fetchAddressByZipcode(formData.postalCode);
-              if (location?.prefectureName) {
-                const prefecture = await getPrefectureByRegion(location.prefectureName);
-                if (prefecture?.id) {
-                  prefectureIdToSave = prefecture.id;
-                }
-              }
-            } catch (error) {
-              console.error('Failed to fetch prefecture from postal code:', error);
-            }
-          }
+          // 都道府県IDを保存（formDataまたはjobResultから取得）
+          const prefectureIdToSave = formData.prefectureId || jobResult.prefectureId;
 
           if (prefectureIdToSave) {
             localStorage.setItem('ridejob_prefecture_id', prefectureIdToSave);
@@ -516,7 +500,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         setIsSubmitting(false);
       }
     },
-    [formData, formOrigin, router, variant, isSubmitting]
+    [formData, formOrigin, router, variant, isSubmitting, jobResult.prefectureId]
   );
 
   const cardStates = useMemo(

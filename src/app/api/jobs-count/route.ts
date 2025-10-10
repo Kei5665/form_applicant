@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
         searchMethod: 'prefecture',
         searchArea,
         prefectureName: prefecture.region,
+        prefectureId: prefecture.id,
         message:
           jobCount > 0
             ? `${searchArea}で${jobCount}件の求人が見つかりました`
@@ -47,6 +48,7 @@ export async function GET(request: NextRequest) {
         searchMethod: 'prefecture',
         searchArea,
         prefectureName: municipality.prefecture.region,
+        prefectureId: municipality.prefecture.id,
         message:
           jobCount > 0
             ? `${searchArea}で${jobCount}件の求人が見つかりました`
@@ -83,6 +85,7 @@ export async function GET(request: NextRequest) {
       searchMethod: 'postal_code',
       searchArea,
       prefectureName: prefecture.region,
+      prefectureId: prefecture.id,
       message:
         jobCount > 0
           ? `${searchArea}で${jobCount}件の求人が見つかりました`

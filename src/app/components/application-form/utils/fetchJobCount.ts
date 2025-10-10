@@ -4,6 +4,7 @@ type JobCountResponse = {
   searchMethod?: 'postal_code' | 'prefecture';
   searchArea?: string;
   prefectureName?: string;
+  prefectureId?: string;
   error?: string;
 };
 

@@ -43,32 +43,22 @@ export default function ApplicationComplete() {
     const fetchJobs = async () => {
       try {
         const prefectureId = localStorage.getItem('ridejob_prefecture_id');
-        console.log('[DEBUG] prefectureId from localStorage:', prefectureId);
-
         if (!prefectureId) {
-          console.log('[DEBUG] No prefectureId found, skipping job fetch');
           setIsLoadingJobs(false);
           return;
         }
 
-        const apiUrl = `/api/jobs/random?prefectureId=${prefectureId}&count=3`;
-        console.log('[DEBUG] Fetching jobs from:', apiUrl);
-
-        const response = await fetch(apiUrl);
-        console.log('[DEBUG] API response status:', response.status);
-
+        const response = await fetch(`/api/jobs/random?prefectureId=${prefectureId}&count=3`);
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('[DEBUG] Failed to fetch jobs. Status:', response.status, 'Error:', errorData);
+          console.error('Failed to fetch jobs');
           setIsLoadingJobs(false);
           return;
         }
 
         const data = await response.json();
-        console.log('[DEBUG] Jobs fetched successfully:', data.jobs?.length, 'jobs');
         setJobs(data.jobs);
       } catch (error) {
-        console.error('[DEBUG] Error fetching jobs:', error);
+        console.error('Error fetching jobs:', error);
       } finally {
         setIsLoadingJobs(false);
       }
