@@ -22,6 +22,7 @@ type PhoneNumberCardProps = {
   isSubmitting: boolean;
   isActive: boolean;
   showEmailField?: boolean;
+  submitButtonText?: string;
 };
 
 export default function PhoneNumberCard({
@@ -40,6 +41,7 @@ export default function PhoneNumberCard({
   isSubmitting,
   isActive,
   showEmailField = false,
+  submitButtonText = '求人情報を見る',
 }: PhoneNumberCardProps) {
   const isFullNameFilled = formData.fullName.trim().length > 0;
   const isFullNameKanaFilled = formData.fullNameKana.trim().length > 0;
@@ -207,7 +209,7 @@ export default function PhoneNumberCard({
             className={`w-full rounded-md py-3 px-12 text-base font-bold text-white ${isSubmitButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#ff702a] cursor-pointer'}`}
             disabled={isSubmitButtonDisabled}
           >
-            <span style={{ whiteSpace: 'nowrap' }}>{isSubmitting ? '送信中...' : '求人情報を見る'}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>{isSubmitting ? '送信中...' : submitButtonText}</span>
           </button>
           <FingerHint isVisible={isSubmitEncouraged} size={44} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[60px]" />
         </div>

@@ -34,6 +34,9 @@ export default function CoupangApplicationComplete() {
               ご連絡させていただきます。
             </p>
             <p className="text-gray-800 mb-4">
+              弊社と面談後、選考会に参加できます。
+            </p>
+            <p className="text-gray-800 mb-4">
               今しばらくお待ちください。
             </p>
           </div>
