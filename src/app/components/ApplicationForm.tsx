@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import { BirthDateCard, FormExitModal, JobTimingCard, NameCard, PhoneNumberCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
 import type { PeopleImageVariant } from './application-form/types';
+import { FORM_PRESETS, type FormPreset } from './application-form/presets';
 
 declare global {
   interface Window {
@@ -15,10 +16,16 @@ declare global {
 }
 
 interface ApplicationFormProps {
+  // プリセット使用時（推奨）
+  preset?: FormPreset;
+
+  // 個別カスタマイズ（必須）
   peopleImageSrc: string;
   peopleImageAlt?: string;
   showPeopleImage?: boolean;
   variant: PeopleImageVariant;
+
+  // オーバーライド用（オプション）- プリセット設定を上書きしたい場合に使用
   formOrigin?: 'coupang' | 'default';
   headerLogoSrc?: string;
   headerUpperText?: string;
@@ -40,25 +47,44 @@ interface ApplicationFormProps {
 }
 
 function ApplicationFormInner({
+  preset,
   peopleImageSrc,
   variant,
-  formOrigin = 'default',
-  containerClassName = '',
-  headerLogoSrc = '/images/ride_logo.svg',
-  headerUpperText = '未経験でタクシー会社に就職するなら',
-  headerLowerText = 'RIDE JOB（ライドジョブ）',
-  loadingLogoSrc = '/images/ride_logo.svg',
-  step1ImageSrc = '/images/STEP1.png',
-  step2ImageSrc = '/images/STEP2.png',
-  step3ImageSrc = '/images/STEP3.png',
-  showHeader = true,
-  showLoadingScreen = true,
-  enableJobTimingStep = true,
-  useModal = true,
+  formOrigin,
+  containerClassName,
+  headerLogoSrc,
+  headerUpperText,
+  headerLowerText,
+  loadingLogoSrc,
+  step1ImageSrc,
+  step2ImageSrc,
+  step3ImageSrc,
+  showHeader,
+  showLoadingScreen,
+  enableJobTimingStep,
+  useModal,
   peopleImageAlt = '応募フォームイメージ',
   showPeopleImage = true,
 }: ApplicationFormProps) {
-  const imagesToPreload = useMemo(() => [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc], [headerLogoSrc, step1ImageSrc, step2ImageSrc, step3ImageSrc]);
+  // プリセット設定を取得
+  const presetConfig = preset ? FORM_PRESETS[preset] : null;
+
+  // プリセット設定とpropsをマージ（propsが優先）
+  const resolvedFormOrigin = formOrigin ?? presetConfig?.formOrigin ?? 'default';
+  const resolvedContainerClassName = containerClassName ?? presetConfig?.containerClassName ?? '';
+  const resolvedHeaderLogoSrc = headerLogoSrc ?? presetConfig?.headerLogoSrc ?? '/images/ride_logo.svg';
+  const resolvedHeaderUpperText = headerUpperText ?? presetConfig?.headerUpperText ?? '未経験でタクシー会社に就職するなら';
+  const resolvedHeaderLowerText = headerLowerText ?? presetConfig?.headerLowerText ?? 'RIDE JOB（ライドジョブ）';
+  const resolvedLoadingLogoSrc = loadingLogoSrc ?? presetConfig?.loadingLogoSrc ?? '/images/ride_logo.svg';
+  const resolvedStep1ImageSrc = step1ImageSrc ?? presetConfig?.step1ImageSrc ?? '/images/STEP1.png';
+  const resolvedStep2ImageSrc = step2ImageSrc ?? presetConfig?.step2ImageSrc ?? '/images/STEP2.png';
+  const resolvedStep3ImageSrc = step3ImageSrc ?? presetConfig?.step3ImageSrc ?? '/images/STEP3.png';
+  const resolvedShowHeader = showHeader ?? presetConfig?.showHeader ?? true;
+  const resolvedShowLoadingScreen = showLoadingScreen ?? presetConfig?.showLoadingScreen ?? true;
+  const resolvedEnableJobTimingStep = enableJobTimingStep ?? presetConfig?.enableJobTimingStep ?? true;
+  const resolvedUseModal = useModal ?? presetConfig?.useModal ?? true;
+
+  const imagesToPreload = useMemo(() => [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc], [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc]);
 
   const {
     loading,
@@ -83,27 +109,27 @@ function ApplicationFormInner({
     confirmExit,
     exitModalVariant,
   } = useApplicationFormState({
-    showLoadingScreen,
+    showLoadingScreen: resolvedShowLoadingScreen,
     imagesToPreload,
     variant,
-    formOrigin,
-    enableJobTimingStep,
+    formOrigin: resolvedFormOrigin,
+    enableJobTimingStep: resolvedEnableJobTimingStep,
   });
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const modalContentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!useModal) return;
+    if (!resolvedUseModal) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [useModal]);
+  }, [resolvedUseModal]);
 
-  const formWrapperClassName = useModal
+  const formWrapperClassName = resolvedUseModal
     ? 'relative w-full max-w-sm px-1 py-6 max-h-[calc(100vh-3rem)] overflow-y-auto no-scrollbar'
     : 'relative w-full max-w-sm px-1 mx-auto no-scrollbar';
 
@@ -111,11 +137,11 @@ function ApplicationFormInner({
     <form onSubmit={handleSubmit} id="form" noValidate className="relative pb-4">
       {showPeopleImage && peopleImageSrc && (
         <div className="mb-6 flex justify-center">
-          <Image src={peopleImageSrc} alt={peopleImageAlt} width={320} height={180} className="h-auto w-full max-w-[320px]" priority={formOrigin === 'coupang'} />
+          <Image src={peopleImageSrc} alt={peopleImageAlt} width={320} height={180} className="h-auto w-full max-w-[320px]" priority={resolvedFormOrigin === 'coupang'} />
         </div>
       )}
 
-      {enableJobTimingStep && (
+      {resolvedEnableJobTimingStep && (
         <JobTimingCard
           selectedTiming={formData.jobTiming}
           errors={errors}
@@ -125,31 +151,31 @@ function ApplicationFormInner({
       )}
 
       <BirthDateCard
-        stepImageSrc={step1ImageSrc}
+        stepImageSrc={resolvedStep1ImageSrc}
         birthDate={formData.birthDate}
         errors={errors}
         onChange={handleInputChange}
-        onNext={enableJobTimingStep ? handleNextCard2 : handleNextCard1}
-        onPrevious={enableJobTimingStep ? handlePreviousCard : undefined}
-        isActive={enableJobTimingStep ? cardStates.isCard2Active : cardStates.isCard1Active}
+        onNext={resolvedEnableJobTimingStep ? handleNextCard2 : handleNextCard1}
+        onPrevious={resolvedEnableJobTimingStep ? handlePreviousCard : undefined}
+        isActive={resolvedEnableJobTimingStep ? cardStates.isCard2Active : cardStates.isCard1Active}
       />
 
       <NameCard
-        stepImageSrc={step2ImageSrc}
+        stepImageSrc={resolvedStep2ImageSrc}
         postalCode={formData.postalCode}
         prefectureId={formData.prefectureId}
         municipalityId={formData.municipalityId}
         errors={errors}
         onChange={handleInputChange}
         onPrevious={handlePreviousCard}
-        onNext={enableJobTimingStep && handleNextCard3 ? handleNextCard3 : handleNextCard2}
-        isActive={enableJobTimingStep ? cardStates.isCard3Active : cardStates.isCard2Active}
+        onNext={resolvedEnableJobTimingStep && handleNextCard3 ? handleNextCard3 : handleNextCard2}
+        isActive={resolvedEnableJobTimingStep ? cardStates.isCard3Active : cardStates.isCard2Active}
       />
 
       <PhoneNumberCard
-        stepImageSrc={step3ImageSrc}
+        stepImageSrc={resolvedStep3ImageSrc}
         jobResult={jobResult}
-        showJobCount={formOrigin !== 'coupang'}
+        showJobCount={resolvedFormOrigin !== 'coupang'}
         formData={formData}
         errors={errors}
         phoneError={phoneError}
@@ -160,8 +186,8 @@ function ApplicationFormInner({
         onPrevious={handlePreviousCard}
         isSubmitDisabled={isSubmitDisabled}
         isSubmitting={isSubmitting}
-        isActive={enableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
-        showEmailField={formOrigin === 'coupang'}
+        isActive={resolvedEnableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
+        showEmailField={resolvedFormOrigin === 'coupang'}
       />
     </form>
   );
@@ -169,31 +195,31 @@ function ApplicationFormInner({
   const modal = (
     <div
       ref={overlayRef}
-      className={`fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4 ${containerClassName}`}
+      className={`fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 px-4 ${resolvedContainerClassName}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="application-form-title"
     >
-      {showHeader && (
+      {resolvedShowHeader && (
         <header className="fixed top-0 z-[10001] flex w-full justify-center">
           <div className="flex w-full max-w-md items-center justify-between bg-white px-4 py-4">
-            <Image src={headerLogoSrc} alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" priority loading="eager" />
+            <Image src={resolvedHeaderLogoSrc} alt="Ride Job Logo" width={120} height={30} className="h-[30px] w-auto" priority loading="eager" />
             <div className="text-right">
-              <p className="text-[11px] text-gray-700 leading-tight">{headerUpperText}</p>
-              <p className="text-xs font-bold text-gray-900 leading-tight">{headerLowerText}</p>
+              <p className="text-[11px] text-gray-700 leading-tight">{resolvedHeaderUpperText}</p>
+              <p className="text-xs font-bold text-gray-900 leading-tight">{resolvedHeaderLowerText}</p>
             </div>
           </div>
         </header>
       )}
 
-      {showLoadingScreen && (
+      {resolvedShowLoadingScreen && (
         <div
           id="loading-screen"
           className={`absolute inset-0 flex flex-col items-center justify-center bg-white transition-all duration-700 ease-out z-[10001] ${
             loading ? 'opacity-100 visible' : 'opacity-0 invisible'
           }`}
         >
-          <Image src={loadingLogoSrc} alt="Ride Job Logo" width={200} height={50} className="w-36 mb-4" />
+          <Image src={resolvedLoadingLogoSrc} alt="Ride Job Logo" width={200} height={50} className="w-36 mb-4" />
           <div className="flex space-x-2">
             <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce" />
             <div className="w-4 h-4 bg-orange-500 rounded-full animate-bounce delay-150" />
@@ -209,7 +235,7 @@ function ApplicationFormInner({
     </div>
   );
 
-  if (useModal) {
+  if (resolvedUseModal) {
     if (typeof window === 'undefined') {
       return modal;
     }
@@ -224,7 +250,7 @@ function ApplicationFormInner({
   }
 
   return (
-    <div className={`flex justify-center px-4 ${containerClassName}`.trim()}>
+    <div className={`flex justify-center px-4 ${resolvedContainerClassName}`.trim()}>
       <div className={formWrapperClassName}>{formContent}</div>
       <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} variant={exitModalVariant} />
     </div>
