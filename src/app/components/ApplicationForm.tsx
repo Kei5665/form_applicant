@@ -175,7 +175,7 @@ function ApplicationFormInner({
       <PhoneNumberCard
         stepImageSrc={resolvedStep3ImageSrc}
         jobResult={jobResult}
-        showJobCount={resolvedFormOrigin !== 'coupang'}
+        showJobCount={resolvedFormOrigin !== 'coupang' && resolvedFormOrigin !== 'mechanic'}
         formData={formData}
         errors={errors}
         phoneError={phoneError}
