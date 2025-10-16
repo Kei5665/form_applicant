@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { BirthDateCard, FormExitModal, JobTimingCard, NameCard, PhoneNumberCard } from './application-form/components';
+import { BirthDateCard, FormExitModal, JobTimingCard, MechanicQualificationCard, NameCard, PhoneNumberCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
 import type { PeopleImageVariant } from './application-form/types';
 import { FORM_PRESETS, type FormPreset } from './application-form/presets';
@@ -35,6 +35,7 @@ interface ApplicationFormProps {
   step1ImageSrc?: string;
   step2ImageSrc?: string;
   step3ImageSrc?: string;
+  step4ImageSrc?: string;
   footerLogoSrc?: string;
   bottomImageSrc?: string;
   showBottomImage?: boolean;
@@ -59,6 +60,7 @@ function ApplicationFormInner({
   step1ImageSrc,
   step2ImageSrc,
   step3ImageSrc,
+  step4ImageSrc,
   showHeader,
   showLoadingScreen,
   enableJobTimingStep,
@@ -79,12 +81,17 @@ function ApplicationFormInner({
   const resolvedStep1ImageSrc = step1ImageSrc ?? presetConfig?.step1ImageSrc ?? '/images/STEP1.png';
   const resolvedStep2ImageSrc = step2ImageSrc ?? presetConfig?.step2ImageSrc ?? '/images/STEP2.png';
   const resolvedStep3ImageSrc = step3ImageSrc ?? presetConfig?.step3ImageSrc ?? '/images/STEP3.png';
+  const resolvedStep4ImageSrc = step4ImageSrc ?? presetConfig?.step4ImageSrc;
   const resolvedShowHeader = showHeader ?? presetConfig?.showHeader ?? true;
   const resolvedShowLoadingScreen = showLoadingScreen ?? presetConfig?.showLoadingScreen ?? true;
   const resolvedEnableJobTimingStep = enableJobTimingStep ?? presetConfig?.enableJobTimingStep ?? true;
   const resolvedUseModal = useModal ?? presetConfig?.useModal ?? true;
 
-  const imagesToPreload = useMemo(() => [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc], [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc]);
+  const imagesToPreload = useMemo(() => {
+    const images = [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc];
+    if (resolvedStep4ImageSrc) images.push(resolvedStep4ImageSrc);
+    return images;
+  }, [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc, resolvedStep4ImageSrc]);
 
   const {
     loading,
@@ -99,6 +106,8 @@ function ApplicationFormInner({
     showExitModal,
     handleInputChange,
     handleJobTimingSelect,
+    handleMechanicQualificationToggle,
+    handleNextMechanicQualification,
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
@@ -150,46 +159,102 @@ function ApplicationFormInner({
         />
       )}
 
-      <BirthDateCard
-        stepImageSrc={resolvedStep1ImageSrc}
-        birthDate={formData.birthDate}
-        errors={errors}
-        onChange={handleInputChange}
-        onNext={resolvedEnableJobTimingStep ? handleNextCard2 : handleNextCard1}
-        onPrevious={resolvedEnableJobTimingStep ? handlePreviousCard : undefined}
-        isActive={resolvedEnableJobTimingStep ? cardStates.isCard2Active : cardStates.isCard1Active}
-      />
+      {resolvedFormOrigin === 'mechanic' ? (
+        <>
+          <MechanicQualificationCard
+            stepImageSrc={resolvedStep1ImageSrc}
+            selectedQualifications={formData.mechanicQualifications}
+            errors={errors}
+            onToggle={handleMechanicQualificationToggle}
+            onNext={handleNextMechanicQualification}
+            onPrevious={handlePreviousCard}
+            isActive={cardStates.isCard2Active}
+          />
 
-      <NameCard
-        stepImageSrc={resolvedStep2ImageSrc}
-        postalCode={formData.postalCode}
-        prefectureId={formData.prefectureId}
-        municipalityId={formData.municipalityId}
-        errors={errors}
-        onChange={handleInputChange}
-        onPrevious={handlePreviousCard}
-        onNext={resolvedEnableJobTimingStep && handleNextCard3 ? handleNextCard3 : handleNextCard2}
-        isActive={resolvedEnableJobTimingStep ? cardStates.isCard3Active : cardStates.isCard2Active}
-      />
+          <BirthDateCard
+            stepImageSrc={resolvedStep2ImageSrc}
+            birthDate={formData.birthDate}
+            errors={errors}
+            onChange={handleInputChange}
+            onNext={handleNextCard2}
+            onPrevious={handlePreviousCard}
+            isActive={cardStates.isCard3Active}
+          />
 
-      <PhoneNumberCard
-        stepImageSrc={resolvedStep3ImageSrc}
-        jobResult={jobResult}
-        showJobCount={resolvedFormOrigin !== 'coupang' && resolvedFormOrigin !== 'mechanic'}
-        formData={formData}
-        errors={errors}
-        phoneError={phoneError}
-        emailError={emailError}
-        phoneNumber={formData.phoneNumber}
-        onChange={handleInputChange}
-        onBlur={handleNameBlur}
-        onPrevious={handlePreviousCard}
-        isSubmitDisabled={isSubmitDisabled}
-        isSubmitting={isSubmitting}
-        isActive={resolvedEnableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
-        showEmailField={true}
-        submitButtonText={resolvedFormOrigin === 'coupang' ? '送信' : undefined}
-      />
+          <NameCard
+            stepImageSrc={resolvedStep3ImageSrc}
+            postalCode={formData.postalCode}
+            prefectureId={formData.prefectureId}
+            municipalityId={formData.municipalityId}
+            errors={errors}
+            onChange={handleInputChange}
+            onPrevious={handlePreviousCard}
+            onNext={handleNextCard3 || handleNextCard2}
+            isActive={cardStates.isCard4Active}
+          />
+
+          <PhoneNumberCard
+            stepImageSrc={resolvedStep4ImageSrc || resolvedStep3ImageSrc}
+            jobResult={jobResult}
+            showJobCount={false}
+            formData={formData}
+            errors={errors}
+            phoneError={phoneError}
+            emailError={emailError}
+            phoneNumber={formData.phoneNumber}
+            onChange={handleInputChange}
+            onBlur={handleNameBlur}
+            onPrevious={handlePreviousCard}
+            isSubmitDisabled={isSubmitDisabled}
+            isSubmitting={isSubmitting}
+            isActive={cardStates.isCard5Active}
+            showEmailField={true}
+          />
+        </>
+      ) : (
+        <>
+          <BirthDateCard
+            stepImageSrc={resolvedStep1ImageSrc}
+            birthDate={formData.birthDate}
+            errors={errors}
+            onChange={handleInputChange}
+            onNext={resolvedEnableJobTimingStep ? handleNextCard2 : handleNextCard1}
+            onPrevious={resolvedEnableJobTimingStep ? handlePreviousCard : undefined}
+            isActive={resolvedEnableJobTimingStep ? cardStates.isCard2Active : cardStates.isCard1Active}
+          />
+
+          <NameCard
+            stepImageSrc={resolvedStep2ImageSrc}
+            postalCode={formData.postalCode}
+            prefectureId={formData.prefectureId}
+            municipalityId={formData.municipalityId}
+            errors={errors}
+            onChange={handleInputChange}
+            onPrevious={handlePreviousCard}
+            onNext={resolvedEnableJobTimingStep && handleNextCard3 ? handleNextCard3 : handleNextCard2}
+            isActive={resolvedEnableJobTimingStep ? cardStates.isCard3Active : cardStates.isCard2Active}
+          />
+
+          <PhoneNumberCard
+            stepImageSrc={resolvedStep3ImageSrc}
+            jobResult={jobResult}
+            showJobCount={resolvedFormOrigin !== 'coupang'}
+            formData={formData}
+            errors={errors}
+            phoneError={phoneError}
+            emailError={emailError}
+            phoneNumber={formData.phoneNumber}
+            onChange={handleInputChange}
+            onBlur={handleNameBlur}
+            onPrevious={handlePreviousCard}
+            isSubmitDisabled={isSubmitDisabled}
+            isSubmitting={isSubmitting}
+            isActive={resolvedEnableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
+            showEmailField={true}
+            submitButtonText={resolvedFormOrigin === 'coupang' ? '送信' : undefined}
+          />
+        </>
+      )}
     </form>
   );
 

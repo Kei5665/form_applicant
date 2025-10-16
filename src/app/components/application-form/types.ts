@@ -6,6 +6,14 @@ export type BirthDate = string;
 
 export type JobTimingOption = 'asap' | 'no_plan';
 
+export type MechanicQualification =
+  | 'none'
+  | 'level3'
+  | 'level2'
+  | 'level1'
+  | 'inspector'
+  | 'body_paint';
+
 export type FormData = {
   jobTiming: JobTimingOption | '';
   birthDate: BirthDate;
@@ -16,6 +24,7 @@ export type FormData = {
   municipalityId: string;
   phoneNumber: string;
   email: string;
+  mechanicQualifications: MechanicQualification[];
 };
 
 export type FormErrors = {
@@ -28,6 +37,7 @@ export type FormErrors = {
   municipalityId?: string;
   phoneNumber?: string;
   email?: string;
+  mechanicQualifications?: string;
 };
 
 export type JobCountResult = {

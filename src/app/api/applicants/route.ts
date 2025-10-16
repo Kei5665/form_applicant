@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { FormData } from '@/app/components/application-form/types';
 import { mapJobTimingLabel } from '@/app/components/application-form/utils/mapJobTimingLabel';
+import { mapMechanicQualifications } from '@/app/components/application-form/utils/mapMechanicQualifications';
 
 // Types for submission payload
 type ExperimentInfo = {
@@ -27,6 +28,7 @@ type ApplicantFormData = {
   phoneNumber?: string;
   email?: string;
   jobTiming?: FormData['jobTiming'];
+  mechanicQualifications?: FormData['mechanicQualifications'];
 };
 
 type ApplicantSubmission = ApplicantFormData & {
@@ -159,6 +161,9 @@ export async function POST(request: NextRequest) {
     const mediaName = isCoupang ? 'Meta広告' : getMediaName(utmParams || {});
     const submissionJobTiming = (submissionData as { jobTiming?: FormData['jobTiming'] }).jobTiming ?? formData.jobTiming ?? '';
     const jobTimingLabel = mapJobTimingLabel(submissionJobTiming);
+    const mechanicQualificationsLabel = formData.mechanicQualifications
+      ? mapMechanicQualifications(formData.mechanicQualifications)
+      : '';
     console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
     
     // 並列送信（Baseのみテスト中は直下の単独送信へ）
@@ -176,6 +181,9 @@ export async function POST(request: NextRequest) {
         const locationDisplay = formData.prefectureName || formData.municipalityName
           ? `${formData.prefectureName || ''} ${formData.municipalityName || ''}`.trim()
           : '未入力';
+        const mechanicQualificationsDisplay = isMechanic && mechanicQualificationsLabel
+          ? `\n整備士資格: ${mechanicQualificationsLabel}`
+          : '';
         const messageContent = `
 ${title}
 -------------------------
@@ -184,7 +192,7 @@ ${title}
 氏名: ${formData.fullName || '未入力'} (${formData.fullNameKana || '未入力'})
 郵便番号: ${formData.postalCode || '未入力'}
 地域: ${locationDisplay}
-転職時期: ${jobTimingLabel || '未選択'}
+転職時期: ${jobTimingLabel || '未選択'}${mechanicQualificationsDisplay}
 電話番号: ${formData.phoneNumber || '未入力'}
 メールアドレス: ${formData.email || '未入力'}
 -------------------------
@@ -234,6 +242,7 @@ ${title}
           phone_number: formData.phoneNumber || '',
           email: formData.email || '',
           job_timing: jobTimingLabel,
+          mechanic_qualifications: mechanicQualificationsLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),
@@ -287,6 +296,7 @@ ${title}
           phone_number: formData.phoneNumber || '',
           email: formData.email || '',
           job_timing: jobTimingLabel,
+          mechanic_qualifications: mechanicQualificationsLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
           submitted_at: new Date().toISOString(),

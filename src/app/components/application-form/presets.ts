@@ -11,6 +11,7 @@ export interface FormPresetConfig {
   step1ImageSrc: string;
   step2ImageSrc: string;
   step3ImageSrc: string;
+  step4ImageSrc?: string;
 
   // Feature flags
   showHeader: boolean;
@@ -77,9 +78,10 @@ export const FORM_PRESETS: Record<FormPreset, FormPresetConfig> = {
     headerUpperText: '未経験で整備士に転職するなら',
     headerLowerText: 'ライドジョブ メカニック',
     loadingLogoSrc: '/images/ride_logo.svg',
-    step1ImageSrc: '/images/STEP1.png',
-    step2ImageSrc: '/images/STEP2.png',
-    step3ImageSrc: '/images/STEP3.png',
+    step1ImageSrc: '/images/Mechanic-STEP1.png',
+    step2ImageSrc: '/images/Mechanic-STEP2.png',
+    step3ImageSrc: '/images/Mechanic-STEP3.png',
+    step4ImageSrc: '/images/Mechanic-STEP4.png',
     showHeader: true,
     showLoadingScreen: true,
     showFooterLogo: true,

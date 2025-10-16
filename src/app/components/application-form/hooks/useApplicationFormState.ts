@@ -30,6 +30,7 @@ const initialFormData: FormData = {
   municipalityId: '',
   phoneNumber: '',
   email: '',
+  mechanicQualifications: [],
 };
 
 export function useApplicationFormState({ showLoadingScreen, imagesToPreload, variant, formOrigin, enableJobTimingStep }: UseApplicationFormStateParams) {
@@ -375,6 +376,36 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     [enableJobTimingStep, handleNextCard1, isFormDirty]
   );
 
+  const handleMechanicQualificationToggle = useCallback(
+    (value: FormData['mechanicQualifications'][number]) => {
+      setFormData((prev) => {
+        const current = prev.mechanicQualifications;
+        const isSelected = current.includes(value);
+        return {
+          ...prev,
+          mechanicQualifications: isSelected
+            ? current.filter((q) => q !== value)
+            : [...current, value],
+        };
+      });
+      setErrors((prev) => ({ ...prev, mechanicQualifications: '' }));
+      if (!isFormDirty) {
+        setIsFormDirty(true);
+      }
+    },
+    [isFormDirty]
+  );
+
+  const handleNextMechanicQualification = useCallback(() => {
+    if (formData.mechanicQualifications.length === 0) {
+      setErrors((prev) => ({ ...prev, mechanicQualifications: '少なくとも1つの資格を選択してください' }));
+      return;
+    }
+    trackEvent('step_complete', getStepEventPayload(2));
+    setCurrentCardIndex((prev) => prev + 1);
+    trackEvent('step_view', getStepEventPayload(3));
+  }, [formData.mechanicQualifications, getStepEventPayload]);
+
   const handleNextCard2 = useCallback(() => {
     const result = validateBirthDateCard(formData.birthDate);
     setErrors(result.errors);
@@ -507,12 +538,23 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
   const cardStates = useMemo(
     () => {
+      if (formOrigin === 'mechanic') {
+        return {
+          isCard1Active: currentCardIndex === 1,
+          isCard2Active: currentCardIndex === 2,
+          isCard3Active: currentCardIndex === 3,
+          isCard4Active: currentCardIndex === 4,
+          isCard5Active: currentCardIndex === 5,
+        };
+      }
+
       if (enableJobTimingStep) {
         return {
           isCard1Active: currentCardIndex === 1,
           isCard2Active: currentCardIndex === 2,
           isCard3Active: currentCardIndex === 3,
           isCard4Active: currentCardIndex === 4,
+          isCard5Active: false,
         };
       }
 
@@ -521,9 +563,10 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         isCard2Active: currentCardIndex === 2,
         isCard3Active: currentCardIndex === 3,
         isCard4Active: false,
+        isCard5Active: false,
       };
     },
-    [currentCardIndex, enableJobTimingStep]
+    [currentCardIndex, enableJobTimingStep, formOrigin]
   );
 
   return {
@@ -539,6 +582,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     jobResult,
     handleInputChange,
     handleJobTimingSelect,
+    handleMechanicQualificationToggle,
+    handleNextMechanicQualification,
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
