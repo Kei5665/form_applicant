@@ -492,7 +492,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           }
         }
         
-        const targetPath = formOrigin === 'coupang' ? '/coupang/applicants/new' : '/applicants/new';
+        const targetPath = formOrigin === 'mechanic'
+          ? '/mechanic/applicants/new'
+          : formOrigin === 'coupang' ? '/coupang/applicants/new' : '/applicants/new';
         router.push(targetPath);
       } catch (error) {
         console.error('Error submitting form:', error);

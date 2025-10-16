@@ -1,4 +1,4 @@
-export type FormPreset = 'default' | 'coupang';
+export type FormPreset = 'default' | 'coupang' | 'mechanic';
 
 export interface FormPresetConfig {
   // Visual settings
@@ -21,7 +21,7 @@ export interface FormPresetConfig {
   useModal: boolean;
 
   // Form behavior
-  formOrigin: 'default' | 'coupang';
+  formOrigin: 'default' | 'coupang' | 'mechanic';
 
   // Styling
   footerBgClassName: string;
@@ -70,5 +70,24 @@ export const FORM_PRESETS: Record<FormPreset, FormPresetConfig> = {
     footerBgClassName: 'bg-[#212e4a]',
     containerClassName: 'pb-8 overflow-hidden',
     footerLogoSrc: '/images/coupang_footer.png',
+  },
+
+  mechanic: {
+    headerLogoSrc: '/images/mechanic-logo.png',
+    headerUpperText: '未経験で整備士に転職するなら',
+    headerLowerText: 'ライドジョブ メカニック',
+    loadingLogoSrc: '/images/ride_logo.svg',
+    step1ImageSrc: '/images/STEP1.png',
+    step2ImageSrc: '/images/STEP2.png',
+    step3ImageSrc: '/images/STEP3.png',
+    showHeader: true,
+    showLoadingScreen: true,
+    showFooterLogo: true,
+    showBottomImage: true,
+    enableJobTimingStep: true,
+    useModal: true,
+    formOrigin: 'mechanic',
+    footerBgClassName: '',
+    containerClassName: '',
   },
 };

@@ -32,7 +32,7 @@ type ApplicantFormData = {
 type ApplicantSubmission = ApplicantFormData & {
   utmParams?: UTMParams;
   experiment?: ExperimentInfo;
-  formOrigin?: 'coupang' | 'default';
+  formOrigin?: 'coupang' | 'default' | 'mechanic';
 };
 
 // UTM parameters to media name mapping function
@@ -95,9 +95,10 @@ export async function POST(request: NextRequest) {
     const isProduction = process.env.NODE_ENV === 'production';
     const sendBaseOnly = process.env.LARK_SEND_BASE_ONLY === 'true';
 
-    // Determine if this is from coupang
+    // Determine form origin type
     const referer = request.headers.get('referer') || '';
     const isCoupang = formOrigin === 'coupang' || /\/coupang(\?|$|\/)?.*/.test(referer);
+    const isMechanic = formOrigin === 'mechanic' || /\/mechanic(\?|$|\/)?.*/.test(referer);
 
     // Determine the appropriate Lark webhook URLs based on environment (with sensible fallbacks)
     const larkWebhookUrlCommon = isProduction
@@ -109,8 +110,14 @@ export async function POST(request: NextRequest) {
     const larkWebhookUrlCoupang = isProduction
       ? process.env.LARK_WEBHOOK_URL_COUPANG_PROD || process.env.LARK_WEBHOOK_URL_COUPANG
       : process.env.LARK_WEBHOOK_URL_COUPANG_TEST || process.env.LARK_WEBHOOK_URL_COUPANG;
+    // Optional dedicated webhook for mechanic
+    const larkWebhookUrlMechanic = isProduction
+      ? process.env.LARK_WEBHOOK_URL_MECHANIC_PROD || process.env.LARK_WEBHOOK_URL_MECHANIC
+      : process.env.LARK_WEBHOOK_URL_MECHANIC_TEST || process.env.LARK_WEBHOOK_URL_MECHANIC;
 
-    const larkWebhookUrl = (isCoupang && larkWebhookUrlCoupang) ? larkWebhookUrlCoupang : larkWebhookUrlCommon;
+    const larkWebhookUrl = isMechanic && larkWebhookUrlMechanic
+      ? larkWebhookUrlMechanic
+      : (isCoupang && larkWebhookUrlCoupang) ? larkWebhookUrlCoupang : larkWebhookUrlCommon;
 
     const baseWebhookUrlCommon = isProduction
       ? process.env.LARK_BASE_WEBHOOK_URL_PROD
@@ -123,8 +130,14 @@ export async function POST(request: NextRequest) {
     const baseWebhookUrlCoupang = isProduction
       ? process.env.LARK_BASE_WEBHOOK_URL_COUPANG_PROD || process.env.LARK_BASE_WEBHOOK_URL_COUPANG
       : process.env.LARK_BASE_WEBHOOK_URL_COUPANG_TEST || process.env.LARK_BASE_WEBHOOK_URL_COUPANG;
+    // Optional dedicated Base webhook for mechanic
+    const baseWebhookUrlMechanic = isProduction
+      ? process.env.LARK_BASE_WEBHOOK_URL_MECHANIC_PROD || process.env.LARK_BASE_WEBHOOK_URL_MECHANIC
+      : process.env.LARK_BASE_WEBHOOK_URL_MECHANIC_TEST || process.env.LARK_BASE_WEBHOOK_URL_MECHANIC;
 
-    const baseWebhookUrl = (isCoupang && baseWebhookUrlCoupang) ? baseWebhookUrlCoupang : baseWebhookUrlCommon;
+    const baseWebhookUrl = isMechanic && baseWebhookUrlMechanic
+      ? baseWebhookUrlMechanic
+      : (isCoupang && baseWebhookUrlCoupang) ? baseWebhookUrlCoupang : baseWebhookUrlCommon;
 
     // 必須URLの検証（Baseのみテスト時はBase URL、通常時はLark URL）
     if (sendBaseOnly) {
@@ -154,7 +167,9 @@ export async function POST(request: NextRequest) {
 
       // Lark 送信タスク
       if (larkWebhookUrl) {
-        const title = isCoupang ? 'クーパンの応募がありました！' : '新しい応募がありました！';
+        const title = isMechanic
+          ? '整備士の応募がありました！'
+          : isCoupang ? 'クーパンの応募がありました！' : '新しい応募がありました！';
         const utmDisplay = utmParams?.utm_source
           ? `${utmParams.utm_source}${utmParams.utm_medium ? `(${utmParams.utm_medium})` : ''}`
           : 'RIDEJOB HP';
