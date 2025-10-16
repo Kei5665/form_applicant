@@ -187,7 +187,7 @@ function ApplicationFormInner({
         isSubmitDisabled={isSubmitDisabled}
         isSubmitting={isSubmitting}
         isActive={resolvedEnableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
-        showEmailField={resolvedFormOrigin === 'coupang'}
+        showEmailField={true}
         submitButtonText={resolvedFormOrigin === 'coupang' ? '送信' : undefined}
       />
     </form>

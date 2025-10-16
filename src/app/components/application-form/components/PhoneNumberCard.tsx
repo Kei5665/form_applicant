@@ -55,11 +55,11 @@ export default function PhoneNumberCard({
     if (!isFullNameKanaFilled) {
       return 'fullNameKana';
     }
-    if (!isPhoneFilled) {
-      return 'phoneNumber';
-    }
     if (showEmailField && !isEmailFilled) {
       return 'email';
+    }
+    if (!isPhoneFilled) {
+      return 'phoneNumber';
     }
     return null;
   })();
@@ -148,6 +148,31 @@ export default function PhoneNumberCard({
         {errors.fullNameKana && <p className="text-red-500 text-xs mt-1">{errors.fullNameKana}</p>}
       </div>
 
+      {showEmailField && (
+        <div className="mb-6 text-left">
+          <label htmlFor="email" className="block mb-1 text-gray-900">
+            メールアドレス
+          </label>
+          <div className="relative flex items-center gap-3">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="例: example@ridejob.jp"
+              className={`flex-1 rounded border p-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${(errors.email || emailError) ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.email}
+              onChange={onChange}
+            />
+            <FingerHint
+              isVisible={firstIncompleteField === 'email'}
+              size={40}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
+            />
+          </div>
+          {(errors.email || emailError) && <p className="text-red-500 text-xs mt-1">{errors.email || emailError}</p>}
+        </div>
+      )}
+
       <div className="mb-6 text-left">
         <label htmlFor="phoneNumber" className="block mb-1 text-gray-900">
           携帯番号
@@ -173,31 +198,6 @@ export default function PhoneNumberCard({
         </div>
         {(errors.phoneNumber || phoneError) && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber || phoneError}</p>}
       </div>
-
-      {showEmailField && (
-        <div className="mb-6 text-left">
-          <label htmlFor="email" className="block mb-1 text-gray-900">
-            メールアドレス
-          </label>
-          <div className="relative flex items-center gap-3">
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="例: example@ridejob.jp"
-              className={`flex-1 rounded border p-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${(errors.email || emailError) ? 'border-red-500' : 'border-gray-300'}`}
-              value={formData.email}
-              onChange={onChange}
-            />
-            <FingerHint
-              isVisible={firstIncompleteField === 'email'}
-              size={40}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
-            />
-          </div>
-          {(errors.email || emailError) && <p className="text-red-500 text-xs mt-1">{errors.email || emailError}</p>}
-        </div>
-      )}
 
       <div className="flex justify-around items-center">
         <button type="button" className="py-2 text-sm font-bold cursor-pointer text-gray-800 mb-0" onClick={onPrevious}>
