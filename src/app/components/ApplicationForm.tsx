@@ -26,7 +26,7 @@ interface ApplicationFormProps {
   variant: PeopleImageVariant;
 
   // オーバーライド用（オプション）- プリセット設定を上書きしたい場合に使用
-  formOrigin?: 'coupang' | 'default';
+  formOrigin?: 'coupang' | 'default' | 'mechanic';
   headerLogoSrc?: string;
   headerUpperText?: string;
   headerLowerText?: string;
