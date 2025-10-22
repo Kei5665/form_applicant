@@ -87,23 +87,6 @@ export default function ApplicationComplete() {
       </header>
 
       <main className="flex flex-1 flex-col pb-12">
-        {/* 求人カード表示 */}
-        {!isLoadingJobs && jobs.length > 0 && (
-          <section className="mt-6 px-4">
-            <div className="flex items-center pl-2 mb-4">
-              <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
-              <h2 className="text-xl font-semibold text-gray-900">
-                {userName ? `${userName}さんへのおすすめ求人情報` : 'あなたにおすすめの求人'}
-              </h2>
-            </div>
-            <div className="space-y-4">
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))}
-            </div>
-          </section>
-        )}
-
         <section className="mt-6">
           <div className="text-center">
             <p className="mt-6 text-2xl font-bold leading-relaxed" style={{ color: '#2205D9' }}>
@@ -239,6 +222,23 @@ export default function ApplicationComplete() {
             </Link>
           </div>
         </section>
+
+        {/* 求人カード表示 */}
+        {!isLoadingJobs && jobs.length > 0 && (
+          <section className="mt-12 px-4">
+            <div className="mb-4 flex items-center pl-2">
+              <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {userName ? `${userName}さんへのおすすめ求人情報` : 'あなたにおすすめの求人'}
+              </h2>
+            </div>
+            <div className="space-y-4">
+              {jobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          </section>
+        )}
         
       </main>
 
