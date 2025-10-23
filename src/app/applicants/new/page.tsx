@@ -106,7 +106,7 @@ export default function ApplicationComplete() {
 
         <div className="mt-6 flex justify-center">
           <Image
-            src="/images/thanks-banner.png"
+            src="/images/thanks-banner.webp"
             alt="転職サポートのご案内バナー"
             width={680}
             height={227}
@@ -140,7 +140,7 @@ export default function ApplicationComplete() {
               rel="noopener noreferrer"
             >
               <Image
-                src="/images/line-section.png"
+                src="/images/line-section.webp"
                 alt="LINE公式アカウント登録バナー"
                 width={750}
                 height={516}

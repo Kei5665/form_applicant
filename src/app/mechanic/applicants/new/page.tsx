@@ -28,7 +28,7 @@ export default function MechanicApplicationComplete() {
       <header className="px-6 pb-5 pt-8">
         <div className="flex items-start justify-between gap-4">
             <Image
-              src="/images/mechanic-logo.png"
+              src="/images/mechanic-logo.webp"
               alt="Mechanic Logo"
               width={132}
               height={34}
@@ -61,7 +61,7 @@ export default function MechanicApplicationComplete() {
 
         <div className="mt-6 flex justify-center">
           <Image
-            src="/images/thanks-banner.png"
+            src="/images/thanks-banner.webp"
             alt="転職サポートのご案内バナー"
             width={680}
             height={227}
@@ -95,7 +95,7 @@ export default function MechanicApplicationComplete() {
               rel="noopener noreferrer"
             >
               <Image
-                src="/images/line-section.png"
+                src="/images/line-section.webp"
                 alt="LINE公式アカウント登録バナー"
                 width={750}
                 height={516}

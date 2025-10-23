@@ -16,7 +16,7 @@ export default function FingerHint({ isVisible, className = '', size = 52 }: Fin
     <div className={containerClassName} aria-hidden="true">
       <div className={animationClassName}>
         <Image
-          src="/images/finger.png"
+          src="/images/finger.webp"
           width={size}
           height={Math.round(size * 0.72)}
           alt=""

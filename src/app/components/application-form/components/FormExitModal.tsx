@@ -34,7 +34,7 @@ function DefaultExitContent({ onClose, onConfirm }: { onClose: () => void; onCon
     <div className="w-full max-w-sm rounded-3xl bg-[#F8F8F8] px-6 py-7 shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
       <div className="flex items-start gap-4">
         <Image
-          src="/images/exit-guard.png"
+          src="/images/exit-guard.webp"
           alt="ライドジョブ三浦"
           width={84}
           height={84}
@@ -60,7 +60,7 @@ function DefaultExitContent({ onClose, onConfirm }: { onClose: () => void; onCon
         >
           入力に戻る
           <span className="pointer-events-none absolute -right-5 top-1/2 -translate-y-1/2">
-            <Image src="/images/finger.png" alt="指アイコン" width={48} height={48} className="h-12 w-12" priority />
+            <Image src="/images/finger.webp" alt="指アイコン" width={48} height={48} className="h-12 w-12" priority />
           </span>
         </button>
         <button
@@ -85,7 +85,7 @@ function PhoneExitContent({ onClose, onConfirm }: { onClose: () => void; onConfi
 
       <div className="mt-4">
         <Image
-          src="/images/exit-guard-phone.png"
+          src="/images/exit-guard-phone.webp"
           alt="年収アップの事例"
           width={300}
           height={220}
