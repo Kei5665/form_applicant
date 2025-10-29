@@ -4,6 +4,7 @@ export { default as FingerHint } from './FingerHint';
 export { default as JobTimingCard } from './JobTimingCard';
 export { default as MechanicQualificationCard } from './MechanicQualificationCard';
 export { default as NameCard } from './NameCard';
+export { default as NameInputCard } from './NameInputCard';
 export { default as PhoneNumberCard } from './PhoneNumberCard';
 export { default as FormExitModal } from './FormExitModal';
 

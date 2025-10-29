@@ -61,7 +61,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     markFormClean,
     setPendingNavigation,
     setExitModalVariant,
-    phoneCardIndex: enableJobTimingStep ? 4 : 3,
+    phoneCardIndex: formOrigin === 'mechanic' ? 6 : enableJobTimingStep ? 5 : 4,
   });
 
   const getStepNumber = useCallback(
@@ -433,6 +433,17 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     }
   }, [enableJobTimingStep, formData, formOrigin, loadJobCount, getStepEventPayload]);
 
+  const handleNextCard4 = useCallback(() => {
+    const nameValidation = validateNameFields(formData);
+    setErrors(nameValidation.errors);
+    if (nameValidation.isValid) {
+      const stepNum = formOrigin === 'mechanic' ? 4 : enableJobTimingStep ? 4 : 3;
+      trackEvent('step_complete', getStepEventPayload(stepNum));
+      setCurrentCardIndex((prev) => prev + 1);
+      trackEvent('step_view', getStepEventPayload(stepNum + 1));
+    }
+  }, [formData, formOrigin, enableJobTimingStep, getStepEventPayload]);
+
   const handlePreviousCard = useCallback(() => {
     setCurrentCardIndex((prev) => {
       const next = Math.max(prev - 1, 1);
@@ -545,6 +556,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           isCard3Active: currentCardIndex === 3,
           isCard4Active: currentCardIndex === 4,
           isCard5Active: currentCardIndex === 5,
+          isCard6Active: currentCardIndex === 6,
         };
       }
 
@@ -554,7 +566,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           isCard2Active: currentCardIndex === 2,
           isCard3Active: currentCardIndex === 3,
           isCard4Active: currentCardIndex === 4,
-          isCard5Active: false,
+          isCard5Active: currentCardIndex === 5,
+          isCard6Active: false,
         };
       }
 
@@ -562,8 +575,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         isCard1Active: currentCardIndex === 1,
         isCard2Active: currentCardIndex === 2,
         isCard3Active: currentCardIndex === 3,
-        isCard4Active: false,
+        isCard4Active: currentCardIndex === 4,
         isCard5Active: false,
+        isCard6Active: false,
       };
     },
     [currentCardIndex, enableJobTimingStep, formOrigin]
@@ -587,9 +601,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
-    ...(enableJobTimingStep
-      ? { handleNextCard3 }
-      : {}),
+    handleNextCard3,
+    handleNextCard4,
     handlePreviousCard,
     handleSubmit,
     hideExitModal,

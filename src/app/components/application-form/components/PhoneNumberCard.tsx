@@ -43,18 +43,10 @@ export default function PhoneNumberCard({
   showEmailField = false,
   submitButtonText = '求人情報を見る',
 }: PhoneNumberCardProps) {
-  const isFullNameFilled = formData.fullName.trim().length > 0;
-  const isFullNameKanaFilled = formData.fullNameKana.trim().length > 0;
   const isPhoneFilled = phoneNumber.trim().length === 11;
   const isEmailFilled = formData.email.trim().length > 0;
 
   const firstIncompleteField = (() => {
-    if (!isFullNameFilled) {
-      return 'fullName';
-    }
-    if (!isFullNameKanaFilled) {
-      return 'fullNameKana';
-    }
     if (showEmailField && !isEmailFilled) {
       return 'email';
     }
@@ -104,75 +96,6 @@ export default function PhoneNumberCard({
           </div>
       )}
 
-
-      <div className="mb-6 text-left">
-        <label className="font-bold mb-2.5 block text-gray-900">お名前（漢字）</label>
-        <div className="relative flex items-center gap-3">
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            placeholder="例: 田中 太郎"
-            className={`flex-1 rounded border p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.fullName ? 'border-red-500' : 'border-gray-300'}`}
-            value={formData.fullName}
-            onChange={onChange}
-            onBlur={onBlur}
-          />
-          <FingerHint
-            isVisible={firstIncompleteField === 'fullName'}
-            size={40}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
-          />
-        </div>
-        {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
-      </div>
-
-      <div className="mb-6 text-left">
-        <label className="font-bold mb-2.5 block text-gray-900">お名前（ふりがな）</label>
-        <div className="relative flex items-center gap-3">
-          <input
-            type="text"
-            id="fullNameKana"
-            name="fullNameKana"
-            placeholder="例: たなか たろう"
-            className={`flex-1 rounded border p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.fullNameKana ? 'border-red-500' : 'border-gray-300'} ${formData.fullNameKana && !errors.fullNameKana ? 'text-gray-900' : ''}`}
-            value={formData.fullNameKana}
-            onChange={onChange}
-          />
-          <FingerHint
-            isVisible={firstIncompleteField === 'fullNameKana'}
-            size={40}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
-          />
-        </div>
-        {errors.fullNameKana && <p className="text-red-500 text-xs mt-1">{errors.fullNameKana}</p>}
-      </div>
-
-      {showEmailField && (
-        <div className="mb-6 text-left">
-          <label htmlFor="email" className="block mb-1 text-gray-900">
-            メールアドレス
-          </label>
-          <div className="relative flex items-center gap-3">
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="例: example@ridejob.jp"
-              className={`flex-1 rounded border p-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${(errors.email || emailError) ? 'border-red-500' : 'border-gray-300'}`}
-              value={formData.email}
-              onChange={onChange}
-            />
-            <FingerHint
-              isVisible={firstIncompleteField === 'email'}
-              size={40}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
-            />
-          </div>
-          {(errors.email || emailError) && <p className="text-red-500 text-xs mt-1">{errors.email || emailError}</p>}
-        </div>
-      )}
-
       <div className="mb-6 text-left">
         <label htmlFor="phoneNumber" className="block mb-1 text-gray-900">
           携帯番号
@@ -198,6 +121,32 @@ export default function PhoneNumberCard({
         </div>
         {(errors.phoneNumber || phoneError) && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber || phoneError}</p>}
       </div>
+
+
+      {showEmailField && (
+        <div className="mb-6 text-left">
+          <label htmlFor="email" className="block mb-1 text-gray-900">
+            メールアドレス
+          </label>
+          <div className="relative flex items-center gap-3">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="例: example@ridejob.jp"
+              className={`flex-1 rounded border p-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${(errors.email || emailError) ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.email}
+              onChange={onChange}
+            />
+            <FingerHint
+              isVisible={firstIncompleteField === 'email'}
+              size={40}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[52px]"
+            />
+          </div>
+          {(errors.email || emailError) && <p className="text-red-500 text-xs mt-1">{errors.email || emailError}</p>}
+        </div>
+      )}
 
       <div className="flex justify-around items-center">
         <button type="button" className="py-2 text-sm font-bold cursor-pointer text-gray-800 mb-0" onClick={onPrevious}>

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { BirthDateCard, FormExitModal, JobTimingCard, MechanicQualificationCard, NameCard, PhoneNumberCard } from './application-form/components';
+import { BirthDateCard, FormExitModal, JobTimingCard, MechanicQualificationCard, NameCard, NameInputCard, PhoneNumberCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
 import type { PeopleImageVariant } from './application-form/types';
 import { FORM_PRESETS, type FormPreset } from './application-form/presets';
@@ -36,6 +36,7 @@ interface ApplicationFormProps {
   step2ImageSrc?: string;
   step3ImageSrc?: string;
   step4ImageSrc?: string;
+  step5ImageSrc?: string;
   footerLogoSrc?: string;
   bottomImageSrc?: string;
   showBottomImage?: boolean;
@@ -61,6 +62,7 @@ function ApplicationFormInner({
   step2ImageSrc,
   step3ImageSrc,
   step4ImageSrc,
+  step5ImageSrc,
   showHeader,
   showLoadingScreen,
   enableJobTimingStep,
@@ -82,6 +84,7 @@ function ApplicationFormInner({
   const resolvedStep2ImageSrc = step2ImageSrc ?? presetConfig?.step2ImageSrc ?? '/images/STEP2.png';
   const resolvedStep3ImageSrc = step3ImageSrc ?? presetConfig?.step3ImageSrc ?? '/images/STEP3.png';
   const resolvedStep4ImageSrc = step4ImageSrc ?? presetConfig?.step4ImageSrc;
+  const resolvedStep5ImageSrc = step5ImageSrc ?? presetConfig?.step5ImageSrc;
   const resolvedShowHeader = showHeader ?? presetConfig?.showHeader ?? true;
   const resolvedShowLoadingScreen = showLoadingScreen ?? presetConfig?.showLoadingScreen ?? true;
   const resolvedEnableJobTimingStep = enableJobTimingStep ?? presetConfig?.enableJobTimingStep ?? true;
@@ -90,8 +93,9 @@ function ApplicationFormInner({
   const imagesToPreload = useMemo(() => {
     const images = [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc];
     if (resolvedStep4ImageSrc) images.push(resolvedStep4ImageSrc);
+    if (resolvedStep5ImageSrc) images.push(resolvedStep5ImageSrc);
     return images;
-  }, [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc, resolvedStep4ImageSrc]);
+  }, [resolvedHeaderLogoSrc, resolvedStep1ImageSrc, resolvedStep2ImageSrc, resolvedStep3ImageSrc, resolvedStep4ImageSrc, resolvedStep5ImageSrc]);
 
   const {
     loading,
@@ -112,6 +116,7 @@ function ApplicationFormInner({
     handleNextCard1,
     handleNextCard2,
     handleNextCard3,
+    handleNextCard4,
     handlePreviousCard,
     handleSubmit,
     hideExitModal,
@@ -189,12 +194,25 @@ function ApplicationFormInner({
             errors={errors}
             onChange={handleInputChange}
             onPrevious={handlePreviousCard}
-            onNext={handleNextCard3 || handleNextCard2}
+            onNext={handleNextCard3}
             isActive={cardStates.isCard4Active}
           />
 
-          <PhoneNumberCard
+          <NameInputCard
             stepImageSrc={resolvedStep4ImageSrc || resolvedStep3ImageSrc}
+            formData={formData}
+            errors={errors}
+            jobResult={jobResult}
+            showJobCount={false}
+            onChange={handleInputChange}
+            onBlur={handleNameBlur}
+            onPrevious={handlePreviousCard}
+            onNext={handleNextCard4}
+            isActive={cardStates.isCard5Active}
+          />
+
+          <PhoneNumberCard
+            stepImageSrc={resolvedStep5ImageSrc || resolvedStep4ImageSrc || resolvedStep3ImageSrc}
             jobResult={jobResult}
             showJobCount={false}
             formData={formData}
@@ -207,7 +225,7 @@ function ApplicationFormInner({
             onPrevious={handlePreviousCard}
             isSubmitDisabled={isSubmitDisabled}
             isSubmitting={isSubmitting}
-            isActive={cardStates.isCard5Active}
+            isActive={cardStates.isCard6Active}
             showEmailField={true}
           />
         </>
@@ -231,12 +249,25 @@ function ApplicationFormInner({
             errors={errors}
             onChange={handleInputChange}
             onPrevious={handlePreviousCard}
-            onNext={resolvedEnableJobTimingStep && handleNextCard3 ? handleNextCard3 : handleNextCard2}
+            onNext={handleNextCard3}
             isActive={resolvedEnableJobTimingStep ? cardStates.isCard3Active : cardStates.isCard2Active}
           />
 
-          <PhoneNumberCard
+          <NameInputCard
             stepImageSrc={resolvedStep3ImageSrc}
+            formData={formData}
+            errors={errors}
+            jobResult={jobResult}
+            showJobCount={resolvedFormOrigin !== 'coupang'}
+            onChange={handleInputChange}
+            onBlur={handleNameBlur}
+            onPrevious={handlePreviousCard}
+            onNext={handleNextCard4}
+            isActive={resolvedEnableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
+          />
+
+          <PhoneNumberCard
+            stepImageSrc={resolvedStep4ImageSrc || resolvedStep3ImageSrc}
             jobResult={jobResult}
             showJobCount={resolvedFormOrigin !== 'coupang'}
             formData={formData}
@@ -249,7 +280,7 @@ function ApplicationFormInner({
             onPrevious={handlePreviousCard}
             isSubmitDisabled={isSubmitDisabled}
             isSubmitting={isSubmitting}
-            isActive={resolvedEnableJobTimingStep ? cardStates.isCard4Active : cardStates.isCard3Active}
+            isActive={resolvedEnableJobTimingStep ? cardStates.isCard5Active : cardStates.isCard4Active}
             showEmailField={true}
             submitButtonText={resolvedFormOrigin === 'coupang' ? '送信' : undefined}
           />

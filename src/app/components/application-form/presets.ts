@@ -12,6 +12,7 @@ export interface FormPresetConfig {
   step2ImageSrc: string;
   step3ImageSrc: string;
   step4ImageSrc?: string;
+  step5ImageSrc?: string;
 
   // Feature flags
   showHeader: boolean;
@@ -42,6 +43,8 @@ export const FORM_PRESETS: Record<FormPreset, FormPresetConfig> = {
     step1ImageSrc: '/images/STEP1.webp',
     step2ImageSrc: '/images/STEP2.webp',
     step3ImageSrc: '/images/STEP3.webp',
+    step4ImageSrc: '/images/STEP4.webp',
+    step5ImageSrc: '/images/STEP5.webp',
     showHeader: true,
     showLoadingScreen: true,
     showFooterLogo: true,
@@ -61,6 +64,7 @@ export const FORM_PRESETS: Record<FormPreset, FormPresetConfig> = {
     step1ImageSrc: '/images/STEP1.webp',
     step2ImageSrc: '/images/STEP2.webp',
     step3ImageSrc: '/images/STEP3.webp',
+    step4ImageSrc: '/images/STEP4.webp',
     showHeader: false,
     showLoadingScreen: false,
     showFooterLogo: false,
@@ -82,6 +86,7 @@ export const FORM_PRESETS: Record<FormPreset, FormPresetConfig> = {
     step2ImageSrc: '/images/Mechanic-STEP2.webp',
     step3ImageSrc: '/images/Mechanic-STEP3.webp',
     step4ImageSrc: '/images/Mechanic-STEP4.webp',
+    step5ImageSrc: '/images/Mechanic-STEP5.webp',
     showHeader: true,
     showLoadingScreen: true,
     showFooterLogo: true,
