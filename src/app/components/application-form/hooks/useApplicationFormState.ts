@@ -61,7 +61,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     markFormClean,
     setPendingNavigation,
     setExitModalVariant,
-    phoneCardIndex: formOrigin === 'mechanic' ? 6 : enableJobTimingStep ? 5 : 4,
+    phoneCardIndex: formOrigin === 'mechanic' ? 5 : formOrigin === 'coupang' ? 3 : enableJobTimingStep ? 5 : 4,
   });
 
   const getStepNumber = useCallback(
@@ -149,14 +149,15 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       if (trimmedPhone.length !== 11 || !isValidPhoneNumber(trimmedPhone)) {
         return false;
       }
-      if (formOrigin !== 'coupang') {
-        return true;
+      // coupangとmechanicはメールアドレス必須
+      if (formOrigin === 'coupang' || formOrigin === 'mechanic') {
+        const trimmedEmail = email.trim();
+        if (!trimmedEmail) {
+          return false;
+        }
+        return isValidEmail(trimmedEmail);
       }
-      const trimmedEmail = email.trim();
-      if (!trimmedEmail) {
-        return false;
-      }
-      return isValidEmail(trimmedEmail);
+      return true;
     },
     [formOrigin]
   );
@@ -184,7 +185,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
   const validateEmailInput = useCallback(
     (email: string) => {
-      if (formOrigin !== 'coupang') {
+      if (formOrigin !== 'coupang' && formOrigin !== 'mechanic') {
         return;
       }
       const trimmed = email.trim();
@@ -550,13 +551,26 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const cardStates = useMemo(
     () => {
       if (formOrigin === 'mechanic') {
+        // mechanic: 5ステップ (JobTiming, Qualification, BirthDate, NameCard, NameAndContact)
         return {
           isCard1Active: currentCardIndex === 1,
           isCard2Active: currentCardIndex === 2,
           isCard3Active: currentCardIndex === 3,
           isCard4Active: currentCardIndex === 4,
           isCard5Active: currentCardIndex === 5,
-          isCard6Active: currentCardIndex === 6,
+          isCard6Active: false,
+        };
+      }
+
+      if (formOrigin === 'coupang') {
+        // coupang: 3ステップ (BirthDate, NameCard, NameAndContact)
+        return {
+          isCard1Active: currentCardIndex === 1,
+          isCard2Active: currentCardIndex === 2,
+          isCard3Active: currentCardIndex === 3,
+          isCard4Active: false,
+          isCard5Active: false,
+          isCard6Active: false,
         };
       }
 

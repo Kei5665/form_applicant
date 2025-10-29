@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { BirthDateCard, FormExitModal, JobTimingCard, MechanicQualificationCard, NameCard, NameInputCard, PhoneNumberCard } from './application-form/components';
+import { BirthDateCard, FormExitModal, JobTimingCard, MechanicQualificationCard, NameCard, NameInputCard, PhoneNumberCard, NameAndContactCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
 import type { PeopleImageVariant } from './application-form/types';
 import { FORM_PRESETS, type FormPreset } from './application-form/presets';
@@ -198,34 +198,60 @@ function ApplicationFormInner({
             isActive={cardStates.isCard4Active}
           />
 
-          <NameInputCard
+          <NameAndContactCard
             stepImageSrc={resolvedStep4ImageSrc || resolvedStep3ImageSrc}
             formData={formData}
             errors={errors}
             jobResult={jobResult}
             showJobCount={false}
+            phoneError={phoneError}
+            emailError={emailError}
             onChange={handleInputChange}
             onBlur={handleNameBlur}
             onPrevious={handlePreviousCard}
-            onNext={handleNextCard4}
+            isSubmitDisabled={isSubmitDisabled}
+            isSubmitting={isSubmitting}
             isActive={cardStates.isCard5Active}
           />
+        </>
+      ) : resolvedFormOrigin === 'coupang' ? (
+        <>
+          <BirthDateCard
+            stepImageSrc={resolvedStep1ImageSrc}
+            birthDate={formData.birthDate}
+            errors={errors}
+            onChange={handleInputChange}
+            onNext={handleNextCard1}
+            isActive={cardStates.isCard1Active}
+          />
 
-          <PhoneNumberCard
-            stepImageSrc={resolvedStep5ImageSrc || resolvedStep4ImageSrc || resolvedStep3ImageSrc}
-            jobResult={jobResult}
-            showJobCount={false}
+          <NameCard
+            stepImageSrc={resolvedStep2ImageSrc}
+            postalCode={formData.postalCode}
+            prefectureId={formData.prefectureId}
+            municipalityId={formData.municipalityId}
+            errors={errors}
+            onChange={handleInputChange}
+            onPrevious={handlePreviousCard}
+            onNext={handleNextCard3}
+            isActive={cardStates.isCard2Active}
+          />
+
+          <NameAndContactCard
+            stepImageSrc={resolvedStep3ImageSrc}
             formData={formData}
             errors={errors}
+            jobResult={jobResult}
+            showJobCount={false}
             phoneError={phoneError}
             emailError={emailError}
-            phoneNumber={formData.phoneNumber}
             onChange={handleInputChange}
+            onBlur={handleNameBlur}
             onPrevious={handlePreviousCard}
             isSubmitDisabled={isSubmitDisabled}
             isSubmitting={isSubmitting}
-            isActive={cardStates.isCard6Active}
-            showEmailField={true}
+            isActive={cardStates.isCard3Active}
+            submitButtonText="送信"
           />
         </>
       ) : (
@@ -257,7 +283,7 @@ function ApplicationFormInner({
             formData={formData}
             errors={errors}
             jobResult={jobResult}
-            showJobCount={resolvedFormOrigin !== 'coupang'}
+            showJobCount={true}
             onChange={handleInputChange}
             onBlur={handleNameBlur}
             onPrevious={handlePreviousCard}
@@ -268,7 +294,7 @@ function ApplicationFormInner({
           <PhoneNumberCard
             stepImageSrc={resolvedStep4ImageSrc || resolvedStep3ImageSrc}
             jobResult={jobResult}
-            showJobCount={resolvedFormOrigin !== 'coupang'}
+            showJobCount={true}
             formData={formData}
             errors={errors}
             phoneError={phoneError}
@@ -280,7 +306,6 @@ function ApplicationFormInner({
             isSubmitting={isSubmitting}
             isActive={resolvedEnableJobTimingStep ? cardStates.isCard5Active : cardStates.isCard4Active}
             showEmailField={true}
-            submitButtonText={resolvedFormOrigin === 'coupang' ? '送信' : undefined}
           />
         </>
       )}

@@ -6,5 +6,6 @@ export { default as MechanicQualificationCard } from './MechanicQualificationCar
 export { default as NameCard } from './NameCard';
 export { default as NameInputCard } from './NameInputCard';
 export { default as PhoneNumberCard } from './PhoneNumberCard';
+export { default as NameAndContactCard } from './NameAndContactCard';
 export { default as FormExitModal } from './FormExitModal';
 
