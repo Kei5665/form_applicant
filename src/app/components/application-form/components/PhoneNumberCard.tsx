@@ -16,7 +16,6 @@ type PhoneNumberCardProps = {
   emailError: string | null;
   phoneNumber: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   onPrevious: () => void;
   isSubmitDisabled: boolean;
   isSubmitting: boolean;
@@ -35,7 +34,6 @@ export default function PhoneNumberCard({
   emailError,
   phoneNumber,
   onChange,
-  onBlur,
   onPrevious,
   isSubmitDisabled,
   isSubmitting,

@@ -221,7 +221,6 @@ function ApplicationFormInner({
             emailError={emailError}
             phoneNumber={formData.phoneNumber}
             onChange={handleInputChange}
-            onBlur={handleNameBlur}
             onPrevious={handlePreviousCard}
             isSubmitDisabled={isSubmitDisabled}
             isSubmitting={isSubmitting}
@@ -276,7 +275,6 @@ function ApplicationFormInner({
             emailError={emailError}
             phoneNumber={formData.phoneNumber}
             onChange={handleInputChange}
-            onBlur={handleNameBlur}
             onPrevious={handlePreviousCard}
             isSubmitDisabled={isSubmitDisabled}
             isSubmitting={isSubmitting}
