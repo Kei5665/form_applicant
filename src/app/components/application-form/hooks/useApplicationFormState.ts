@@ -65,8 +65,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   });
 
   const getStepNumber = useCallback(
-    (cardIndex: number) => (enableJobTimingStep ? cardIndex - 1 : cardIndex),
-    [enableJobTimingStep]
+    (cardIndex: number) => cardIndex,
+    []
   );
 
   const getStepEventPayload = useCallback(
@@ -349,17 +349,23 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         const result = validateJobTiming(value);
         setErrors(result.errors);
         if (result.isValid) {
-          trackEvent('step_complete', getStepEventPayload(1));
-          setCurrentCardIndex(2);
-          trackEvent('step_view', getStepEventPayload(2));
+          setCurrentCardIndex((prev) => {
+            trackEvent('step_complete', getStepEventPayload(prev));
+            const next = prev + 1;
+            trackEvent('step_view', getStepEventPayload(next));
+            return next;
+          });
         }
       } else {
         const result = validateBirthDateCard(formData.birthDate);
         setErrors(result.errors);
         if (result.isValid) {
-          trackEvent('step_complete', getStepEventPayload(1));
-          setCurrentCardIndex(2);
-          trackEvent('step_view', getStepEventPayload(2));
+          setCurrentCardIndex((prev) => {
+            trackEvent('step_complete', getStepEventPayload(prev));
+            const next = prev + 1;
+            trackEvent('step_view', getStepEventPayload(next));
+            return next;
+          });
         }
       }
     }, [enableJobTimingStep, formData.birthDate, formData.jobTiming, getStepEventPayload]);
@@ -402,28 +408,37 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       setErrors((prev) => ({ ...prev, mechanicQualifications: '少なくとも1つの資格を選択してください' }));
       return;
     }
-    trackEvent('step_complete', getStepEventPayload(2));
-    setCurrentCardIndex((prev) => prev + 1);
-    trackEvent('step_view', getStepEventPayload(3));
+    setCurrentCardIndex((prev) => {
+      trackEvent('step_complete', getStepEventPayload(prev));
+      const next = prev + 1;
+      trackEvent('step_view', getStepEventPayload(next));
+      return next;
+    });
   }, [formData.mechanicQualifications, getStepEventPayload]);
 
   const handleNextCard2 = useCallback(() => {
     const result = validateBirthDateCard(formData.birthDate);
     setErrors(result.errors);
     if (result.isValid) {
-      trackEvent('step_complete', getStepEventPayload(enableJobTimingStep ? 2 : 1));
-      setCurrentCardIndex((prev) => prev + 1);
-      trackEvent('step_view', getStepEventPayload(enableJobTimingStep ? 3 : 2));
+      setCurrentCardIndex((prev) => {
+        trackEvent('step_complete', getStepEventPayload(prev));
+        const next = prev + 1;
+        trackEvent('step_view', getStepEventPayload(next));
+        return next;
+      });
     }
-  }, [enableJobTimingStep, formData.birthDate, getStepEventPayload]);
+  }, [formData.birthDate, getStepEventPayload]);
 
   const handleNextCard3 = useCallback(() => {
     const result = validateCard2(formData);
     setErrors(result.errors);
     if (result.isValid) {
-      trackEvent('step_complete', getStepEventPayload(enableJobTimingStep ? 3 : 2));
-      setCurrentCardIndex((prev) => prev + 1);
-      trackEvent('step_view', getStepEventPayload(enableJobTimingStep ? 4 : 3));
+      setCurrentCardIndex((prev) => {
+        trackEvent('step_complete', getStepEventPayload(prev));
+        const next = prev + 1;
+        trackEvent('step_view', getStepEventPayload(next));
+        return next;
+      });
       if (formOrigin !== 'coupang') {
         if (formData.prefectureId) {
           loadJobCount({ prefectureId: formData.prefectureId });
@@ -432,18 +447,20 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         }
       }
     }
-  }, [enableJobTimingStep, formData, formOrigin, loadJobCount, getStepEventPayload]);
+  }, [formData, formOrigin, loadJobCount, getStepEventPayload]);
 
   const handleNextCard4 = useCallback(() => {
     const nameValidation = validateNameFields(formData);
     setErrors(nameValidation.errors);
     if (nameValidation.isValid) {
-      const stepNum = formOrigin === 'mechanic' ? 4 : enableJobTimingStep ? 4 : 3;
-      trackEvent('step_complete', getStepEventPayload(stepNum));
-      setCurrentCardIndex((prev) => prev + 1);
-      trackEvent('step_view', getStepEventPayload(stepNum + 1));
+      setCurrentCardIndex((prev) => {
+        trackEvent('step_complete', getStepEventPayload(prev));
+        const next = prev + 1;
+        trackEvent('step_view', getStepEventPayload(next));
+        return next;
+      });
     }
-  }, [formData, formOrigin, enableJobTimingStep, getStepEventPayload]);
+  }, [formData, getStepEventPayload]);
 
   const handlePreviousCard = useCallback(() => {
     setCurrentCardIndex((prev) => {
