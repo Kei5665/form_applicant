@@ -17,7 +17,6 @@ export default function CoupangApplicationForm() {
     errors,
     isSubmitting,
     handleChange,
-    handlePhoneNumberBlur,
     handleSubmit,
   } = useCoupangForm();
 
@@ -150,8 +149,8 @@ export default function CoupangApplicationForm() {
             value={formData.fullName}
             onChange={handleChange}
             error={errors.fullName}
-            placeholder="山田　太郎"
-            helpText="姓と名の間に全角スペースを入れてください"
+            placeholder="山田太郎"
+            helpText="全角文字で入力してください"
           />
 
           <TextInput
@@ -160,8 +159,8 @@ export default function CoupangApplicationForm() {
             value={formData.fullNameKana}
             onChange={handleChange}
             error={errors.fullNameKana}
-            placeholder="やまだ　たろう"
-            helpText="ひらがなで、姓と名の間に全角スペースを入れてください"
+            placeholder="やまだたろう"
+            helpText="ひらがなで入力してください"
           />
 
           <TextInput
@@ -170,8 +169,8 @@ export default function CoupangApplicationForm() {
             value={formData.englishName}
             onChange={handleChange}
             error={errors.englishName}
-            placeholder="Taro　Yamada"
-            helpText="名 → 姓 の順で、間に全角スペースを入れてください"
+            placeholder="Taro Yamada"
+            helpText="名 → 姓 の順で入力してください（例：Taro Yamada）"
           />
 
           <TextInput
@@ -180,10 +179,9 @@ export default function CoupangApplicationForm() {
             type="tel"
             value={formData.phoneNumber}
             onChange={handleChange}
-            onBlur={handlePhoneNumberBlur}
             error={errors.phoneNumber}
-            placeholder="090-1234-5678"
-            helpText="ハイフン付きで入力してください"
+            placeholder="09012345678"
+            helpText="ハイフンなしで入力してください"
           />
         </FormSection>
 
@@ -231,7 +229,7 @@ export default function CoupangApplicationForm() {
         </FormSection>
 
         {/* カテゴリ4: 参加条件確認 */}
-        <FormSection title="参加条件確認（すべて必須）">
+        <FormSection title="参加条件確認（該当する項目にチェックしてください）">
           <div className="space-y-3">
             <CheckboxInput
               name="condition1"

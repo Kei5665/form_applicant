@@ -1,7 +1,7 @@
 import { useState, useCallback, type FormEvent, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CoupangFormData, CoupangFormErrors } from '../types';
-import { validateCoupangForm, formatPhoneNumber } from '../validation';
+import { validateCoupangForm } from '../validation';
 
 declare global {
   interface Window {
@@ -49,13 +49,6 @@ export function useCoupangForm() {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   }, [errors]);
-
-  const handlePhoneNumberBlur = useCallback(() => {
-    if (formData.phoneNumber) {
-      const formatted = formatPhoneNumber(formData.phoneNumber);
-      setFormData((prev) => ({ ...prev, phoneNumber: formatted }));
-    }
-  }, [formData.phoneNumber]);
 
   const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,7 +116,6 @@ export function useCoupangForm() {
     errors,
     isSubmitting,
     handleChange,
-    handlePhoneNumberBlur,
     handleSubmit,
   };
 }

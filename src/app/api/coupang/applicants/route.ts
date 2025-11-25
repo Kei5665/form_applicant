@@ -252,8 +252,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Gmail 確認メール送信タスク
-      if (GAS_EMAIL_API_URL && formData.email && formData.seminarSlot) {
+      // Gmail 確認メール送信タスク（全条件クリア時のみ）
+      if (conditionsmet && GAS_EMAIL_API_URL && formData.email && formData.seminarSlot) {
         const zoomUrl = getZoomUrlForSlot(seminarSlots, formData.seminarSlot);
         
         tasks.push(
@@ -270,10 +270,12 @@ export async function POST(request: NextRequest) {
             if (!emailResult.success) {
               console.error('Failed to send confirmation email:', emailResult.error);
             } else {
-              console.log('Confirmation email sent successfully to:', formData.email);
+              console.log('✓ 全条件クリア：Gmail送信完了 to:', formData.email);
             }
           })()
         );
+      } else if (!conditionsmet) {
+        console.log('⚠ 一部条件未確認：Gmail送信スキップ、Lark通知とLark Base登録のみ実行');
       }
 
       await Promise.allSettled(tasks);

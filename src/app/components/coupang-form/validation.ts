@@ -20,19 +20,9 @@ export function validateFullName(fullName: string): string | undefined {
     return '氏名（漢字）を入力してください';
   }
 
-  // 全角スペースで分割
-  const parts = fullName.split('　');
-  if (parts.length !== 2) {
-    return '姓と名の間に全角スペースを1つ入れてください（例：山田　太郎）';
-  }
-
-  if (parts[0].trim() === '' || parts[1].trim() === '') {
-    return '姓と名の両方を入力してください';
-  }
-
-  // 全角文字チェック（ひらがな、カタカナ、漢字）
-  const fullWidthRegex = /^[ぁ-んァ-ヶー一-龥々〆〤]+$/;
-  if (!fullWidthRegex.test(parts[0]) || !fullWidthRegex.test(parts[1])) {
+  // 全角文字チェック（ひらがな、カタカナ、漢字、スペース）
+  const fullWidthRegex = /^[ぁ-んァ-ヶー一-龥々〆〤\u3000 ]+$/;
+  if (!fullWidthRegex.test(fullName)) {
     return '全角文字で入力してください';
   }
 
@@ -45,19 +35,9 @@ export function validateFullNameKana(fullNameKana: string): string | undefined {
     return '氏名（ふりがな）を入力してください';
   }
 
-  // 全角スペースで分割
-  const parts = fullNameKana.split('　');
-  if (parts.length !== 2) {
-    return '姓と名の間に全角スペースを1つ入れてください（例：やまだ　たろう）';
-  }
-
-  if (parts[0].trim() === '' || parts[1].trim() === '') {
-    return '姓と名の両方を入力してください';
-  }
-
-  // ひらがなのみチェック
-  const hiraganaRegex = /^[ぁ-ん]+$/;
-  if (!hiraganaRegex.test(parts[0]) || !hiraganaRegex.test(parts[1])) {
+  // ひらがなとスペースのみチェック
+  const hiraganaRegex = /^[ぁ-ん\u3000 ]+$/;
+  if (!hiraganaRegex.test(fullNameKana)) {
     return 'ひらがなで入力してください';
   }
 
@@ -70,19 +50,9 @@ export function validateEnglishName(englishName: string): string | undefined {
     return '英名を入力してください';
   }
 
-  // 全角スペースで分割
-  const parts = englishName.split('　');
-  if (parts.length !== 2) {
-    return '名と姓の間に全角スペースを1つ入れてください（例：Taro　Yamada）';
-  }
-
-  if (parts[0].trim() === '' || parts[1].trim() === '') {
-    return '名と姓の両方を入力してください';
-  }
-
-  // アルファベットチェック（大文字小文字、スペース、ハイフン許可）
-  const alphabetRegex = /^[a-zA-Z\-]+$/;
-  if (!alphabetRegex.test(parts[0].trim()) || !alphabetRegex.test(parts[1].trim())) {
+  // アルファベット、スペース、ハイフンのみ許可
+  const alphabetRegex = /^[a-zA-Z\-\u3000 ]+$/;
+  if (!alphabetRegex.test(englishName)) {
     return 'アルファベットで入力してください';
   }
 
@@ -95,10 +65,17 @@ export function validatePhoneNumber(phoneNumber: string): string | undefined {
     return '電話番号を入力してください';
   }
 
-  // ハイフン付き形式チェック（XXX-XXXX-XXXX or XX-XXXX-XXXX）
-  const phoneRegex = /^0\d{1,4}-\d{1,4}-\d{4}$/;
-  if (!phoneRegex.test(phoneNumber)) {
-    return 'ハイフン付きで入力してください（例：090-1234-5678）';
+  // 数字のみ抽出
+  const numbers = phoneNumber.replace(/[^\d]/g, '');
+  
+  // 10桁または11桁の数字をチェック
+  if (numbers.length < 10 || numbers.length > 11) {
+    return '10桁または11桁の電話番号を入力してください';
+  }
+
+  // 0から始まることをチェック
+  if (!numbers.startsWith('0')) {
+    return '電話番号は0から始まる必要があります';
   }
 
   return undefined;
@@ -150,22 +127,8 @@ export function validateCoupangForm(formData: CoupangFormData): CoupangFormError
     errors.pastExperience = '過去の参加／勤務経験を選択してください';
   }
 
-  // 参加条件確認
-  if (!formData.condition1) {
-    errors.condition1 = '参加条件を確認してください';
-  }
-  if (!formData.condition2) {
-    errors.condition2 = '参加条件を確認してください';
-  }
-  if (!formData.condition3) {
-    errors.condition3 = '参加条件を確認してください';
-  }
-  if (!formData.condition4) {
-    errors.condition4 = '参加条件を確認してください';
-  }
-  if (!formData.condition5) {
-    errors.condition5 = '参加条件を確認してください';
-  }
+  // 参加条件確認は任意（必須チェックなし）
+  // 全て満たす場合のみGmail送信、それ以外はLark通知のみ
 
   return errors;
 }

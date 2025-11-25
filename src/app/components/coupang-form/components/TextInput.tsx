@@ -35,7 +35,7 @@ export function TextInput({
         onChange={onChange}
         onBlur={onBlur}
         placeholder={placeholder}
-        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6b35] placeholder:text-gray-500 ${
+        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff6b35] placeholder:text-gray-500 text-gray-900 ${
           error ? 'border-red-500' : 'border-gray-300'
         }`}
       />
