@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import ApplicationForm from '@/app/components/ApplicationForm';
+import CoupangApplicationForm from '@/app/components/coupang-form/CoupangApplicationForm';
 
 export default function CoupangPage() {
   return (
@@ -13,13 +13,7 @@ export default function CoupangPage() {
         priority
       />
       <div className="relative z-10">
-        <ApplicationForm
-          preset="coupang"
-          variant="B"
-          peopleImageSrc="/images/coupang_banner.webp"
-          peopleImageAlt="クーパン求⼈特設フォーム"
-          showPeopleImage
-        />
+        <CoupangApplicationForm />
       </div>
     </div>
   );
