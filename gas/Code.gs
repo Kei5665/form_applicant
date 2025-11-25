@@ -549,6 +549,30 @@ function createEmailHtml(data) {
         </ul>
       </div>
 
+      <div class="info-box">
+        <h2>📋 求人情報</h2>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li style="margin-bottom: 15px;">
+            <strong>フィールドセールス（大阪府）</strong><br>
+            <a href="https://ridejob.jp/job/y2qx1ngsh" style="color: #ff6b35; font-size: 14px; word-break: break-all;">
+              https://ridejob.jp/job/y2qx1ngsh
+            </a>
+          </li>
+          <li style="margin-bottom: 15px;">
+            <strong>フィールドセールス（東京都）</strong><br>
+            <a href="https://ridejob.jp/job/9ndalsv3lmx" style="color: #ff6b35; font-size: 14px; word-break: break-all;">
+              https://ridejob.jp/job/9ndalsv3lmx
+            </a>
+          </li>
+          <li style="margin-bottom: 15px;">
+            <strong>アカウントマネージャー（東京都）</strong><br>
+            <a href="https://ridejob.jp/job/e38_jj8p495a" style="color: #ff6b35; font-size: 14px; word-break: break-all;">
+              https://ridejob.jp/job/e38_jj8p495a
+            </a>
+          </li>
+        </ul>
+      </div>
+
       <p style="margin-top: 30px;">ご不明な点がございましたら、お気軽にお問い合わせください。</p>
       <p style="font-weight: bold;">当日お会いできることを楽しみにしております。</p>
     </div>
@@ -608,6 +632,18 @@ ${zoomUrl}
 
 - 面接（約5分）
   オンライン面接形式で実施します。
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+📋 求人情報
+━━━━━━━━━━━━━━━━━━━━━━━━
+・フィールドセールス（大阪府）
+  https://ridejob.jp/job/y2qx1ngsh
+
+・フィールドセールス（東京都）
+  https://ridejob.jp/job/9ndalsv3lmx
+
+・アカウントマネージャー（東京都）
+  https://ridejob.jp/job/e38_jj8p495a
 
 ご不明な点がございましたら、お気軽にお問い合わせください。
 当日お会いできることを楽しみにしております。

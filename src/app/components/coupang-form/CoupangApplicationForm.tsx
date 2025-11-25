@@ -126,6 +126,34 @@ export default function CoupangApplicationForm() {
               <p>・5分前には入室いただき待機をお願い致します。</p>
             </div>
           </div>
+
+          {/* 求人情報 */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-2 flex items-start">
+              <span className="inline-block w-2 h-2 bg-[#ff6b35] rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+              求人情報
+            </h3>
+            <div className="text-gray-700 ml-4 space-y-2">
+              <div>
+                <p className="font-semibold">・フィールドセールス（大阪府）</p>
+                <a href="https://ridejob.jp/job/y2qx1ngsh" target="_blank" rel="noopener noreferrer" className="text-[#ff6b35] hover:underline text-xs block pl-2">
+                  https://ridejob.jp/job/y2qx1ngsh
+                </a>
+              </div>
+              <div>
+                <p className="font-semibold">・フィールドセールス（東京都）</p>
+                <a href="https://ridejob.jp/job/9ndalsv3lmx" target="_blank" rel="noopener noreferrer" className="text-[#ff6b35] hover:underline text-xs block pl-2">
+                  https://ridejob.jp/job/9ndalsv3lmx
+                </a>
+              </div>
+              <div>
+                <p className="font-semibold">・アカウントマネージャー（東京都）</p>
+                <a href="https://ridejob.jp/job/e38_jj8p495a" target="_blank" rel="noopener noreferrer" className="text-[#ff6b35] hover:underline text-xs block pl-2">
+                  https://ridejob.jp/job/e38_jj8p495a
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
