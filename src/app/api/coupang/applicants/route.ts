@@ -147,8 +147,6 @@ export async function POST(request: NextRequest) {
       formData.condition1,
       formData.condition2,
       formData.condition3,
-      formData.condition4,
-      formData.condition5,
     ].every((c) => c === true);
 
     // セミナースロットのリストを取得（Gmail送信用）

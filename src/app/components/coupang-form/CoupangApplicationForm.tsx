@@ -280,20 +280,6 @@ export default function CoupangApplicationForm() {
               onChange={handleChange}
               error={errors.condition3}
             />
-            <CheckboxInput
-              name="condition4"
-              label={CONDITION_LABELS[3]}
-              checked={formData.condition4}
-              onChange={handleChange}
-              error={errors.condition4}
-            />
-            <CheckboxInput
-              name="condition5"
-              label={CONDITION_LABELS[4]}
-              checked={formData.condition5}
-              onChange={handleChange}
-              error={errors.condition5}
-            />
           </div>
         </FormSection>
 

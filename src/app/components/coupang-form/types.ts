@@ -36,12 +36,10 @@ export type CoupangFormData = {
   seminarSlot: string;        // 参加希望日時
   pastExperience: PastExperience | '';
 
-  // 参加条件確認（5つすべて必須）
-  condition1: boolean;  // 一都三県もしくは大阪府で勤務可能
-  condition2: boolean;  // 18歳〜40歳
-  condition3: boolean;  // 前科・犯罪歴なし
-  condition4: boolean;  // 心身ともに健康
-  condition5: boolean;  // 日本国籍保有
+  // 参加条件確認（任意）
+  condition1: boolean;  // 18歳〜40歳
+  condition2: boolean;  // 心身ともに健康
+  condition3: boolean;  // 日本国籍、または就労制限ないビザ
 };
 
 export type CoupangFormErrors = {

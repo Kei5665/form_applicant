@@ -22,8 +22,6 @@ const initialFormData: CoupangFormData = {
   condition1: false,
   condition2: false,
   condition3: false,
-  condition4: false,
-  condition5: false,
 };
 
 export function useCoupangForm() {
