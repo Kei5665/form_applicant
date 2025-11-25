@@ -53,9 +53,32 @@ npm install
 
 ### 環境変数設定
 `.env.local`ファイルを作成し、以下を設定：
-```
+
+#### 基本設定（RIDEJOB フォーム用）
+```bash
 LARK_WEBHOOK_URL=your_lark_webhook_url_here
 ```
+
+#### Coupangフォーム用設定
+```bash
+# Lark Webhook URLs（開発環境）
+LARK_WEBHOOK_URL_COUPANG_TEST=your_test_webhook_url
+LARK_BASE_WEBHOOK_URL_COUPANG_TEST=your_test_base_webhook_url
+
+# Lark Webhook URLs（本番環境）
+LARK_WEBHOOK_URL_COUPANG_PROD=your_prod_webhook_url
+LARK_BASE_WEBHOOK_URL_COUPANG_PROD=your_prod_base_webhook_url
+
+# Gmail送信用GAS API URL
+GAS_EMAIL_API_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+
+# テストモード（オプション、trueの場合Baseのみ送信）
+LARK_SEND_BASE_ONLY=false
+```
+
+**注意**:
+- `GAS_EMAIL_API_URL`の設定方法は`gas/README.md`を参照してください
+- Gmail送信機能が不要な場合は`GAS_EMAIL_API_URL`を設定しなくても動作します
 
 ### 開発サーバー起動
 ```bash
