@@ -48,7 +48,7 @@ export default function CoupangApplicationComplete() {
       {/* Selection Process Section */}
       <div className="bg-white rounded-lg p-6 shadow-md mb-8">
         <h2 className="text-lg font-bold text-gray-900 mb-4 border-l-4 border-[#ff6b35] pl-3">
-          選考会参加を希望される方
+          担当エージェントに直接細かく聴きたい方
         </h2>
         <div className="text-base text-gray-700 space-y-2 mb-6">
           <p>担当者との電話面談の日程をご調整いただいた方に</p>
@@ -68,7 +68,7 @@ export default function CoupangApplicationComplete() {
       {/* LINE Registration Section */}
       <div className="bg-white rounded-lg p-6 shadow-md mb-8">
         <h2 className="text-lg font-bold text-gray-900 mb-4 border-l-4 border-[#ff6b35] pl-3">
-          求人情報のみ受け取りたい方
+          担当エージェントにLINEで細かく聴きたい方
         </h2>
         <div className="text-base text-gray-700 space-y-2 mb-6">
           <p>LIFT JOB 公式LINEにご登録後、</p>
