@@ -507,10 +507,20 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           : '';
 
         const { fetchPrefectureName, fetchMunicipalityName } = await import('@/lib/locationClient');
-        const prefectureName = formData.prefectureId ? await fetchPrefectureName(formData.prefectureId) : '';
-        const municipalityName = formData.municipalityId
+        let prefectureName = formData.prefectureId ? await fetchPrefectureName(formData.prefectureId) : '';
+        let municipalityName = formData.municipalityId
           ? await fetchMunicipalityName(formData.municipalityId)
           : '';
+
+        // 郵便番号が入力されている場合、ZipCloud APIから住所情報を取得
+        if (formData.postalCode && !formData.prefectureId && !formData.municipalityId) {
+          const { fetchAddressByZipcode } = await import('@/lib/zipcloud');
+          const addressInfo = await fetchAddressByZipcode(formData.postalCode);
+          if (addressInfo) {
+            prefectureName = addressInfo.prefectureName || '';
+            municipalityName = addressInfo.municipalityName || '';
+          }
+        }
 
         const body = {
           ...formData,
