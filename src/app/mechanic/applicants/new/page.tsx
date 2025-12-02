@@ -89,7 +89,7 @@ export default function MechanicApplicationComplete() {
 
           <div className="mt-4">
             <Link
-              href="https://lin.ee/4bLPZ5w"
+              href="https://lin.ee/1kfvHQrb"
               className="block"
               target="_blank"
               rel="noopener noreferrer"
