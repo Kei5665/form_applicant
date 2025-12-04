@@ -45,3 +45,17 @@ export type CoupangFormData = {
 export type CoupangFormErrors = {
   [K in keyof CoupangFormData]?: string;
 };
+
+export type JobListing = {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  salary: string;
+  salaryDetail: string[];
+  highlights: string[];
+  jobType: string;
+  workStyle: string;
+  url: string;
+  updatedAt: string;
+};

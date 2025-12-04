@@ -2,6 +2,7 @@ import { useState, useCallback, type FormEvent, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CoupangFormData, CoupangFormErrors } from '../types';
 import { validateCoupangForm } from '../validation';
+import { JOB_LISTINGS } from '../constants';
 
 declare global {
   interface Window {
@@ -29,6 +30,7 @@ export function useCoupangForm() {
   const [formData, setFormData] = useState<CoupangFormData>(initialFormData);
   const [errors, setErrors] = useState<CoupangFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState<string>(JOB_LISTINGS[0].id);
 
   const handleChange = useCallback((
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -115,5 +117,7 @@ export function useCoupangForm() {
     isSubmitting,
     handleChange,
     handleSubmit,
+    selectedJobId,
+    setSelectedJobId,
   };
 }
