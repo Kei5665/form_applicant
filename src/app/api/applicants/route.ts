@@ -14,6 +14,7 @@ type UTMParams = {
   utm_medium?: string;
   utm_campaign?: string;
   utm_term?: string;
+  utm_creative?: string;
 };
 
 type ApplicantFormData = {
@@ -231,6 +232,7 @@ ${title}
           utm_medium: utmParams?.utm_medium || '',
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
+          utm_creative: utmParams?.utm_creative || '',
           birth_date: formData.birthDate || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',
@@ -285,6 +287,7 @@ ${title}
           utm_medium: utmParams?.utm_medium || '',
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
+          utm_creative: utmParams?.utm_creative || '',
           birth_date: formData.birthDate || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',

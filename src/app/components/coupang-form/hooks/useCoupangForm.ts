@@ -76,6 +76,7 @@ export function useCoupangForm() {
         utm_medium: urlParams.get('utm_medium') || undefined,
         utm_campaign: urlParams.get('utm_campaign') || undefined,
         utm_term: urlParams.get('utm_term') || undefined,
+        utm_creative: urlParams.get('utm_creative') || undefined,
       };
 
       // GTMイベント送信

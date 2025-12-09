@@ -12,6 +12,7 @@ type UTMParams = {
   utm_medium?: string;
   utm_campaign?: string;
   utm_term?: string;
+  utm_creative?: string;
 };
 
 type CoupangSubmission = CoupangFormData & {
@@ -216,6 +217,7 @@ export async function POST(request: NextRequest) {
           utm_medium: utmParams?.utm_medium || '',
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
+          utm_creative: utmParams?.utm_creative || '',
           email: formData.email || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',
@@ -289,6 +291,7 @@ export async function POST(request: NextRequest) {
           utm_medium: utmParams?.utm_medium || '',
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
+          utm_creative: utmParams?.utm_creative || '',
           email: formData.email || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',

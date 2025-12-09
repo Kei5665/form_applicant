@@ -500,6 +500,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           utm_medium: urlParams.get('utm_medium') || '',
           utm_campaign: urlParams.get('utm_campaign') || '',
           utm_term: urlParams.get('utm_term') || '',
+          utm_creative: urlParams.get('utm_creative') || '',
         };
 
         const birthDateString = formData.birthDate.length === 8
