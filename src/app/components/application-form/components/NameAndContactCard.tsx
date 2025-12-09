@@ -91,7 +91,7 @@ export default function NameAndContactCard({
                 <span className="ml-1 text-base">件</span>
               </p>
               <p className={`text-base font-semibold ${isPositiveJobCount ? 'text-gray-900' : 'text-gray-600'}`}>
-                {isPositiveJobCount ? 'すぐにご覧いただけます！' : '現在ご案内できる求人が見つかりませんでした。'}
+                {isPositiveJobCount ? 'すぐにご案内できます！' : '現在ご案内できる求人が見つかりませんでした。'}
               </p>
             </div>
           ) : (
