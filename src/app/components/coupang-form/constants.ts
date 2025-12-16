@@ -30,7 +30,7 @@ export const JOB_LISTINGS: JobListing[] = [
     ],
     jobType: 'アカウントマネージャー',
     workStyle: '変形労働時間制',
-    url: 'https://ridejob.jp/job/e38_jj8p495a',
+    url: 'https://ridejob.jp/job/uyl1oq5g4_7',
     updatedAt: '2025/11/18',
   },
   {
@@ -57,7 +57,7 @@ export const JOB_LISTINGS: JobListing[] = [
     ],
     jobType: 'フィールドセールス',
     workStyle: '変形労働時間制',
-    url: 'https://ridejob.jp/job/9ndalsv3lmx',
+    url: 'https://ridejob.jp/job/llrcvhvh3cy4',
     updatedAt: '2025/11/18',
   },
   {
@@ -84,7 +84,7 @@ export const JOB_LISTINGS: JobListing[] = [
     ],
     jobType: 'フィールドセールス',
     workStyle: '変形労働時間制',
-    url: 'https://ridejob.jp/job/y2qx1ngsh',
+    url: 'https://ridejob.jp/job/ivp4hsarcy1',
     updatedAt: '2025/11/18',
   },
   {
@@ -109,7 +109,7 @@ export const JOB_LISTINGS: JobListing[] = [
     ],
     jobType: 'アカウントマネージャー',
     workStyle: '変形労働時間制',
-    url: 'https://ridejob.jp/job/609mke934kvv',
+    url: 'https://ridejob.jp/job/crzf-xlcz',
     updatedAt: '2025/11/27',
   },
 ];
