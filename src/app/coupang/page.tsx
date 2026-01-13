@@ -3,7 +3,7 @@ import CoupangStepForm from '@/app/components/coupang-form/CoupangStepForm';
 
 export default function CoupangPage() {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-[100dvh] bg-[#f97316]">
       <Image
         src="/images/coupang_bg.webp"
         alt="Background"
