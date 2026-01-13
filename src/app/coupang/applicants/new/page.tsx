@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect } from "react";
+import CoupangSeminarDetails from '@/app/components/coupang-form/components/CoupangSeminarDetails';
+import CoupangJobListing from '@/app/components/coupang-form/components/CoupangJobListing';
 
 declare global {
   interface Window {
@@ -19,7 +21,7 @@ export default function CoupangApplicationComplete() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-md px-4 bg-[#f1f9fa] min-h-screen">
+    <div className="mx-auto max-w-2xl px-4 bg-[#f1f9fa] min-h-screen">
       {/* Header Section */}
       <div className="text-center pt-8 pb-4">
         <h1 className="text-2xl font-bold text-[#ff6b35] leading-relaxed">
@@ -27,23 +29,11 @@ export default function CoupangApplicationComplete() {
         </h1>
       </div>
 
-      {/* Gift Campaign Section */}
-      <div className="bg-white rounded-lg p-6 shadow-md mb-8">
-        <div className="text-center">
-          <p className="text-base mb-3">
-            <span className="text-2xl mr-2">🎁</span>
-            <span className="font-bold text-gray-600 text-xl">説明会参加者限定<br />アマギフ1,000円プレゼントが</span>
-            <br />
-            <p className="font-bold text-red-600 text-xl mt-2">もうすぐ終了です！</p>
-          </p>
-          <p className="text-sm text-gray-700 mb-2">
-            迷っている方はお早めに✨
-          </p>
-          <p className="text-sm text-gray-700">
-            面談予約 or LINE登録で今ならGET！
-          </p>
-        </div>
-      </div>
+      {/* セミナー詳細 */}
+      <CoupangSeminarDetails />
+
+      {/* 求人情報 */}
+      <CoupangJobListing />
 
       {/* Selection Process Section */}
       <div className="bg-white rounded-lg p-6 shadow-md mb-8">
