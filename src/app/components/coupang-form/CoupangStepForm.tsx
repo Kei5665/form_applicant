@@ -4,8 +4,8 @@ import { useCoupangFormState } from './hooks/useCoupangFormState';
 import { useSeminarSlots } from './hooks/useSeminarSlots';
 import {
   JOB_POSITION_LABELS,
-  APPLICATION_REASON_LABELS,
-  PAST_EXPERIENCE_LABELS,
+  LOCATION_LABELS,
+  AGE_OPTIONS,
 } from './constants';
 import CoupangApplicationInfoCard from './components/CoupangApplicationInfoCard';
 import CoupangSeminarInfoCard from './components/CoupangSeminarInfoCard';
@@ -45,34 +45,27 @@ export default function CoupangStepForm({
   const { slots, isLoading: slotsLoading } = useSeminarSlots();
 
   // 選択肢の配列作成
-  const jobPositionOptions = [
-    { value: '' as const, label: '選択してください' },
-    ...Object.entries(JOB_POSITION_LABELS).map(([value, label]) => ({
-      value: value as keyof typeof JOB_POSITION_LABELS,
-      label,
-    })),
-  ];
+  const jobPositionOptions = Object.entries(JOB_POSITION_LABELS).map(([value, label]) => ({
+    value: value as keyof typeof JOB_POSITION_LABELS,
+    label,
+  }));
 
-  const applicationReasonOptions = [
-    { value: '' as const, label: '選択してください' },
-    ...Object.entries(APPLICATION_REASON_LABELS).map(([value, label]) => ({
-      value: value as keyof typeof APPLICATION_REASON_LABELS,
-      label,
-    })),
-  ];
-
-  const pastExperienceOptions = [
-    { value: '' as const, label: '選択してください' },
-    ...Object.entries(PAST_EXPERIENCE_LABELS).map(([value, label]) => ({
-      value: value as keyof typeof PAST_EXPERIENCE_LABELS,
-      label,
-    })),
-  ];
+  const locationOptions = Object.entries(LOCATION_LABELS).map(([value, label]) => ({
+    value: value as keyof typeof LOCATION_LABELS,
+    label,
+  }));
 
   const seminarSlotOptions = slots.map((slot) => ({
     value: slot.date,
     label: slot.date,
   }));
+
+  const seminarOptionsWithFallback = [
+    ...seminarSlotOptions,
+    { value: 'no_schedule', label: '参加できる日程がありません' },
+  ];
+
+  const ageOptions = AGE_OPTIONS;
 
   return (
     <div className="relative w-full">
@@ -83,7 +76,7 @@ export default function CoupangStepForm({
           formData={formData}
           errors={errors}
           jobPositionOptions={jobPositionOptions}
-          applicationReasonOptions={applicationReasonOptions}
+          locationOptions={locationOptions}
           onChange={handleChange}
           onNext={handleNextStep1}
           isActive={cardStates.isStep1Active}
@@ -94,8 +87,8 @@ export default function CoupangStepForm({
           stepImageSrc={stepImageSrcs.step2!}
           formData={formData}
           errors={errors}
-          seminarSlotOptions={seminarSlotOptions}
-          pastExperienceOptions={pastExperienceOptions}
+          seminarSlotOptions={seminarOptionsWithFallback}
+          ageOptions={ageOptions}
           slotsLoading={slotsLoading}
           onChange={handleChange}
           onNext={handleNextStep2}
@@ -128,4 +121,3 @@ export default function CoupangStepForm({
     </div>
   );
 }
-

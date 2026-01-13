@@ -20,8 +20,8 @@ export function validateStep1(formData: CoupangFormData): { isValid: boolean; er
     errors.jobPosition = '希望職種を選択してください';
   }
 
-  if (!formData.applicationReason) {
-    errors.applicationReason = '志望理由を選択してください';
+  if (!formData.desiredLocation) {
+    errors.desiredLocation = '希望勤務地を選択してください';
   }
 
   return {
@@ -38,8 +38,13 @@ export function validateStep2(formData: CoupangFormData): { isValid: boolean; er
     errors.seminarSlot = '参加希望日時を選択してください';
   }
 
-  if (!formData.pastExperience) {
-    errors.pastExperience = '過去の参加／勤務経験を選択してください';
+  if (!formData.age) {
+    errors.age = '年齢を選択してください';
+  } else {
+    const ageValue = Number(formData.age);
+    if (Number.isNaN(ageValue) || ageValue < 18 || ageValue > 40) {
+      errors.age = '年齢は18歳〜40歳の範囲で選択してください';
+    }
   }
 
   return {
@@ -52,16 +57,18 @@ export function validateStep2(formData: CoupangFormData): { isValid: boolean; er
 export function validateStep3(formData: CoupangFormData): { isValid: boolean; errors: CoupangFormErrors } {
   const errors: CoupangFormErrors = {};
 
-  if (!formData.condition1) {
-    errors.condition1 = 'この条件を確認してください';
+  // 氏名（漢字）
+  if (!formData.fullName.trim()) {
+    errors.fullName = '氏名を入力してください';
+  } else if (!/^[ぁ-んァ-ヶー一-龠々\s]+$/.test(formData.fullName)) {
+    errors.fullName = '氏名は全角文字で入力してください';
   }
 
-  if (!formData.condition2) {
-    errors.condition2 = 'この条件を確認してください';
-  }
-
-  if (!formData.condition3) {
-    errors.condition3 = 'この条件を確認してください';
+  // 氏名（ふりがな）
+  if (!formData.fullNameKana.trim()) {
+    errors.fullNameKana = 'ふりがなを入力してください';
+  } else if (!/^[ぁ-んー\s]+$/.test(formData.fullNameKana)) {
+    errors.fullNameKana = 'ふりがなはひらがなで入力してください';
   }
 
   return {
@@ -79,27 +86,6 @@ export function validateStep4(formData: CoupangFormData): { isValid: boolean; er
     errors.email = 'メールアドレスを入力してください';
   } else if (!isValidEmail(formData.email)) {
     errors.email = '有効なメールアドレスを入力してください';
-  }
-
-  // 氏名（漢字）
-  if (!formData.fullName.trim()) {
-    errors.fullName = '氏名を入力してください';
-  } else if (!/^[ぁ-んァ-ヶー一-龠々\s]+$/.test(formData.fullName)) {
-    errors.fullName = '氏名は全角文字で入力してください';
-  }
-
-  // 氏名（ふりがな）
-  if (!formData.fullNameKana.trim()) {
-    errors.fullNameKana = 'ふりがなを入力してください';
-  } else if (!/^[ぁ-んー\s]+$/.test(formData.fullNameKana)) {
-    errors.fullNameKana = 'ふりがなはひらがなで入力してください';
-  }
-
-  // 英名
-  if (!formData.englishName.trim()) {
-    errors.englishName = '英名を入力してください';
-  } else if (!/^[A-Za-z\s]+$/.test(formData.englishName)) {
-    errors.englishName = '英名はアルファベットで入力してください';
   }
 
   // 電話番号
@@ -134,4 +120,3 @@ export function validateAllSteps(formData: CoupangFormData): { isValid: boolean;
     errors: allErrors,
   };
 }
-

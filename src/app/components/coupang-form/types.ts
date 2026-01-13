@@ -1,19 +1,35 @@
 export type JobPosition =
-  | 'field_sales_tokyo'
-  | 'field_sales_osaka'
-  | 'account_manager_tokyo'
-  | 'account_manager_osaka';
+  | 'field_sales'
+  | 'account_manager';
 
-export type ApplicationReason =
-  | 'company_attraction'
-  | 'industry_interest'
-  | 'position_interest'
-  | 'compensation_benefits';
+export type DesiredLocation =
+  | 'tokyo'
+  | 'fukuoka';
 
-export type PastExperience =
-  | 'seminar_attended'
-  | 'work_experience'
-  | 'none';
+export type Age =
+  | '18'
+  | '19'
+  | '20'
+  | '21'
+  | '22'
+  | '23'
+  | '24'
+  | '25'
+  | '26'
+  | '27'
+  | '28'
+  | '29'
+  | '30'
+  | '31'
+  | '32'
+  | '33'
+  | '34'
+  | '35'
+  | '36'
+  | '37'
+  | '38'
+  | '39'
+  | '40';
 
 export type SeminarSlot = {
   date: string;
@@ -25,21 +41,15 @@ export type CoupangFormData = {
   email: string;
   fullName: string;           // 氏名（漢字）
   fullNameKana: string;       // 氏名（ふりがな）
-  englishName: string;        // 英名
   phoneNumber: string;        // 電話番号
 
   // 応募情報
   jobPosition: JobPosition | '';
-  applicationReason: ApplicationReason | '';
+  desiredLocation: DesiredLocation | '';
 
   // セミナー情報
   seminarSlot: string;        // 参加希望日時
-  pastExperience: PastExperience | '';
-
-  // 参加条件確認（任意）
-  condition1: boolean;  // 18歳〜40歳
-  condition2: boolean;  // 心身ともに健康
-  condition3: boolean;  // 日本国籍、または就労制限ないビザ
+  age: Age | '';
 };
 
 export type CoupangFormErrors = {

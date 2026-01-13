@@ -1,7 +1,5 @@
 import Image from 'next/image';
 import CoupangStepForm from '@/app/components/coupang-form/CoupangStepForm';
-import CoupangSeminarDetails from '@/app/components/coupang-form/components/CoupangSeminarDetails';
-import CoupangJobListing from '@/app/components/coupang-form/components/CoupangJobListing';
 
 export default function CoupangPage() {
   return (
@@ -27,12 +25,6 @@ export default function CoupangPage() {
               priority
             />
           </div>
-
-          {/* セミナー詳細情報 */}
-          <CoupangSeminarDetails />
-
-          {/* 求人情報 */}
-          <CoupangJobListing />
 
           {/* ステップフォーム */}
           <CoupangStepForm />

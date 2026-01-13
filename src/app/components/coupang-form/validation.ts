@@ -44,21 +44,6 @@ export function validateFullNameKana(fullNameKana: string): string | undefined {
   return undefined;
 }
 
-// 英名のバリデーション
-export function validateEnglishName(englishName: string): string | undefined {
-  if (!englishName) {
-    return '英名を入力してください';
-  }
-
-  // アルファベット、スペース、ハイフンのみ許可
-  const alphabetRegex = /^[a-zA-Z\-\u3000 ]+$/;
-  if (!alphabetRegex.test(englishName)) {
-    return 'アルファベットで入力してください';
-  }
-
-  return undefined;
-}
-
 // 電話番号のバリデーション
 export function validatePhoneNumber(phoneNumber: string): string | undefined {
   if (!phoneNumber) {
@@ -103,9 +88,6 @@ export function validateCoupangForm(formData: CoupangFormData): CoupangFormError
   const fullNameKanaError = validateFullNameKana(formData.fullNameKana);
   if (fullNameKanaError) errors.fullNameKana = fullNameKanaError;
 
-  const englishNameError = validateEnglishName(formData.englishName);
-  if (englishNameError) errors.englishName = englishNameError;
-
   const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
   if (phoneNumberError) errors.phoneNumber = phoneNumberError;
 
@@ -114,8 +96,8 @@ export function validateCoupangForm(formData: CoupangFormData): CoupangFormError
     errors.jobPosition = '希望職種を選択してください';
   }
 
-  if (!formData.applicationReason) {
-    errors.applicationReason = '志望理由を選択してください';
+  if (!formData.desiredLocation) {
+    errors.desiredLocation = '希望勤務地を選択してください';
   }
 
   // セミナー情報
@@ -123,12 +105,9 @@ export function validateCoupangForm(formData: CoupangFormData): CoupangFormError
     errors.seminarSlot = '参加希望日時を選択してください';
   }
 
-  if (!formData.pastExperience) {
-    errors.pastExperience = '過去の参加／勤務経験を選択してください';
+  if (!formData.age) {
+    errors.age = '年齢を選択してください';
   }
-
-  // 参加条件確認は任意（必須チェックなし）
-  // 全て満たす場合のみGmail送信、それ以外はLark通知のみ
 
   return errors;
 }

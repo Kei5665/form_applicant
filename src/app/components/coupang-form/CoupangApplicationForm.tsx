@@ -1,14 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { FormSection, TextInput, SelectInput, CheckboxInput } from './components';
+import { FormSection, TextInput, SelectInput } from './components';
 import { useCoupangForm } from './hooks/useCoupangForm';
 import { useSeminarSlots } from './hooks/useSeminarSlots';
 import {
   JOB_POSITION_LABELS,
-  APPLICATION_REASON_LABELS,
-  PAST_EXPERIENCE_LABELS,
-  CONDITION_LABELS,
+  LOCATION_LABELS,
+  AGE_OPTIONS,
   JOB_LISTINGS,
 } from './constants';
 
@@ -31,12 +30,7 @@ export default function CoupangApplicationForm() {
     label,
   }));
 
-  const applicationReasonOptions = Object.entries(APPLICATION_REASON_LABELS).map(([value, label]) => ({
-    value,
-    label,
-  }));
-
-  const pastExperienceOptions = Object.entries(PAST_EXPERIENCE_LABELS).map(([value, label]) => ({
+  const locationOptions = Object.entries(LOCATION_LABELS).map(([value, label]) => ({
     value,
     label,
   }));
@@ -45,6 +39,13 @@ export default function CoupangApplicationForm() {
     value: slot.date,
     label: slot.date,
   }));
+
+  const seminarOptionsWithFallback = [
+    ...seminarSlotOptions,
+    { value: 'no_schedule', label: '参加できる日程がありません' },
+  ];
+
+  const ageOptions = AGE_OPTIONS;
 
   // 選択中の求人情報を取得
   const selectedJob = JOB_LISTINGS.find((job) => job.id === selectedJobId) || JOB_LISTINGS[0];
@@ -275,18 +276,8 @@ export default function CoupangApplicationForm() {
           />
 
           <TextInput
-            name="englishName"
-            label="英名"
-            value={formData.englishName}
-            onChange={handleChange}
-            error={errors.englishName}
-            placeholder="Taro Yamada"
-            helpText="名 → 姓 の順で入力してください（例：Taro Yamada）"
-          />
-
-          <TextInput
             name="phoneNumber"
-            label="電話番号"
+            label="携帯番号"
             type="tel"
             value={formData.phoneNumber}
             onChange={handleChange}
@@ -308,12 +299,12 @@ export default function CoupangApplicationForm() {
           />
 
           <SelectInput
-            name="applicationReason"
-            label="志望理由"
-            value={formData.applicationReason}
+            name="desiredLocation"
+            label="希望勤務地"
+            value={formData.desiredLocation}
             onChange={handleChange}
-            error={errors.applicationReason}
-            options={applicationReasonOptions}
+            error={errors.desiredLocation}
+            options={locationOptions}
           />
         </FormSection>
 
@@ -325,45 +316,19 @@ export default function CoupangApplicationForm() {
             value={formData.seminarSlot}
             onChange={handleChange}
             error={errors.seminarSlot}
-            options={seminarSlotOptions}
+            options={seminarOptionsWithFallback}
             placeholder={slotsLoading ? '読み込み中...' : '選択してください'}
           />
 
           <SelectInput
-            name="pastExperience"
-            label="過去の参加／勤務経験"
-            value={formData.pastExperience}
+            name="age"
+            label="年齢"
+            value={formData.age}
             onChange={handleChange}
-            error={errors.pastExperience}
-            options={pastExperienceOptions}
+            error={errors.age}
+            options={ageOptions}
           />
-        </FormSection>
-
-        {/* カテゴリ4: 参加条件確認 */}
-        <FormSection title="参加条件確認（該当する項目にチェックしてください）">
-          <div className="space-y-3">
-            <CheckboxInput
-              name="condition1"
-              label={CONDITION_LABELS[0]}
-              checked={formData.condition1}
-              onChange={handleChange}
-              error={errors.condition1}
-            />
-            <CheckboxInput
-              name="condition2"
-              label={CONDITION_LABELS[1]}
-              checked={formData.condition2}
-              onChange={handleChange}
-              error={errors.condition2}
-            />
-            <CheckboxInput
-              name="condition3"
-              label={CONDITION_LABELS[2]}
-              checked={formData.condition3}
-              onChange={handleChange}
-              error={errors.condition3}
-            />
-          </div>
+          <p className="text-xs text-gray-600">※上限年齢は40歳までとなります</p>
         </FormSection>
 
         {/* 送信ボタン */}

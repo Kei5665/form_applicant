@@ -3,14 +3,14 @@
 import Image from 'next/image';
 import FormCard from '../../application-form/components/FormCard';
 import { SelectInput } from './SelectInput';
-import type { CoupangFormData, CoupangFormErrors, PastExperience } from '../types';
+import type { CoupangFormData, CoupangFormErrors, Age } from '../types';
 
 type CoupangSeminarInfoCardProps = {
   stepImageSrc: string;
   formData: CoupangFormData;
   errors: CoupangFormErrors;
   seminarSlotOptions: { value: string; label: string }[];
-  pastExperienceOptions: { value: PastExperience | ''; label: string }[];
+  ageOptions: { value: Age | ''; label: string }[];
   slotsLoading: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onNext: () => void;
@@ -23,7 +23,7 @@ export default function CoupangSeminarInfoCard({
   formData,
   errors,
   seminarSlotOptions,
-  pastExperienceOptions,
+  ageOptions,
   slotsLoading,
   onChange,
   onNext,
@@ -59,14 +59,16 @@ export default function CoupangSeminarInfoCard({
         />
 
         <SelectInput
-          name="pastExperience"
-          label="過去の参加／勤務経験"
-          value={formData.pastExperience}
+          name="age"
+          label="年齢"
+          value={formData.age}
           onChange={onChange}
-          error={errors.pastExperience}
-          options={pastExperienceOptions}
+          error={errors.age}
+          options={ageOptions}
         />
       </div>
+
+      <p className="mt-4 text-xs text-gray-600">※上限年齢は40歳までとなります</p>
 
       <div className="mt-8 flex gap-3">
         <button
@@ -87,4 +89,3 @@ export default function CoupangSeminarInfoCard({
     </FormCard>
   );
 }
-

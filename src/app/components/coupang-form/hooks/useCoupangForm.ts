@@ -14,15 +14,11 @@ const initialFormData: CoupangFormData = {
   email: '',
   fullName: '',
   fullNameKana: '',
-  englishName: '',
   phoneNumber: '',
   jobPosition: '',
-  applicationReason: '',
+  desiredLocation: '',
   seminarSlot: '',
-  pastExperience: '',
-  condition1: false,
-  condition2: false,
-  condition3: false,
+  age: '',
 };
 
 export function useCoupangForm() {

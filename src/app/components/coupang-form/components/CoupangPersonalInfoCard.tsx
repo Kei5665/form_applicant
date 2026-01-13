@@ -38,7 +38,7 @@ export default function CoupangPersonalInfoCard({
 
       <div className="mb-6 text-center">
         <p className="text-sm text-gray-600 mb-2">ステップ 4/4</p>
-        <h2 className="text-xl font-bold text-gray-900">求職者情報</h2>
+        <h2 className="text-xl font-bold text-gray-900">連絡先情報</h2>
       </div>
 
       <div className="space-y-6">
@@ -54,38 +54,8 @@ export default function CoupangPersonalInfoCard({
         />
 
         <TextInput
-          name="fullName"
-          label="氏名（漢字）"
-          value={formData.fullName}
-          onChange={onChange}
-          error={errors.fullName}
-          placeholder="山田太郎"
-          helpText="全角文字で入力してください"
-        />
-
-        <TextInput
-          name="fullNameKana"
-          label="氏名（ふりがな）"
-          value={formData.fullNameKana}
-          onChange={onChange}
-          error={errors.fullNameKana}
-          placeholder="やまだたろう"
-          helpText="ひらがなで入力してください"
-        />
-
-        <TextInput
-          name="englishName"
-          label="英名"
-          value={formData.englishName}
-          onChange={onChange}
-          error={errors.englishName}
-          placeholder="Taro Yamada"
-          helpText="名 → 姓 の順で入力してください（例：Taro Yamada）"
-        />
-
-        <TextInput
           name="phoneNumber"
-          label="電話番号"
+          label="携帯番号"
           type="tel"
           value={formData.phoneNumber}
           onChange={onChange}
@@ -115,4 +85,3 @@ export default function CoupangPersonalInfoCard({
     </FormCard>
   );
 }
-

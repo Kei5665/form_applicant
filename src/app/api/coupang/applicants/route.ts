@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { CoupangFormData } from '@/app/components/coupang-form/types';
 import {
   JOB_POSITION_LABELS,
-  APPLICATION_REASON_LABELS,
-  PAST_EXPERIENCE_LABELS,
+  LOCATION_LABELS,
 } from '@/app/components/coupang-form/constants';
 import type { SeminarSlot } from '@/app/api/coupang/seminar-slots/route';
 
@@ -136,23 +135,18 @@ export async function POST(request: NextRequest) {
 
     // ラベル変換
     const jobPositionLabel = formData.jobPosition ? JOB_POSITION_LABELS[formData.jobPosition] : '未選択';
-    const applicationReasonLabel = formData.applicationReason
-      ? APPLICATION_REASON_LABELS[formData.applicationReason]
+    const desiredLocationLabel = formData.desiredLocation
+      ? LOCATION_LABELS[formData.desiredLocation]
       : '未選択';
-    const pastExperienceLabel = formData.pastExperience
-      ? PAST_EXPERIENCE_LABELS[formData.pastExperience]
-      : '未選択';
-
-    // 参加条件のチェック結果
-    const conditionsmet = [
-      formData.condition1,
-      formData.condition2,
-      formData.condition3,
-    ].every((c) => c === true);
+    const ageLabel = formData.age ? `${formData.age}歳` : '未選択';
+    const seminarSlotLabel = formData.seminarSlot === 'no_schedule'
+      ? '参加できる日程がありません'
+      : (formData.seminarSlot || '未選択');
 
     // セミナースロットのリストを取得（Gmail送信用）
     let seminarSlots: SeminarSlot[] = [];
-    if (formData.seminarSlot && GAS_EMAIL_API_URL) {
+    const hasSeminarSlot = Boolean(formData.seminarSlot && formData.seminarSlot !== 'no_schedule');
+    if (hasSeminarSlot && GAS_EMAIL_API_URL) {
       seminarSlots = await fetchSeminarSlots();
     }
 
@@ -173,13 +167,11 @@ export async function POST(request: NextRequest) {
 メールアドレス: ${formData.email || '未入力'}
 氏名（漢字）: ${formData.fullName || '未入力'}
 氏名（ふりがな）: ${formData.fullNameKana || '未入力'}
-英名: ${formData.englishName || '未入力'}
 電話番号: ${formData.phoneNumber || '未入力'}
 希望職種: ${jobPositionLabel}
-志望理由: ${applicationReasonLabel}
-参加希望日時: ${formData.seminarSlot || '未選択'}
-過去の参加／勤務経験: ${pastExperienceLabel}
-参加条件: ${conditionsmet ? 'すべて満たす' : '一部未確認'}
+希望勤務地: ${desiredLocationLabel}
+年齢: ${ageLabel}
+参加希望日時: ${seminarSlotLabel}
 -------------------------
         `.trim();
 
@@ -221,13 +213,11 @@ export async function POST(request: NextRequest) {
           email: formData.email || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',
-          english_name: formData.englishName || '',
           phone_number: formData.phoneNumber || '',
           job_position: jobPositionLabel,
-          application_reason: applicationReasonLabel,
-          seminar_slot: formData.seminarSlot || '',
-          past_experience: pastExperienceLabel,
-          conditions_met: conditionsmet,
+          desired_location: desiredLocationLabel,
+          age: formData.age || '',
+          seminar_slot: seminarSlotLabel,
           submitted_at: new Date().toISOString(),
           environment: process.env.NODE_ENV,
           user_agent: userAgent,
@@ -253,7 +243,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Gmail 確認メール送信タスク（全条件クリア時のみ）
-      if (conditionsmet && GAS_EMAIL_API_URL && formData.email && formData.seminarSlot) {
+      if (hasSeminarSlot && GAS_EMAIL_API_URL && formData.email) {
         const zoomUrl = getZoomUrlForSlot(seminarSlots, formData.seminarSlot);
         
         tasks.push(
@@ -274,8 +264,8 @@ export async function POST(request: NextRequest) {
             }
           })()
         );
-      } else if (!conditionsmet) {
-        console.log('⚠ 一部条件未確認：Gmail送信スキップ、Lark通知とLark Base登録のみ実行');
+      } else if (!hasSeminarSlot) {
+        console.log('⚠ 参加希望日時が未設定のためGmail送信スキップ、Lark通知とLark Base登録のみ実行');
       }
 
       await Promise.allSettled(tasks);
@@ -295,13 +285,11 @@ export async function POST(request: NextRequest) {
           email: formData.email || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',
-          english_name: formData.englishName || '',
           phone_number: formData.phoneNumber || '',
           job_position: jobPositionLabel,
-          application_reason: applicationReasonLabel,
-          seminar_slot: formData.seminarSlot || '',
-          past_experience: pastExperienceLabel,
-          conditions_met: conditionsmet,
+          desired_location: desiredLocationLabel,
+          age: formData.age || '',
+          seminar_slot: seminarSlotLabel,
           submitted_at: new Date().toISOString(),
           environment: process.env.NODE_ENV,
           user_agent: userAgent,

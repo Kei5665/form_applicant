@@ -19,15 +19,11 @@ const initialFormData: CoupangFormData = {
   email: '',
   fullName: '',
   fullNameKana: '',
-  englishName: '',
   phoneNumber: '',
   jobPosition: '',
-  applicationReason: '',
+  desiredLocation: '',
   seminarSlot: '',
-  pastExperience: '',
-  condition1: false,
-  condition2: false,
-  condition3: false,
+  age: '',
 };
 
 export function useCoupangFormState() {
@@ -161,11 +157,11 @@ export function useCoupangFormState() {
       if (!validation.isValid) {
         setErrors(validation.errors);
         // エラーがある場合、最初のエラーがあるステップに戻る
-        if (validation.errors.jobPosition || validation.errors.applicationReason) {
+        if (validation.errors.jobPosition || validation.errors.desiredLocation) {
           setCurrentStep(1);
-        } else if (validation.errors.seminarSlot || validation.errors.pastExperience) {
+        } else if (validation.errors.seminarSlot || validation.errors.age) {
           setCurrentStep(2);
-        } else if (validation.errors.condition1 || validation.errors.condition2 || validation.errors.condition3) {
+        } else if (validation.errors.fullName || validation.errors.fullNameKana) {
           setCurrentStep(3);
         }
         return;
@@ -244,4 +240,3 @@ export function useCoupangFormState() {
     handleSubmit,
   };
 }
-

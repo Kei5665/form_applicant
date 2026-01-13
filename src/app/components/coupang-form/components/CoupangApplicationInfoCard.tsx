@@ -3,14 +3,14 @@
 import Image from 'next/image';
 import FormCard from '../../application-form/components/FormCard';
 import { SelectInput } from './SelectInput';
-import type { CoupangFormData, CoupangFormErrors, JobPosition, ApplicationReason } from '../types';
+import type { CoupangFormData, CoupangFormErrors, JobPosition, DesiredLocation } from '../types';
 
 type CoupangApplicationInfoCardProps = {
   stepImageSrc: string;
   formData: CoupangFormData;
   errors: CoupangFormErrors;
   jobPositionOptions: { value: JobPosition | ''; label: string }[];
-  applicationReasonOptions: { value: ApplicationReason | ''; label: string }[];
+  locationOptions: { value: DesiredLocation | ''; label: string }[];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onNext: () => void;
   isActive: boolean;
@@ -21,7 +21,7 @@ export default function CoupangApplicationInfoCard({
   formData,
   errors,
   jobPositionOptions,
-  applicationReasonOptions,
+  locationOptions,
   onChange,
   onNext,
   isActive,
@@ -55,12 +55,12 @@ export default function CoupangApplicationInfoCard({
         />
 
         <SelectInput
-          name="applicationReason"
-          label="志望理由"
-          value={formData.applicationReason}
+          name="desiredLocation"
+          label="希望勤務地"
+          value={formData.desiredLocation}
           onChange={onChange}
-          error={errors.applicationReason}
-          options={applicationReasonOptions}
+          error={errors.desiredLocation}
+          options={locationOptions}
         />
       </div>
 
@@ -76,4 +76,3 @@ export default function CoupangApplicationInfoCard({
     </FormCard>
   );
 }
-

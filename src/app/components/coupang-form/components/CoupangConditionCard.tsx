@@ -2,15 +2,14 @@
 
 import Image from 'next/image';
 import FormCard from '../../application-form/components/FormCard';
-import { CheckboxInput } from './CheckboxInput';
+import { TextInput } from './TextInput';
 import type { CoupangFormData, CoupangFormErrors } from '../types';
-import { CONDITION_LABELS } from '../constants';
 
 type CoupangConditionCardProps = {
   stepImageSrc: string;
   formData: CoupangFormData;
   errors: CoupangFormErrors;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onNext: () => void;
   onPrevious: () => void;
   isActive: boolean;
@@ -39,31 +38,27 @@ export default function CoupangConditionCard({
 
       <div className="mb-6 text-center">
         <p className="text-sm text-gray-600 mb-2">ステップ 3/4</p>
-        <h2 className="text-xl font-bold text-gray-900">参加条件確認</h2>
-        <p className="text-sm text-gray-600 mt-2">該当する項目にチェックしてください</p>
+        <h2 className="text-xl font-bold text-gray-900">氏名入力</h2>
       </div>
 
       <div className="space-y-4">
-        <CheckboxInput
-          name="condition1"
-          label={CONDITION_LABELS[0]}
-          checked={formData.condition1}
+        <TextInput
+          name="fullName"
+          label="氏名"
+          value={formData.fullName}
           onChange={onChange}
-          error={errors.condition1}
+          error={errors.fullName}
+          placeholder="山田太郎"
+          helpText="全角文字で入力してください"
         />
-        <CheckboxInput
-          name="condition2"
-          label={CONDITION_LABELS[1]}
-          checked={formData.condition2}
+        <TextInput
+          name="fullNameKana"
+          label="ふりがな"
+          value={formData.fullNameKana}
           onChange={onChange}
-          error={errors.condition2}
-        />
-        <CheckboxInput
-          name="condition3"
-          label={CONDITION_LABELS[2]}
-          checked={formData.condition3}
-          onChange={onChange}
-          error={errors.condition3}
+          error={errors.fullNameKana}
+          placeholder="やまだたろう"
+          helpText="ひらがなで入力してください"
         />
       </div>
 
@@ -86,4 +81,3 @@ export default function CoupangConditionCard({
     </FormCard>
   );
 }
-

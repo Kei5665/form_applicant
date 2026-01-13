@@ -1,10 +1,13 @@
-import type { JobPosition, ApplicationReason, PastExperience, JobListing } from './types';
+import type { JobPosition, DesiredLocation, Age, JobListing } from './types';
 
 export const JOB_POSITION_LABELS: Record<JobPosition, string> = {
-  field_sales_tokyo: 'フィールドセールス（東京都）',
-  field_sales_osaka: 'フィールドセールス（大阪府）',
-  account_manager_tokyo: 'アカウントマネージャー（東京都）',
-  account_manager_osaka: 'アカウントマネージャー（大阪府）',
+  field_sales: 'フィールドセールス',
+  account_manager: 'アカウントマネージャー',
+};
+
+export const LOCATION_LABELS: Record<DesiredLocation, string> = {
+  tokyo: '東京',
+  fukuoka: '福岡',
 };
 
 export const JOB_LISTINGS: JobListing[] = [
@@ -114,21 +117,13 @@ export const JOB_LISTINGS: JobListing[] = [
   },
 ];
 
-export const APPLICATION_REASON_LABELS: Record<ApplicationReason, string> = {
-  company_attraction: 'ロケットナウに魅力を感じたため',
-  industry_interest: 'フードデリバリー業界に興味があるため',
-  position_interest: '募集職種に興味があるため',
-  compensation_benefits: '給与や待遇に魅力を感じたため',
-};
-
-export const PAST_EXPERIENCE_LABELS: Record<PastExperience, string> = {
-  seminar_attended: 'はい、セミナーに参加したことがあります',
-  work_experience: 'はい、ロケットナウで勤務したことがあります',
-  none: 'いいえ、どちらもありません',
-};
-
-export const CONDITION_LABELS = [
-  '18歳〜40歳までの方（長期キャリア形成のため）',
-  '心身ともに健康な方',
-  '日本国籍、または就労制限ないビザをお持ちである',
-] as const;
+export const AGE_OPTIONS: { value: Age; label: string }[] = Array.from(
+  { length: 23 },
+  (_, index) => {
+    const age = 18 + index;
+    return {
+      value: String(age) as Age,
+      label: `${age}歳`,
+    };
+  }
+);
