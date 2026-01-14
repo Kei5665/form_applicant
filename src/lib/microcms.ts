@@ -229,6 +229,19 @@ export async function getRandomJobsByPrefectureId(prefectureId: string, count: n
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
+export async function getLatestJobsByCategoryId(categoryId: string, count: number = 3): Promise<Job[]> {
+  if (!hasMicrocmsEnv) {
+    throw new Error('microCMS environment variables are not set');
+  }
+  const params = new URLSearchParams({
+    filters: `jobCategory[equals]${categoryId}`,
+    orders: '-publishedAt',
+    limit: count.toString(),
+  });
+  const response = await fetchFromMicroCMS<Job>('jobs', params);
+  return response.contents;
+}
+
 const FALLBACK_PREFECTURES: PrefectureEntry[] = [
   { id: '01', region: '北海道', area: '' },
   { id: '02', region: '青森県', area: '' },

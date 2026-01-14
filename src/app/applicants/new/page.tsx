@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import JobCard from "@/app/components/JobCard";
+import type { Job } from "@/lib/microcms";
 
 // Extend Window interface for GTM dataLayer
 declare global {
@@ -12,6 +14,10 @@ declare global {
 }
 
 export default function ApplicationComplete() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+  const [userName, setUserName] = useState<string>('');
+
   // Track form completion on page load
   useEffect(() => {
     if (typeof window !== 'undefined' && window.dataLayer) {
@@ -20,6 +26,38 @@ export default function ApplicationComplete() {
         'form_name': 'ridejob_application'
       });
     }
+  }, []);
+
+  // お名前を取得してlocalStorageから削除（プライバシー保護）
+  useEffect(() => {
+    const name = localStorage.getItem('ridejob_user_name');
+    if (name) {
+      setUserName(name);
+      localStorage.removeItem('ridejob_user_name');
+    }
+  }, []);
+
+  // 求人情報を取得
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch('/api/jobs/random?categoryId=6&count=3');
+        if (!response.ok) {
+          console.error('Failed to fetch jobs');
+          setIsLoadingJobs(false);
+          return;
+        }
+
+        const data = await response.json();
+        setJobs(data.jobs);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      } finally {
+        setIsLoadingJobs(false);
+      }
+    };
+
+    fetchJobs();
   }, []);
 
   return (
@@ -227,6 +265,30 @@ export default function ApplicationComplete() {
             </Link>
           </div>
         </section>
+
+        {/* 求人カード表示 */}
+        {!isLoadingJobs && jobs.length > 0 && (
+          <section className="mt-12 px-4">
+            <div className="mb-4 flex items-center pl-2">
+              <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {userName ? `${userName}さんへのおすすめの限定求人` : 'あなたにおすすめの限定求人'}
+              </h2>
+            </div>
+            <div className="px-2 text-sm leading-relaxed text-gray-700">
+              <p className="mt-6">
+                {new Date().toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' })}現在、タクシー求人への問合せが殺到しています。
+              </p>
+              <p className="mt-2">採用予定人数が埋まり次第、掲載されている求人の募集が終わっている場合があります。</p>
+              <p className="mt-2">求人の募集状況については、弊社へお問い合わせください。</p>
+            </div>
+            <div className="space-y-4 mt-6">
+              {jobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <footer className="mt-16 bg-[#CDE6FF] px-6 py-12 text-center text-sm text-gray-800">
