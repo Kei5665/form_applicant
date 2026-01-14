@@ -154,6 +154,56 @@ export default function ApplicationComplete() {
         </section>
 
         <section className="mt-12">
+          <div className="bg-[#9CCAF5] p-4">
+            <div className="rounded-xl bg-white px-6 py-8 shadow-[0_10px_25px_rgba(34,5,217,0.12)]">
+              <div className="text-center">
+                <p className="text-xl font-semibold text-[#2205D9]">RIDE JOBで転職した人の声</p>
+                <div className="mx-auto mt-2 h-0.5 w-10 rounded bg-[#2205D9]"></div>
+              </div>
+
+              <div className="mt-6 space-y-5 text-[15px] leading-relaxed text-gray-900">
+                <p>
+                  転職エージェントの利用は初めてでしたが、心強いフォローのおかげで安心して転職活動を進められました。
+                </p>
+                <p>
+                  家族とも「以前よりずっと良い環境になった」と話しています。担当者の斉田さんには本当に感謝しています。
+                </p>
+                <p>
+                  タクシー運転手は自分の頑張り次第で売上につながる仕事なので、やりがいを感じています。
+                </p>
+                <p>
+                  一緒に働いている同僚も親切で、安心して働ける環境に入社できてよかったです。
+                </p>
+              </div>
+
+              <div className="mt-6 border-t border-dotted border-[#7AA7FF] pt-6">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">Kさん</p>
+                    <p className="mt-1 text-base font-semibold text-gray-900">50代</p>
+                    <div className="mt-3 inline-flex items-center gap-2 whitespace-nowrap">
+                      <span className="rounded border border-[#2205D9] px-2 py-0.5 text-xs font-semibold text-[#2205D9]">
+                        前職
+                      </span>
+                      <span className="text-sm text-gray-700">トラックドライバー</span>
+                    </div>
+                  </div>
+                  <div className="flex h-24 w-24 items-center justify-center">
+                    <Image
+                      src="/images/Profile Image.png"
+                      alt="転職者のアイコン"
+                      width={80}
+                      height={80}
+                      className="h-20 w-20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-12">
           <div className="flex items-center pl-2">
             <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
             <h2 className="text-xl font-semibold text-gray-900">RIDE JOB公式サイトで求人を探す</h2>
