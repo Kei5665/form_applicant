@@ -24,6 +24,7 @@ const initialFormData: CoupangFormData = {
   desiredLocation: '',
   seminarSlot: '',
   age: '',
+  birthDate: '',
 };
 
 export function useCoupangFormState() {
@@ -65,6 +66,10 @@ export function useCoupangFormState() {
       // 電話番号のハイフン除去
       if (name === 'phoneNumber') {
         processedValue = value.replace(/[-－ー]/g, '');
+      }
+
+      if (name === 'birthDate') {
+        processedValue = value.replace(/\D/g, '').slice(0, 8);
       }
 
       // メールアドレスのスペース除去と小文字化
@@ -159,7 +164,7 @@ export function useCoupangFormState() {
         // エラーがある場合、最初のエラーがあるステップに戻る
         if (validation.errors.jobPosition || validation.errors.desiredLocation) {
           setCurrentStep(1);
-        } else if (validation.errors.seminarSlot || validation.errors.age) {
+        } else if (validation.errors.seminarSlot || validation.errors.age || validation.errors.birthDate) {
           setCurrentStep(2);
         } else if (validation.errors.fullName || validation.errors.fullNameKana) {
           setCurrentStep(3);

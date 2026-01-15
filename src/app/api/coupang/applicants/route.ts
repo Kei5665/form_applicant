@@ -139,6 +139,7 @@ export async function POST(request: NextRequest) {
       ? LOCATION_LABELS[formData.desiredLocation]
       : '未選択';
     const ageLabel = formData.age ? `${formData.age}歳` : '未選択';
+    const birthDateLabel = formData.birthDate || '未入力';
     const seminarSlotLabel = formData.seminarSlot === 'no_schedule'
       ? '参加できる日程がありません'
       : (formData.seminarSlot || '未選択');
@@ -171,6 +172,7 @@ export async function POST(request: NextRequest) {
 希望職種: ${jobPositionLabel}
 希望勤務地: ${desiredLocationLabel}
 年齢: ${ageLabel}
+生年月日: ${birthDateLabel}
 参加希望日時: ${seminarSlotLabel}
 -------------------------
         `.trim();
@@ -217,6 +219,7 @@ export async function POST(request: NextRequest) {
           job_position: jobPositionLabel,
           desired_location: desiredLocationLabel,
           age: formData.age || '',
+          birth_date: formData.birthDate || '',
           seminar_slot: seminarSlotLabel,
           submitted_at: new Date().toISOString(),
           environment: process.env.NODE_ENV,
@@ -289,6 +292,7 @@ export async function POST(request: NextRequest) {
           job_position: jobPositionLabel,
           desired_location: desiredLocationLabel,
           age: formData.age || '',
+          birth_date: formData.birthDate || '',
           seminar_slot: seminarSlotLabel,
           submitted_at: new Date().toISOString(),
           environment: process.env.NODE_ENV,

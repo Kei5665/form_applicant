@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import FormCard from '../../application-form/components/FormCard';
 import { SelectInput } from './SelectInput';
+import { TextInput } from './TextInput';
 import type { CoupangFormData, CoupangFormErrors, Age } from '../types';
 
 type CoupangSeminarInfoCardProps = {
@@ -65,6 +66,18 @@ export default function CoupangSeminarInfoCard({
           onChange={onChange}
           error={errors.age}
           options={ageOptions}
+        />
+
+        <TextInput
+          name="birthDate"
+          label="生年月日"
+          value={formData.birthDate}
+          onChange={onChange}
+          error={errors.birthDate}
+          placeholder="19900101"
+          helpText="8桁の半角数字で入力してください"
+          inputMode="numeric"
+          maxLength={8}
         />
       </div>
 

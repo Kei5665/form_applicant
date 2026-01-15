@@ -12,6 +12,31 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
   return phoneRegex.test(phoneNumber);
 }
 
+export function isValidBirthDate(birthDate: string): boolean {
+  if (!/^\d{8}$/.test(birthDate)) {
+    return false;
+  }
+
+  const year = Number(birthDate.slice(0, 4));
+  const month = Number(birthDate.slice(4, 6));
+  const day = Number(birthDate.slice(6, 8));
+
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+    return false;
+  }
+
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    return false;
+  }
+
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 // ステップ1: 応募情報のバリデーション
 export function validateStep1(formData: CoupangFormData): { isValid: boolean; errors: CoupangFormErrors } {
   const errors: CoupangFormErrors = {};
@@ -45,6 +70,12 @@ export function validateStep2(formData: CoupangFormData): { isValid: boolean; er
     if (Number.isNaN(ageValue) || ageValue < 18 || ageValue > 40) {
       errors.age = '年齢は18歳〜40歳の範囲で選択してください';
     }
+  }
+
+  if (!formData.birthDate) {
+    errors.birthDate = '生年月日を入力してください';
+  } else if (!isValidBirthDate(formData.birthDate)) {
+    errors.birthDate = '生年月日を8桁の数字で入力してください';
   }
 
   return {

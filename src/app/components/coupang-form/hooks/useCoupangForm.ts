@@ -19,6 +19,7 @@ const initialFormData: CoupangFormData = {
   desiredLocation: '',
   seminarSlot: '',
   age: '',
+  birthDate: '',
 };
 
 export function useCoupangForm() {
@@ -37,7 +38,13 @@ export function useCoupangForm() {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      let processedValue = value;
+
+      if (name === 'birthDate') {
+        processedValue = value.replace(/\D/g, '').slice(0, 8);
+      }
+
+      setFormData((prev) => ({ ...prev, [name]: processedValue }));
     }
 
     // エラーをクリア

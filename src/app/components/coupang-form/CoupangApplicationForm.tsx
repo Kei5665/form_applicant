@@ -328,6 +328,17 @@ export default function CoupangApplicationForm() {
             error={errors.age}
             options={ageOptions}
           />
+          <TextInput
+            name="birthDate"
+            label="生年月日"
+            value={formData.birthDate}
+            onChange={handleChange}
+            error={errors.birthDate}
+            placeholder="19900101"
+            helpText="8桁の半角数字で入力してください"
+            inputMode="numeric"
+            maxLength={8}
+          />
           <p className="text-xs text-gray-600">※上限年齢は40歳までとなります</p>
         </FormSection>
 

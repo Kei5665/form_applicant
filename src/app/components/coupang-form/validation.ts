@@ -74,6 +74,39 @@ export function validateRequired(value: string | boolean, fieldName: string): st
   return undefined;
 }
 
+export function validateBirthDate(birthDate: string): string | undefined {
+  if (!birthDate) {
+    return '生年月日を入力してください';
+  }
+
+  if (!/^\d{8}$/.test(birthDate)) {
+    return '生年月日を8桁の数字で入力してください';
+  }
+
+  const year = Number(birthDate.slice(0, 4));
+  const month = Number(birthDate.slice(4, 6));
+  const day = Number(birthDate.slice(6, 8));
+
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+    return '生年月日を8桁の数字で入力してください';
+  }
+
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    return '生年月日を8桁の数字で入力してください';
+  }
+
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return '生年月日を8桁の数字で入力してください';
+  }
+
+  return undefined;
+}
+
 // 全フォームデータのバリデーション
 export function validateCoupangForm(formData: CoupangFormData): CoupangFormErrors {
   const errors: CoupangFormErrors = {};
@@ -108,6 +141,9 @@ export function validateCoupangForm(formData: CoupangFormData): CoupangFormError
   if (!formData.age) {
     errors.age = '年齢を選択してください';
   }
+
+  const birthDateError = validateBirthDate(formData.birthDate);
+  if (birthDateError) errors.birthDate = birthDateError;
 
   return errors;
 }
