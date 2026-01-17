@@ -1,7 +1,7 @@
 'use client';
 
+import Image from 'next/image';
 import FormCard from './FormCard';
-import FingerHint from './FingerHint';
 import StepProgressBar from './StepProgressBar';
 import type { FormErrors, MechanicQualification } from '../types';
 
@@ -21,11 +21,12 @@ type MechanicQualificationCardProps = {
 const qualificationOptions: Array<{
   value: MechanicQualification;
   label: string;
+  imageSrc?: string;
 }> = [
-  { value: 'level3', label: '自動車整備士3級' },
-  { value: 'level2', label: '自動車整備士2級' },
-  { value: 'level1', label: '自動車整備士1級' },
-  { value: 'inspector', label: '自動車検査員' },
+  { value: 'level3', label: '自動車整備士3級', imageSrc: '/images/整備士３級.png' },
+  { value: 'level2', label: '自動車整備士2級', imageSrc: '/images/整備士2級.png' },
+  { value: 'level1', label: '自動車整備士1級', imageSrc: '/images/整備士1級.png' },
+  { value: 'inspector', label: '自動車検査員', imageSrc: '/images/自動車検査員.png' },
   { value: 'none', label: '資格なし' },
 ];
 
@@ -43,59 +44,61 @@ export default function MechanicQualificationCard({
   };
 
   const isNextEnabled = Boolean(selectedQualification);
-  const shouldShowHint = !selectedQualification;
+
+  const cardOptions = qualificationOptions.filter((option) => option.value !== 'none');
+  const noneOption = qualificationOptions.find((option) => option.value === 'none');
 
   return (
     <FormCard isActive={isActive} className="pb-6 mt-10">
       <StepProgressBar currentStep={progress.currentStep} totalSteps={progress.totalSteps} />
 
       <div className="mb-6 text-center">
-        <h2 className="mb-2 text-lg font-bold text-gray-900">
-          保有資格
-        </h2>
+        <p className="text-xs font-semibold text-gray-500">条件に合った求人を検索します</p>
+        <h2 className="mt-2 text-lg font-bold text-gray-900">保有資格を教えてください</h2>
       </div>
 
-      <div className="space-y-3 mb-6">
-        {qualificationOptions.map((option, index) => {
+      <div className="mb-6 grid grid-cols-2 gap-4">
+        {cardOptions.map((option, index) => {
           const isSelected = selectedQualification === option.value;
           return (
             <button
               key={option.value}
               type="button"
-              className={`relative w-full rounded-lg px-4 py-4 text-left transition-all duration-150 ease-out border-2 focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+              className={`relative flex w-full flex-col items-center justify-center gap-2 rounded-xl bg-white px-3 py-3 text-center transition-all duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                 isSelected
-                  ? 'border-[#ff702a] bg-orange-50'
-                  : 'border-gray-300 bg-white hover:border-gray-400'
+                  ? 'bg-orange-50'
+                  : 'hover:bg-gray-50'
               }`}
               onClick={() => handleToggle(option.value)}
             >
-              <div className="flex items-center justify-between">
-                <span className={`text-base font-semibold ${isSelected ? 'text-[#ff702a]' : 'text-gray-900'}`}>
-                  {option.label}
-                </span>
-                <div
-                  className={`flex h-6 w-6 items-center justify-center rounded border-2 transition-colors ${
-                    isSelected
-                      ? 'border-[#ff702a] bg-[#ff702a]'
-                      : 'border-gray-400 bg-white'
-                  }`}
-                >
-                  {isSelected && (
-                    <span className="text-white text-sm font-bold">✓</span>
-                  )}
-                </div>
-              </div>
-              {index === 0 && (
-                <FingerHint
-                  isVisible={shouldShowHint}
-                  size={40}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 translate-x-12 sm:size-[52px]"
+              <span className="sr-only">{option.label}</span>
+              {option.imageSrc && (
+                <Image
+                  src={option.imageSrc}
+                  alt={option.label}
+                  width={160}
+                  height={120}
+                  className="h-[110px] w-auto"
                 />
               )}
             </button>
           );
         })}
       </div>
+
+      {noneOption && (
+        <button
+          type="button"
+          className={`mb-6 w-full rounded-xl border-2 py-3 text-center text-sm font-semibold transition-all duration-150 ease-out focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+            selectedQualification === noneOption.value
+              ? 'border-[#ff702a] bg-orange-50 text-[#ff702a]'
+              : 'border-gray-300 bg-white text-gray-900 hover:border-gray-400'
+          }`}
+          onClick={() => handleToggle(noneOption.value)}
+        >
+          {noneOption.label}
+        </button>
+      )}
 
       {errors.mechanicQualification && (
         <p className="text-red-500 text-xs mb-4">{errors.mechanicQualification}</p>
@@ -126,11 +129,6 @@ export default function MechanicQualificationCard({
           >
             次へ
           </button>
-          <FingerHint
-            isVisible={isNextEnabled}
-            size={44}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[60px]"
-          />
         </div>
       </div>
     </FormCard>
