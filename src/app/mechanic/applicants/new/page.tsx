@@ -41,7 +41,7 @@ export default function MechanicApplicationComplete() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('/api/jobs/random?categoryIds=3,10&count=3');
+        const response = await fetch('/api/jobs/random?categoryId=3&count=3');
         if (!response.ok) {
           console.error('Failed to fetch jobs');
           setIsLoadingJobs(false);
