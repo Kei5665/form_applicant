@@ -4,10 +4,11 @@ import Image from 'next/image';
 
 import FormCard from './FormCard';
 import FingerHint from './FingerHint';
+import StepProgressBar from './StepProgressBar';
 import type { FormData, FormErrors, JobCountResult } from '../types';
 
 type NameInputCardProps = {
-  stepImageSrc: string;
+  stepImageSrc?: string;
   formData: FormData;
   errors: FormErrors;
   jobResult: JobCountResult;
@@ -17,6 +18,10 @@ type NameInputCardProps = {
   onPrevious: () => void;
   onNext: () => void;
   isActive: boolean;
+  progress?: {
+    currentStep: number;
+    totalSteps: number;
+  };
 };
 
 export default function NameInputCard({
@@ -30,6 +35,7 @@ export default function NameInputCard({
   onPrevious,
   onNext,
   isActive,
+  progress,
 }: NameInputCardProps) {
   const isFullNameFilled = formData.fullName.trim().length > 0;
   const isFullNameKanaFilled = formData.fullNameKana.trim().length > 0;
@@ -53,7 +59,11 @@ export default function NameInputCard({
 
   return (
     <FormCard isActive={isActive} className="pb-6 mt-10">
-      <Image className="w-full mb-4" src={stepImageSrc} alt="Step Name" width={300} height={50} />
+      {progress ? (
+        <StepProgressBar currentStep={progress.currentStep} totalSteps={progress.totalSteps} />
+      ) : stepImageSrc ? (
+        <Image className="w-full mb-4" src={stepImageSrc} alt="Step" width={300} height={50} />
+      ) : null}
 
       {showJobCount && (
         <div className="text-center mb-6">

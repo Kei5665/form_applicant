@@ -6,6 +6,7 @@ import Image from 'next/image';
 
 import FormCard from './FormCard';
 import FingerHint from './FingerHint';
+import StepProgressBar from './StepProgressBar';
 import type { FormErrors } from '../types';
 type PrefectureOption = {
   id: string;
@@ -19,7 +20,7 @@ type MunicipalityOption = {
 };
 
 type NameCardProps = {
-  stepImageSrc: string;
+  stepImageSrc?: string;
   postalCode: string;
   prefectureId: string;
   municipalityId: string;
@@ -28,9 +29,13 @@ type NameCardProps = {
   onPrevious: () => void;
   onNext: () => void;
   isActive: boolean;
+  progress?: {
+    currentStep: number;
+    totalSteps: number;
+  };
 };
 
-export default function NameCard({ stepImageSrc, postalCode, prefectureId, municipalityId, errors, onChange, onPrevious, onNext, isActive }: NameCardProps) {
+export default function NameCard({ stepImageSrc, postalCode, prefectureId, municipalityId, errors, onChange, onPrevious, onNext, isActive, progress }: NameCardProps) {
   const [showFallback, setShowFallback] = useState(false);
   const [prefectures, setPrefectures] = useState<PrefectureOption[]>([]);
   const [municipalityOptions, setMunicipalityOptions] = useState<MunicipalityOption[]>([]);
@@ -136,7 +141,11 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
 
   return (
     <FormCard isActive={isActive} className="h-full">
-      <Image className="w-full mb-4" src={stepImageSrc} alt="Step 3" width={300} height={50} />
+      {progress ? (
+        <StepProgressBar currentStep={progress.currentStep} totalSteps={progress.totalSteps} />
+      ) : stepImageSrc ? (
+        <Image className="w-full mb-4" src={stepImageSrc} alt="Step" width={300} height={50} />
+      ) : null}
       <h1 className="text-lg text-center font-bold mb-4 text-gray-700">条件に合った求人を検索します</h1>
       <div>
         <h3 className="mb-2 text-base font-semibold text-gray-900">お住まいの郵便番号</h3>
@@ -242,4 +251,3 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
     </FormCard>
   );
 }
-

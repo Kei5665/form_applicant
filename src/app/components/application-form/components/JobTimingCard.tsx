@@ -9,6 +9,7 @@ type JobTimingCardProps = {
   errors: FormErrors;
   onSelect: (value: FormData['jobTiming']) => void;
   isActive: boolean;
+  errorMessage?: string;
 };
 
 const options: Array<{
@@ -29,7 +30,7 @@ const options: Array<{
   },
 ];
 
-export default function JobTimingCard({ selectedTiming, errors, onSelect, isActive }: JobTimingCardProps) {
+export default function JobTimingCard({ selectedTiming, errors, onSelect, isActive, errorMessage }: JobTimingCardProps) {
   const handleClick = (value: FormData['jobTiming']) => {
     onSelect(value);
   };
@@ -70,7 +71,7 @@ export default function JobTimingCard({ selectedTiming, errors, onSelect, isActi
         })}
       </div>
 
-      {errors.jobTiming && <p className="mt-4 text-xs text-red-500">{errors.jobTiming}</p>}
+      {(errorMessage ?? errors.jobTiming) && <p className="mt-4 text-xs text-red-500">{errorMessage ?? errors.jobTiming}</p>}
 
       <div className="mt-6 flex items-center justify-end">
         <FingerHint isVisible={isNextEncouraged} size={44} className="sm:size-[60px]" />
@@ -78,5 +79,4 @@ export default function JobTimingCard({ selectedTiming, errors, onSelect, isActi
     </FormCard>
   );
 }
-
 

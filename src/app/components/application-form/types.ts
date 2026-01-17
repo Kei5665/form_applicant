@@ -4,18 +4,21 @@ export type FormOrigin = 'coupang' | 'default' | 'mechanic';
 
 export type BirthDate = string;
 
-export type JobTimingOption = 'asap' | 'no_plan';
+export type JobTimingOption = 'asap' | 'no_plan' | 'within_3_months' | 'within_6_months' | 'within_1_year';
 
 export type MechanicQualification =
-  | 'none'
   | 'level3'
   | 'level2'
   | 'level1'
   | 'inspector'
-  | 'body_paint';
+  | 'none';
+
+export type DesiredIncomeOption = '300' | '400' | '500' | '600';
 
 export type FormData = {
+  jobIntent: JobTimingOption | '';
   jobTiming: JobTimingOption | '';
+  desiredIncome: DesiredIncomeOption | '';
   birthDate: BirthDate;
   fullName: string;
   fullNameKana: string;
@@ -24,11 +27,13 @@ export type FormData = {
   municipalityId: string;
   phoneNumber: string;
   email: string;
-  mechanicQualifications: MechanicQualification[];
+  mechanicQualification: MechanicQualification | '';
 };
 
 export type FormErrors = {
+  jobIntent?: string;
   jobTiming?: string;
+  desiredIncome?: string;
   birthDate?: string;
   fullName?: string;
   fullNameKana?: string;
@@ -37,7 +42,7 @@ export type FormErrors = {
   municipalityId?: string;
   phoneNumber?: string;
   email?: string;
-  mechanicQualifications?: string;
+  mechanicQualification?: string;
 };
 
 export type JobCountResult = {
@@ -50,4 +55,3 @@ export type JobCountResult = {
   prefectureName?: string;
   prefectureId?: string;
 };
-

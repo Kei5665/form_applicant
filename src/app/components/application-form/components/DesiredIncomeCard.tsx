@@ -3,14 +3,14 @@
 import FormCard from './FormCard';
 import FingerHint from './FingerHint';
 import StepProgressBar from './StepProgressBar';
-import type { FormErrors, MechanicQualification } from '../types';
+import type { FormData, FormErrors } from '../types';
 
-type MechanicQualificationCardProps = {
-  selectedQualification: MechanicQualification | '';
+type DesiredIncomeCardProps = {
+  selectedIncome: FormData['desiredIncome'];
   errors: FormErrors;
-  onSelect: (value: MechanicQualification) => void;
+  onSelect: (value: FormData['desiredIncome']) => void;
   onNext: () => void;
-  onPrevious?: () => void;
+  onPrevious: () => void;
   isActive: boolean;
   progress: {
     currentStep: number;
@@ -18,46 +18,38 @@ type MechanicQualificationCardProps = {
   };
 };
 
-const qualificationOptions: Array<{
-  value: MechanicQualification;
+const options: Array<{
+  value: FormData['desiredIncome'];
   label: string;
 }> = [
-  { value: 'level3', label: '自動車整備士3級' },
-  { value: 'level2', label: '自動車整備士2級' },
-  { value: 'level1', label: '自動車整備士1級' },
-  { value: 'inspector', label: '自動車検査員' },
-  { value: 'none', label: '資格なし' },
+  { value: '300', label: '300万円' },
+  { value: '400', label: '400万円' },
+  { value: '500', label: '500万円' },
+  { value: '600', label: '600万円' },
 ];
 
-export default function MechanicQualificationCard({
-  selectedQualification,
+export default function DesiredIncomeCard({
+  selectedIncome,
   errors,
   onSelect,
   onNext,
   onPrevious,
   isActive,
   progress,
-}: MechanicQualificationCardProps) {
-  const handleToggle = (value: MechanicQualification) => {
-    onSelect(value);
-  };
-
-  const isNextEnabled = Boolean(selectedQualification);
-  const shouldShowHint = !selectedQualification;
+}: DesiredIncomeCardProps) {
+  const isNextEnabled = Boolean(selectedIncome);
 
   return (
     <FormCard isActive={isActive} className="pb-6 mt-10">
       <StepProgressBar currentStep={progress.currentStep} totalSteps={progress.totalSteps} />
 
       <div className="mb-6 text-center">
-        <h2 className="mb-2 text-lg font-bold text-gray-900">
-          保有資格
-        </h2>
+        <h2 className="mb-2 text-lg font-bold text-gray-900">希望年収</h2>
       </div>
 
       <div className="space-y-3 mb-6">
-        {qualificationOptions.map((option, index) => {
-          const isSelected = selectedQualification === option.value;
+        {options.map((option, index) => {
+          const isSelected = selectedIncome === option.value;
           return (
             <button
               key={option.value}
@@ -67,7 +59,7 @@ export default function MechanicQualificationCard({
                   ? 'border-[#ff702a] bg-orange-50'
                   : 'border-gray-300 bg-white hover:border-gray-400'
               }`}
-              onClick={() => handleToggle(option.value)}
+              onClick={() => onSelect(option.value)}
             >
               <div className="flex items-center justify-between">
                 <span className={`text-base font-semibold ${isSelected ? 'text-[#ff702a]' : 'text-gray-900'}`}>
@@ -87,7 +79,7 @@ export default function MechanicQualificationCard({
               </div>
               {index === 0 && (
                 <FingerHint
-                  isVisible={shouldShowHint}
+                  isVisible={!selectedIncome}
                   size={40}
                   className="absolute right-2 top-1/2 -translate-y-1/2 translate-x-12 sm:size-[52px]"
                 />
@@ -97,22 +89,18 @@ export default function MechanicQualificationCard({
         })}
       </div>
 
-      {errors.mechanicQualification && (
-        <p className="text-red-500 text-xs mb-4">{errors.mechanicQualification}</p>
+      {errors.desiredIncome && (
+        <p className="text-red-500 text-xs mb-4">{errors.desiredIncome}</p>
       )}
 
       <div className="flex justify-around items-center">
-        {onPrevious ? (
-          <button
-            type="button"
-            className="py-2 text-sm font-bold cursor-pointer text-gray-800 mb-0"
-            onClick={onPrevious}
-          >
-            ＜ 戻る
-          </button>
-        ) : (
-          <span />
-        )}
+        <button
+          type="button"
+          className="py-2 text-sm font-bold cursor-pointer text-gray-800 mb-0"
+          onClick={onPrevious}
+        >
+          ＜ 戻る
+        </button>
         <div className="relative ml-auto flex w-[70%] max-w-[320px] items-center justify-end">
           <button
             type="button"

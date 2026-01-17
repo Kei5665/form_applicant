@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-import { BirthDateCard, FormExitModal, JobTimingCard, MechanicQualificationCard, NameCard, NameInputCard, PhoneNumberCard, NameAndContactCard } from './application-form/components';
+import { BirthDateCard, DesiredIncomeCard, FormExitModal, JobTimingCard, MechanicJobTimingCard, MechanicQualificationCard, NameCard, NameInputCard, PhoneNumberCard, NameAndContactCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
 import type { PeopleImageVariant } from './application-form/types';
 import { FORM_PRESETS, type FormPreset } from './application-form/presets';
@@ -110,8 +110,13 @@ function ApplicationFormInner({
     showExitModal,
     handleInputChange,
     handleJobTimingSelect,
-    handleMechanicQualificationToggle,
+    handleJobIntentSelect,
+    handleMechanicQualificationSelect,
+    handleMechanicJobTimingSelect,
+    handleDesiredIncomeSelect,
     handleNextMechanicQualification,
+    handleNextMechanicJobTiming,
+    handleNextDesiredIncome,
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
@@ -155,7 +160,17 @@ function ApplicationFormInner({
         </div>
       )}
 
-      {resolvedEnableJobTimingStep && (
+      {resolvedFormOrigin === 'mechanic' && (
+        <JobTimingCard
+          selectedTiming={formData.jobIntent}
+          errors={errors}
+          onSelect={handleJobIntentSelect}
+          errorMessage={errors.jobIntent ?? ''}
+          isActive={cardStates.isCard1Active}
+        />
+      )}
+
+      {resolvedEnableJobTimingStep && resolvedFormOrigin !== 'mechanic' && (
         <JobTimingCard
           selectedTiming={formData.jobTiming}
           errors={errors}
@@ -167,27 +182,46 @@ function ApplicationFormInner({
       {resolvedFormOrigin === 'mechanic' ? (
         <>
           <MechanicQualificationCard
-            stepImageSrc={resolvedStep1ImageSrc}
-            selectedQualifications={formData.mechanicQualifications}
+            selectedQualification={formData.mechanicQualification}
             errors={errors}
-            onToggle={handleMechanicQualificationToggle}
+            onSelect={(value) => handleMechanicQualificationSelect(value, true)}
             onNext={handleNextMechanicQualification}
             onPrevious={handlePreviousCard}
             isActive={cardStates.isCard2Active}
+            progress={{ currentStep: 1, totalSteps: 7 }}
+          />
+
+          <MechanicJobTimingCard
+            selectedTiming={formData.jobTiming}
+            errors={errors}
+            onSelect={(value) => handleMechanicJobTimingSelect(value, true)}
+            onNext={handleNextMechanicJobTiming}
+            onPrevious={handlePreviousCard}
+            isActive={cardStates.isCard3Active}
+            progress={{ currentStep: 2, totalSteps: 7 }}
+          />
+
+          <DesiredIncomeCard
+            selectedIncome={formData.desiredIncome}
+            errors={errors}
+            onSelect={(value) => handleDesiredIncomeSelect(value, true)}
+            onNext={handleNextDesiredIncome}
+            onPrevious={handlePreviousCard}
+            isActive={cardStates.isCard4Active}
+            progress={{ currentStep: 3, totalSteps: 7 }}
           />
 
           <BirthDateCard
-            stepImageSrc={resolvedStep2ImageSrc}
             birthDate={formData.birthDate}
             errors={errors}
             onChange={handleInputChange}
             onNext={handleNextCard2}
             onPrevious={handlePreviousCard}
-            isActive={cardStates.isCard3Active}
+            isActive={cardStates.isCard5Active}
+            progress={{ currentStep: 4, totalSteps: 7 }}
           />
 
           <NameCard
-            stepImageSrc={resolvedStep3ImageSrc}
             postalCode={formData.postalCode}
             prefectureId={formData.prefectureId}
             municipalityId={formData.municipalityId}
@@ -195,23 +229,39 @@ function ApplicationFormInner({
             onChange={handleInputChange}
             onPrevious={handlePreviousCard}
             onNext={handleNextCard3}
-            isActive={cardStates.isCard4Active}
+            isActive={cardStates.isCard6Active}
+            progress={{ currentStep: 5, totalSteps: 7 }}
           />
 
-          <NameAndContactCard
-            stepImageSrc={resolvedStep4ImageSrc || resolvedStep3ImageSrc}
+          <NameInputCard
             formData={formData}
             errors={errors}
             jobResult={jobResult}
             showJobCount={false}
-            phoneError={phoneError}
-            emailError={emailError}
             onChange={handleInputChange}
             onBlur={handleNameBlur}
             onPrevious={handlePreviousCard}
+            onNext={handleNextCard4}
+            isActive={cardStates.isCard7Active}
+            progress={{ currentStep: 6, totalSteps: 7 }}
+          />
+
+          <PhoneNumberCard
+            jobResult={jobResult}
+            showJobCount={false}
+            formData={formData}
+            errors={errors}
+            phoneError={phoneError}
+            emailError={emailError}
+            phoneNumber={formData.phoneNumber}
+            onChange={handleInputChange}
+            onPrevious={handlePreviousCard}
             isSubmitDisabled={isSubmitDisabled}
             isSubmitting={isSubmitting}
-            isActive={cardStates.isCard5Active}
+            isActive={cardStates.isCard8Active}
+            showEmailField={true}
+            submitButtonText="求人情報を受け取る"
+            progress={{ currentStep: 7, totalSteps: 7 }}
           />
         </>
       ) : resolvedFormOrigin === 'coupang' ? (
@@ -384,4 +434,3 @@ export default function ApplicationForm(props: ApplicationFormProps) {
     </Suspense>
   );
 }
-

@@ -4,10 +4,11 @@ import Image from 'next/image';
 
 import FormCard from './FormCard';
 import FingerHint from './FingerHint';
+import StepProgressBar from './StepProgressBar';
 import type { FormData, FormErrors, JobCountResult } from '../types';
 
 type PhoneNumberCardProps = {
-  stepImageSrc: string;
+  stepImageSrc?: string;
   jobResult: JobCountResult;
   showJobCount: boolean;
   formData: FormData;
@@ -22,6 +23,10 @@ type PhoneNumberCardProps = {
   isActive: boolean;
   showEmailField?: boolean;
   submitButtonText?: string;
+  progress?: {
+    currentStep: number;
+    totalSteps: number;
+  };
 };
 
 export default function PhoneNumberCard({
@@ -40,6 +45,7 @@ export default function PhoneNumberCard({
   isActive,
   showEmailField = false,
   submitButtonText = '求人情報を受け取る',
+  progress,
 }: PhoneNumberCardProps) {
   const isPhoneFilled = phoneNumber.trim().length === 11;
   const isEmailFilled = formData.email.trim().length > 0;
@@ -63,7 +69,11 @@ export default function PhoneNumberCard({
 
   return (
     <FormCard isActive={isActive} className="pb-6 mt-10">
-      <Image className="w-full mb-4" src={stepImageSrc} alt="Step 4" width={300} height={50} />
+      {progress ? (
+        <StepProgressBar currentStep={progress.currentStep} totalSteps={progress.totalSteps} />
+      ) : stepImageSrc ? (
+        <Image className="w-full mb-4" src={stepImageSrc} alt="Step" width={300} height={50} />
+      ) : null}
 
       {showJobCount && (
           <div className="text-center mb-6">
@@ -164,4 +174,3 @@ export default function PhoneNumberCard({
     </FormCard>
   );
 }
-

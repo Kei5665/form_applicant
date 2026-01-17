@@ -24,6 +24,24 @@ export const validateJobTiming = (jobTiming: FormData['jobTiming']) => {
   return { isValid: true, errors };
 };
 
+export const validateDesiredIncome = (desiredIncome: FormData['desiredIncome']) => {
+  const errors: FormErrors = {};
+  if (!desiredIncome) {
+    errors.desiredIncome = '選択してください。';
+    return { isValid: false, errors };
+  }
+  return { isValid: true, errors };
+};
+
+export const validateMechanicQualification = (mechanicQualification: FormData['mechanicQualification']) => {
+  const errors: FormErrors = {};
+  if (!mechanicQualification) {
+    errors.mechanicQualification = '選択してください。';
+    return { isValid: false, errors };
+  }
+  return { isValid: true, errors };
+};
+
 export const validateBirthDateCard = (birthDate: BirthDate) => {
   let isValid = true;
   const errors: FormErrors = {};
@@ -142,4 +160,3 @@ export const validateFinalStep = (formData: FormData, requireEmail: boolean) => 
 };
 
 export { isValidPhoneNumber, isValidEmail };
-

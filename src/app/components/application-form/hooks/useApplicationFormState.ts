@@ -8,7 +8,7 @@ import { useHiraganaConverter } from './useHiraganaConverter';
 import { useFormExitGuard } from './useFormExitGuard';
 import { useImagePreloader } from './useImagePreloader';
 import { trackEvent } from '../utils/trackEvent';
-import { isValidEmail, isValidPhoneNumber, validateBirthDateCard, validateCard2, validateFinalStep, validateJobTiming, validateNameFields } from '../utils/validators';
+import { isValidEmail, isValidPhoneNumber, validateBirthDateCard, validateCard2, validateDesiredIncome, validateFinalStep, validateJobTiming, validateMechanicQualification, validateNameFields } from '../utils/validators';
 import { fetchJobCount, type JobCountParams } from '../utils/fetchJobCount';
 import { notifyInvalidPhoneNumber } from '../utils/notifyInvalidPhoneNumber';
 
@@ -21,7 +21,9 @@ type UseApplicationFormStateParams = {
 };
 
 const initialFormData: FormData = {
+  jobIntent: '',
   jobTiming: '',
+  desiredIncome: '',
   birthDate: '',
   fullName: '',
   fullNameKana: '',
@@ -30,11 +32,12 @@ const initialFormData: FormData = {
   municipalityId: '',
   phoneNumber: '',
   email: '',
-  mechanicQualifications: [],
+  mechanicQualification: '',
 };
 
 export function useApplicationFormState({ showLoadingScreen, imagesToPreload, variant, formOrigin, enableJobTimingStep }: UseApplicationFormStateParams) {
   const router = useRouter();
+  const isMechanic = formOrigin === 'mechanic';
   const [loading, setLoading] = useState(showLoadingScreen);
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -61,7 +64,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     markFormClean,
     setPendingNavigation,
     setExitModalVariant,
-    phoneCardIndex: formOrigin === 'mechanic' ? 5 : formOrigin === 'coupang' ? 3 : enableJobTimingStep ? 5 : 4,
+    phoneCardIndex: isMechanic ? 8 : formOrigin === 'coupang' ? 3 : enableJobTimingStep ? 5 : 4,
   });
 
   const getStepNumber = useCallback(
@@ -383,29 +386,84 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     [enableJobTimingStep, handleNextCard1, isFormDirty]
   );
 
-  const handleMechanicQualificationToggle = useCallback(
-    (value: FormData['mechanicQualifications'][number]) => {
-      setFormData((prev) => {
-        const current = prev.mechanicQualifications;
-        const isSelected = current.includes(value);
-        return {
-          ...prev,
-          mechanicQualifications: isSelected
-            ? current.filter((q) => q !== value)
-            : [...current, value],
-        };
-      });
-      setErrors((prev) => ({ ...prev, mechanicQualifications: '' }));
+  const handleMechanicQualificationSelect = useCallback(
+    (value: FormData['mechanicQualification'], autoAdvance = false) => {
+      setFormData((prev) => ({ ...prev, mechanicQualification: value }));
+      setErrors((prev) => ({ ...prev, mechanicQualification: '' }));
       if (!isFormDirty) {
         setIsFormDirty(true);
       }
+      if (autoAdvance) {
+        setCurrentCardIndex((prev) => {
+          trackEvent('step_complete', getStepEventPayload(prev));
+          const next = prev + 1;
+          trackEvent('step_view', getStepEventPayload(next));
+          return next;
+        });
+      }
     },
-    [isFormDirty]
+    [getStepEventPayload, isFormDirty]
+  );
+
+  const handleJobIntentSelect = useCallback(
+    (value: FormData['jobIntent']) => {
+      setFormData((prev) => ({ ...prev, jobIntent: value }));
+      setErrors((prev) => ({ ...prev, jobIntent: '' }));
+      if (!isFormDirty) {
+        setIsFormDirty(true);
+      }
+      setCurrentCardIndex((prev) => {
+        trackEvent('step_complete', getStepEventPayload(prev));
+        const next = prev + 1;
+        trackEvent('step_view', getStepEventPayload(next));
+        return next;
+      });
+    },
+    [getStepEventPayload, isFormDirty]
+  );
+
+  const handleMechanicJobTimingSelect = useCallback(
+    (value: FormData['jobTiming'], autoAdvance = false) => {
+      setFormData((prev) => ({ ...prev, jobTiming: value }));
+      setErrors((prev) => ({ ...prev, jobTiming: '' }));
+      if (!isFormDirty) {
+        setIsFormDirty(true);
+      }
+      if (autoAdvance) {
+        setCurrentCardIndex((prev) => {
+          trackEvent('step_complete', getStepEventPayload(prev));
+          const next = prev + 1;
+          trackEvent('step_view', getStepEventPayload(next));
+          return next;
+        });
+      }
+    },
+    [getStepEventPayload, isFormDirty]
+  );
+
+  const handleDesiredIncomeSelect = useCallback(
+    (value: FormData['desiredIncome'], autoAdvance = false) => {
+      setFormData((prev) => ({ ...prev, desiredIncome: value }));
+      setErrors((prev) => ({ ...prev, desiredIncome: '' }));
+      if (!isFormDirty) {
+        setIsFormDirty(true);
+      }
+      if (autoAdvance) {
+        setCurrentCardIndex((prev) => {
+          trackEvent('step_complete', getStepEventPayload(prev));
+          const next = prev + 1;
+          trackEvent('step_view', getStepEventPayload(next));
+          return next;
+        });
+      }
+    },
+    [getStepEventPayload, isFormDirty]
   );
 
   const handleNextMechanicQualification = useCallback(() => {
-    if (formData.mechanicQualifications.length === 0) {
-      setErrors((prev) => ({ ...prev, mechanicQualifications: '少なくとも1つの資格を選択してください' }));
+    const result = validateMechanicQualification(formData.mechanicQualification);
+    setErrors(result.errors);
+    if (!result.isValid) {
       return;
     }
     setCurrentCardIndex((prev) => {
@@ -414,7 +472,35 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       trackEvent('step_view', getStepEventPayload(next));
       return next;
     });
-  }, [formData.mechanicQualifications, getStepEventPayload]);
+  }, [formData.mechanicQualification, getStepEventPayload]);
+
+  const handleNextMechanicJobTiming = useCallback(() => {
+    const result = validateJobTiming(formData.jobTiming);
+    setErrors(result.errors);
+    if (!result.isValid) {
+      return;
+    }
+    setCurrentCardIndex((prev) => {
+      trackEvent('step_complete', getStepEventPayload(prev));
+      const next = prev + 1;
+      trackEvent('step_view', getStepEventPayload(next));
+      return next;
+    });
+  }, [formData.jobTiming, getStepEventPayload]);
+
+  const handleNextDesiredIncome = useCallback(() => {
+    const result = validateDesiredIncome(formData.desiredIncome);
+    setErrors(result.errors);
+    if (!result.isValid) {
+      return;
+    }
+    setCurrentCardIndex((prev) => {
+      trackEvent('step_complete', getStepEventPayload(prev));
+      const next = prev + 1;
+      trackEvent('step_view', getStepEventPayload(next));
+      return next;
+    });
+  }, [formData.desiredIncome, getStepEventPayload]);
 
   const handleNextCard2 = useCallback(() => {
     const result = validateBirthDateCard(formData.birthDate);
@@ -484,7 +570,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         setIsSubmitDisabled(true);
         return;
       }
-      const finalValidation = validateFinalStep(formData, formOrigin === 'coupang');
+      const finalValidation = validateFinalStep(formData, formOrigin === 'coupang' || formOrigin === 'mechanic');
       if (!finalValidation.isValid) {
         setErrors((prev) => ({ ...prev, ...finalValidation.errors }));
         setIsSubmitDisabled(true);
@@ -579,14 +665,16 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const cardStates = useMemo(
     () => {
       if (formOrigin === 'mechanic') {
-        // mechanic: 5ステップ (JobTiming, Qualification, BirthDate, NameCard, NameAndContact)
+        // mechanic: 8ステップ (Intent, Qualification, JobTiming, DesiredIncome, BirthDate, PostalCode, Name, Contact)
         return {
           isCard1Active: currentCardIndex === 1,
           isCard2Active: currentCardIndex === 2,
           isCard3Active: currentCardIndex === 3,
           isCard4Active: currentCardIndex === 4,
           isCard5Active: currentCardIndex === 5,
-          isCard6Active: false,
+          isCard6Active: currentCardIndex === 6,
+          isCard7Active: currentCardIndex === 7,
+          isCard8Active: currentCardIndex === 8,
         };
       }
 
@@ -599,6 +687,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           isCard4Active: false,
           isCard5Active: false,
           isCard6Active: false,
+          isCard7Active: false,
+          isCard8Active: false,
         };
       }
 
@@ -610,6 +700,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           isCard4Active: currentCardIndex === 4,
           isCard5Active: currentCardIndex === 5,
           isCard6Active: false,
+          isCard7Active: false,
+          isCard8Active: false,
         };
       }
 
@@ -620,6 +712,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         isCard4Active: currentCardIndex === 4,
         isCard5Active: false,
         isCard6Active: false,
+        isCard7Active: false,
+        isCard8Active: false,
       };
     },
     [currentCardIndex, enableJobTimingStep, formOrigin]
@@ -638,8 +732,13 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     jobResult,
     handleInputChange,
     handleJobTimingSelect,
-    handleMechanicQualificationToggle,
+    handleJobIntentSelect,
+    handleMechanicQualificationSelect,
+    handleMechanicJobTimingSelect,
+    handleDesiredIncomeSelect,
     handleNextMechanicQualification,
+    handleNextMechanicJobTiming,
+    handleNextDesiredIncome,
     handleNameBlur,
     handleNextCard1,
     handleNextCard2,
@@ -653,4 +752,3 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     markFormClean,
   };
 }
-

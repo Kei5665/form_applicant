@@ -3,9 +3,11 @@ export { default as FormCard } from './FormCard';
 export { default as FingerHint } from './FingerHint';
 export { default as JobTimingCard } from './JobTimingCard';
 export { default as MechanicQualificationCard } from './MechanicQualificationCard';
+export { default as MechanicJobTimingCard } from './MechanicJobTimingCard';
+export { default as DesiredIncomeCard } from './DesiredIncomeCard';
+export { default as StepProgressBar } from './StepProgressBar';
 export { default as NameCard } from './NameCard';
 export { default as NameInputCard } from './NameInputCard';
 export { default as PhoneNumberCard } from './PhoneNumberCard';
 export { default as NameAndContactCard } from './NameAndContactCard';
 export { default as FormExitModal } from './FormExitModal';
-

@@ -4,25 +4,34 @@ import Image from 'next/image';
 
 import FormCard from './FormCard';
 import FingerHint from './FingerHint';
+import StepProgressBar from './StepProgressBar';
 import type { BirthDate, FormErrors } from '../types';
 
 type BirthDateCardProps = {
-  stepImageSrc: string;
+  stepImageSrc?: string;
   birthDate: BirthDate;
   errors: FormErrors;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onNext: () => void;
   isActive: boolean;
   onPrevious?: () => void;
+  progress?: {
+    currentStep: number;
+    totalSteps: number;
+  };
 };
 
-export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChange, onNext, isActive, onPrevious }: BirthDateCardProps) {
+export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChange, onNext, isActive, onPrevious, progress }: BirthDateCardProps) {
   const isFilled = birthDate.length === 8;
 
   return (
     <FormCard isActive={isActive} className="h-full">
       <div className="mb-6 text-left">
-        <Image className="w-full mb-4" src={stepImageSrc} alt="Step 2" width={300} height={50} priority />
+        {progress ? (
+          <StepProgressBar currentStep={progress.currentStep} totalSteps={progress.totalSteps} />
+        ) : stepImageSrc ? (
+          <Image className="w-full mb-4" src={stepImageSrc} alt="Step" width={300} height={50} priority />
+        ) : null}
         <h1 className="text-lg text-center font-bold mb-4 text-gray-700">条件に合った求人を検索します</h1>
         <label className="font-bold mb-2.5 block text-gray-900">生年月日</label>
         <div className="relative flex items-center gap-3">
@@ -62,4 +71,3 @@ export default function BirthDateCard({ stepImageSrc, birthDate, errors, onChang
     </FormCard>
   );
 }
-
