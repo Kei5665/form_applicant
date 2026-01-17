@@ -118,6 +118,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const loadJobCount = useCallback(async (params: Partial<JobCountParams>) => {
     const hasPostal = typeof params.postalCode === 'string' && params.postalCode.trim().length > 0;
     const hasPref = typeof params.prefectureId === 'string' && params.prefectureId.trim().length > 0;
+    const jobCategoryIds = formOrigin === 'mechanic' ? ['3', '10'] : undefined;
 
     if (!hasPostal && !hasPref) {
       setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
@@ -127,8 +128,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     try {
       const result = await fetchJobCount(
         hasPostal
-          ? { postalCode: params.postalCode as string }
-          : { prefectureId: params.prefectureId as string }
+          ? { postalCode: params.postalCode as string, jobCategoryIds }
+          : { prefectureId: params.prefectureId as string, jobCategoryIds }
       );
       setJobResult({
         jobCount: result.jobCount,
@@ -144,7 +145,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       console.error('Error fetching job count:', error);
       setJobResult({ jobCount: null, message: '', isLoading: false, error: '求人件数の取得中にエラーが発生しました' });
     }
-  }, []);
+  }, [formOrigin]);
 
   const isSubmitReady = useCallback(
     (phoneNumber: string, email: string) => {

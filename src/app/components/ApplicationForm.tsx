@@ -237,7 +237,7 @@ function ApplicationFormInner({
             formData={formData}
             errors={errors}
             jobResult={jobResult}
-            showJobCount={false}
+            showJobCount={true}
             onChange={handleInputChange}
             onBlur={handleNameBlur}
             onPrevious={handlePreviousCard}
@@ -248,7 +248,7 @@ function ApplicationFormInner({
 
           <PhoneNumberCard
             jobResult={jobResult}
-            showJobCount={false}
+            showJobCount={true}
             formData={formData}
             errors={errors}
             phoneError={phoneError}

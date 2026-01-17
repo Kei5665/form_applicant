@@ -10,13 +10,17 @@ export async function GET(request: NextRequest) {
     const postalCode = searchParams.get('postalCode');
     const prefectureId = searchParams.get('prefectureId');
     const municipalityId = searchParams.get('municipalityId');
+    const jobCategoryIdsParam = searchParams.get('jobCategoryIds');
+    const jobCategoryIds = jobCategoryIdsParam
+      ? jobCategoryIdsParam.split(',').map((id) => id.trim()).filter(Boolean)
+      : undefined;
 
     if (prefectureId) {
       const prefecture = await fetchPrefectureById(prefectureId);
       if (!prefecture) {
         return NextResponse.json({ error: '都道府県の取得に失敗しました' }, { status: 404 });
       }
-      const response = await getJobsByPrefectureId(prefectureId);
+      const response = await getJobsByPrefectureId(prefectureId, jobCategoryIds);
       const jobCount = response.totalCount;
       const searchArea = `${prefecture.region}内`;
 
@@ -39,7 +43,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: '市区町村の取得に失敗しました' }, { status: 404 });
       }
 
-      const response = await getJobsByPrefectureId(municipality.prefecture.id);
+      const response = await getJobsByPrefectureId(municipality.prefecture.id, jobCategoryIds);
       const jobCount = response.totalCount;
       const searchArea = `${municipality.prefecture.region}内`;
 
@@ -75,7 +79,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '都道府県の取得に失敗しました' }, { status: 404 });
     }
 
-    const response = await getJobsByPrefectureId(prefecture.id);
+    const response = await getJobsByPrefectureId(prefecture.id, jobCategoryIds);
     const jobCount = response.totalCount;
     const searchArea = `${prefecture.region}内`;
 

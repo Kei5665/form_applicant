@@ -168,6 +168,25 @@ export interface Job {
 
 export type JobsResponse = MicroCMSListResponse<Job>;
 
+function buildJobCategoryFilter(categoryIds?: string[]): string | undefined {
+  if (!categoryIds || categoryIds.length === 0) {
+    return undefined;
+  }
+  const ids = categoryIds.map((id) => id.trim()).filter(Boolean);
+  if (ids.length === 0) {
+    return undefined;
+  }
+  return `jobCategory[in]${ids.join(',')}`;
+}
+
+function buildFilters(filters: Array<string | undefined>): string | undefined {
+  const parts = filters.filter((value): value is string => Boolean(value && value.trim().length > 0));
+  if (parts.length === 0) {
+    return undefined;
+  }
+  return parts.join('[and]');
+}
+
 export async function getPrefectureByRegion(regionName: string): Promise<PrefectureEntry | null> {
   if (!hasMicrocmsEnv) {
     throw new Error('microCMS environment variables are not set');
@@ -177,15 +196,16 @@ export async function getPrefectureByRegion(regionName: string): Promise<Prefect
   return data.contents[0] ?? null;
 }
 
-export async function getJobsByPrefectureId(prefectureId: string): Promise<JobsResponse> {
+export async function getJobsByPrefectureId(prefectureId: string, jobCategoryIds?: string[]): Promise<JobsResponse> {
   if (!hasMicrocmsEnv) {
     throw new Error('microCMS environment variables are not set');
   }
-  const params = new URLSearchParams({ filters: `prefecture[equals]${prefectureId}` });
+  const filters = buildFilters([`prefecture[equals]${prefectureId}`, buildJobCategoryFilter(jobCategoryIds)]);
+  const params = filters ? new URLSearchParams({ filters }) : undefined;
   return fetchFromMicroCMS<Job>('jobs', params);
 }
 
-export async function getJobCountByPrefecture(prefectureName: string): Promise<number> {
+export async function getJobCountByPrefecture(prefectureName: string, jobCategoryIds?: string[]): Promise<number> {
   if (!hasMicrocmsEnv) {
     throw new Error('microCMS environment variables are not set');
   }
@@ -193,15 +213,16 @@ export async function getJobCountByPrefecture(prefectureName: string): Promise<n
   if (!prefecture) {
     return 0;
   }
-  const response = await getJobsByPrefectureId(prefecture.id);
+  const response = await getJobsByPrefectureId(prefecture.id, jobCategoryIds);
   return response.totalCount;
 }
 
-export async function getJobsByMunicipalityId(municipalityId: string): Promise<JobsResponse> {
+export async function getJobsByMunicipalityId(municipalityId: string, jobCategoryIds?: string[]): Promise<JobsResponse> {
   if (!hasMicrocmsEnv) {
     throw new Error('microCMS environment variables are not set');
   }
-  const params = new URLSearchParams({ filters: `municipality[equals]${municipalityId}` });
+  const filters = buildFilters([`municipality[equals]${municipalityId}`, buildJobCategoryFilter(jobCategoryIds)]);
+  const params = filters ? new URLSearchParams({ filters }) : undefined;
   return fetchFromMicroCMS<Job>('jobs', params);
 }
 
