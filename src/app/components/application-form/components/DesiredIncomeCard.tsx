@@ -1,7 +1,6 @@
 'use client';
 
 import FormCard from './FormCard';
-import FingerHint from './FingerHint';
 import StepProgressBar from './StepProgressBar';
 import type { FormData, FormErrors } from '../types';
 
@@ -77,13 +76,6 @@ export default function DesiredIncomeCard({
                   )}
                 </div>
               </div>
-              {index === 0 && (
-                <FingerHint
-                  isVisible={!selectedIncome}
-                  size={40}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 translate-x-12 sm:size-[52px]"
-                />
-              )}
             </button>
           );
         })}
@@ -114,11 +106,6 @@ export default function DesiredIncomeCard({
           >
             次へ
           </button>
-          <FingerHint
-            isVisible={isNextEnabled}
-            size={44}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 sm:size-[60px]"
-          />
         </div>
       </div>
     </FormCard>

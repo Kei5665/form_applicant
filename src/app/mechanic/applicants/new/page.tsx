@@ -73,8 +73,8 @@ export default function MechanicApplicationComplete() {
               className="h-[34px] w-auto"
             />
             <div className="text-right text-[11px] leading-relaxed text-gray-700">
-              <p>未経験で整備士に転職するなら</p>
-              <p className="font-semibold text-gray-900">RIDE JOB MECHANIC（ライドジョブ メカニック）</p>
+              <p>ホワイト企業への整備士転職なら</p>
+              <p className="font-semibold text-gray-900">ライドジョブ メカニクス</p>
             </div>
           </div>
       </header>
