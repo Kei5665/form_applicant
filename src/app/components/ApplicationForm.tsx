@@ -260,6 +260,7 @@ function ApplicationFormInner({
             isSubmitting={isSubmitting}
             isActive={cardStates.isCard8Active}
             showEmailField={true}
+            preferPhoneFirst={true}
             submitButtonText="求人情報を受け取る"
             progress={{ currentStep: 7, totalSteps: 7 }}
           />

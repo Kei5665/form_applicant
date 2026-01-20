@@ -22,6 +22,7 @@ type PhoneNumberCardProps = {
   isSubmitting: boolean;
   isActive: boolean;
   showEmailField?: boolean;
+  preferPhoneFirst?: boolean;
   submitButtonText?: string;
   progress?: {
     currentStep: number;
@@ -44,6 +45,7 @@ export default function PhoneNumberCard({
   isSubmitting,
   isActive,
   showEmailField = false,
+  preferPhoneFirst = false,
   submitButtonText = '求人情報を受け取る',
   progress,
 }: PhoneNumberCardProps) {
@@ -51,6 +53,12 @@ export default function PhoneNumberCard({
   const isEmailFilled = formData.email.trim().length > 0;
 
   const firstIncompleteField = (() => {
+    if (preferPhoneFirst && !isPhoneFilled) {
+      return 'phoneNumber';
+    }
+    if (preferPhoneFirst && showEmailField && !isEmailFilled) {
+      return 'email';
+    }
     if (showEmailField && !isEmailFilled) {
       return 'email';
     }
