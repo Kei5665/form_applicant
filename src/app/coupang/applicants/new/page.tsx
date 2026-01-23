@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect } from "react";
-import CoupangSeminarDetails from '@/app/components/coupang-form/components/CoupangSeminarDetails';
-import CoupangJobListing from '@/app/components/coupang-form/components/CoupangJobListing';
 
 declare global {
   interface Window {
@@ -11,6 +9,8 @@ declare global {
 }
 
 export default function CoupangApplicationComplete() {
+  const currentMonth = new Date().toLocaleDateString('ja-JP', { month: 'long' });
+
   useEffect(() => {
     if (typeof window !== 'undefined' && window.dataLayer) {
       window.dataLayer.push({
@@ -27,50 +27,27 @@ export default function CoupangApplicationComplete() {
         <h1 className="text-2xl font-bold text-[#ff6b35] leading-relaxed">
           この度はお申込みいただき<br />ありがとうございました！
         </h1>
+        <p className="mt-3 text-lg text-gray-700 leading-relaxed">
+          担当者より、お電話またはオンラインにて求人詳細をご案内します。
+        </p>
       </div>
 
-      {/* セミナー詳細 */}
-      <CoupangSeminarDetails />
-
-      {/* 求人情報 */}
-      <CoupangJobListing />
-
-      {/* Selection Process Section */}
+      {/* eeasy Reservation Section */}
       <div className="bg-white rounded-lg p-6 shadow-md mb-8">
         <h2 className="text-lg font-bold text-gray-900 mb-4 border-l-4 border-[#ff6b35] pl-3">
-          担当エージェントに直接聴きたい方
+          【重要】面談予約はお早めに
         </h2>
         <div className="text-base text-gray-700 space-y-2 mb-6">
-          <p>担当者との電話面談の日程をご調整いただいた方に</p>
-          <p>求人の詳細をお送りいたします。</p>
-          <p>ご面談の際に選考会の詳細もお伝えいたします。</p>
+          <p>{currentMonth}から求人の問い合わせが急増しており、ご希望日時に面談枠をご用意できないことがあります。</p>
+          <p>空き枠があるうちに、以下より日程をご予約ください。</p>
         </div>
         <a
-          href="https://pmagent.eeasy.jp/ridejob"
+          href="https://meeting.eeasy.jp/ridejob./general"
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full bg-[#ff6b35] hover:bg-[#e55a2b] text-white font-bold py-4 px-6 rounded-lg text-center transition-colors"
         >
           面談予約へ<br />
-        </a>
-      </div>
-
-      {/* LINE Registration Section */}
-      <div className="bg-white rounded-lg p-6 shadow-md mb-8">
-        <h2 className="text-lg font-bold text-gray-900 mb-4 border-l-4 border-[#ff6b35] pl-3">
-          担当エージェントにLINEで聴きたい方
-        </h2>
-        <div className="text-base text-gray-700 space-y-2 mb-6">
-          <p>LIFT JOB 公式LINEにご登録後、</p>
-          <p>求人内容をお送りいたします。</p>
-        </div>
-        <a
-          href="https://lin.ee/SSlcaLH"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block w-full bg-[#ff6b35] hover:bg-[#e55a2b] text-white font-bold py-4 px-6 rounded-lg text-center transition-colors"
-        >
-          LINE登録へ<br />
         </a>
       </div>
 
