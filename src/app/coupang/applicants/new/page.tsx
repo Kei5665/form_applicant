@@ -1,6 +1,5 @@
 'use client';
 
-import Script from "next/script";
 import { useEffect } from "react";
 
 declare global {
@@ -8,8 +7,6 @@ declare global {
     dataLayer: Record<string, unknown>[];
   }
 }
-
-declare const EeasyWidget: (url: string) => void;
 
 export default function CoupangApplicationComplete() {
   const currentMonth = new Date().toLocaleDateString('ja-JP', { month: 'long' });
@@ -44,16 +41,6 @@ export default function CoupangApplicationComplete() {
           <p>{currentMonth}から求人の問い合わせが急増しており、ご希望日時に面談枠をご用意できないことがあります。</p>
           <p>空き枠があるうちに、以下より日程をご予約ください。</p>
         </div>
-        <div id="eeasy-widget" />
-        <Script
-          src="https://js.eeasy.jp/embed"
-          strategy="afterInteractive"
-          onLoad={() => {
-            if (typeof EeasyWidget === "function") {
-              EeasyWidget("https://pmagent.eeasy.jp/liftjob");
-            }
-          }}
-        />
         <a
           href="https://pmagent.eeasy.jp/liftjob"
           target="_blank"
