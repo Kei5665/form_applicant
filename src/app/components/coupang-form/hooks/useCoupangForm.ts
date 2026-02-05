@@ -17,7 +17,6 @@ const initialFormData: CoupangFormData = {
   phoneNumber: '',
   jobPosition: '',
   desiredLocation: '',
-  seminarSlot: '',
   age: '',
   birthDate: '',
 };

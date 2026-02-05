@@ -59,10 +59,6 @@ export function validateStep1(formData: CoupangFormData): { isValid: boolean; er
 export function validateStep2(formData: CoupangFormData): { isValid: boolean; errors: CoupangFormErrors } {
   const errors: CoupangFormErrors = {};
 
-  if (!formData.seminarSlot) {
-    errors.seminarSlot = '参加希望日時を選択してください';
-  }
-
   if (!formData.age) {
     errors.age = '年齢を選択してください';
   } else {

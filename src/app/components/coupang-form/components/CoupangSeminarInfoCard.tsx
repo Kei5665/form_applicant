@@ -10,9 +10,7 @@ type CoupangSeminarInfoCardProps = {
   stepImageSrc: string;
   formData: CoupangFormData;
   errors: CoupangFormErrors;
-  seminarSlotOptions: { value: string; label: string }[];
   ageOptions: { value: Age | ''; label: string }[];
-  slotsLoading: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onNext: () => void;
   onPrevious: () => void;
@@ -23,9 +21,7 @@ export default function CoupangSeminarInfoCard({
   stepImageSrc,
   formData,
   errors,
-  seminarSlotOptions,
   ageOptions,
-  slotsLoading,
   onChange,
   onNext,
   onPrevious,
@@ -49,16 +45,6 @@ export default function CoupangSeminarInfoCard({
       </div>
 
       <div className="space-y-6">
-        <SelectInput
-          name="seminarSlot"
-          label="参加希望日時"
-          value={formData.seminarSlot}
-          onChange={onChange}
-          error={errors.seminarSlot}
-          options={seminarSlotOptions}
-          placeholder={slotsLoading ? '読み込み中...' : '選択してください'}
-        />
-
         <SelectInput
           name="age"
           label="年齢"

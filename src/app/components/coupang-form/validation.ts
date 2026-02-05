@@ -134,10 +134,6 @@ export function validateCoupangForm(formData: CoupangFormData): CoupangFormError
   }
 
   // セミナー情報
-  if (!formData.seminarSlot) {
-    errors.seminarSlot = '参加希望日時を選択してください';
-  }
-
   if (!formData.age) {
     errors.age = '年齢を選択してください';
   }

@@ -48,7 +48,6 @@ export type CoupangFormData = {
   desiredLocation: DesiredLocation | '';
 
   // セミナー情報
-  seminarSlot: string;        // 参加希望日時
   age: Age | '';
   birthDate: string;          // 生年月日（8桁）
 };

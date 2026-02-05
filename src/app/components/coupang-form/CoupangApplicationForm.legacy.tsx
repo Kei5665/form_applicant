@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { FormSection, TextInput, SelectInput } from './components';
 import { useCoupangForm } from './hooks/useCoupangForm';
-import { useSeminarSlots } from './hooks/useSeminarSlots';
 import {
   JOB_POSITION_LABELS,
   LOCATION_LABELS,
@@ -22,8 +21,6 @@ export default function CoupangApplicationForm() {
     setSelectedJobId,
   } = useCoupangForm();
 
-  const { slots, isLoading: slotsLoading } = useSeminarSlots();
-
   // 選択肢の配列作成
   const jobPositionOptions = Object.entries(JOB_POSITION_LABELS).map(([value, label]) => ({
     value,
@@ -34,16 +31,6 @@ export default function CoupangApplicationForm() {
     value,
     label,
   }));
-
-  const seminarSlotOptions = slots.map((slot) => ({
-    value: slot.date,
-    label: slot.date,
-  }));
-
-  const seminarOptionsWithFallback = [
-    ...seminarSlotOptions,
-    { value: 'no_schedule', label: '参加できる日程がありません' },
-  ];
 
   const ageOptions = AGE_OPTIONS;
 
@@ -310,16 +297,6 @@ export default function CoupangApplicationForm() {
 
         {/* カテゴリ3: セミナー情報 */}
         <FormSection title="セミナー情報">
-          <SelectInput
-            name="seminarSlot"
-            label="参加希望日時"
-            value={formData.seminarSlot}
-            onChange={handleChange}
-            error={errors.seminarSlot}
-            options={seminarOptionsWithFallback}
-            placeholder={slotsLoading ? '読み込み中...' : '選択してください'}
-          />
-
           <SelectInput
             name="age"
             label="年齢"

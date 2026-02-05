@@ -1,7 +1,6 @@
 'use client';
 
 import { useCoupangFormState } from './hooks/useCoupangFormState';
-import { useSeminarSlots } from './hooks/useSeminarSlots';
 import {
   JOB_POSITION_LABELS,
   LOCATION_LABELS,
@@ -42,8 +41,6 @@ export default function CoupangStepForm({
     handleSubmit,
   } = useCoupangFormState();
 
-  const { slots, isLoading: slotsLoading } = useSeminarSlots();
-
   // 選択肢の配列作成
   const jobPositionOptions = Object.entries(JOB_POSITION_LABELS).map(([value, label]) => ({
     value: value as keyof typeof JOB_POSITION_LABELS,
@@ -54,16 +51,6 @@ export default function CoupangStepForm({
     value: value as keyof typeof LOCATION_LABELS,
     label,
   }));
-
-  const seminarSlotOptions = slots.map((slot) => ({
-    value: slot.date,
-    label: slot.date,
-  }));
-
-  const seminarOptionsWithFallback = [
-    ...seminarSlotOptions,
-    { value: 'no_schedule', label: '参加できる日程がありません' },
-  ];
 
   const ageOptions = AGE_OPTIONS;
 
@@ -87,9 +74,7 @@ export default function CoupangStepForm({
           stepImageSrc={stepImageSrcs.step2!}
           formData={formData}
           errors={errors}
-          seminarSlotOptions={seminarOptionsWithFallback}
           ageOptions={ageOptions}
-          slotsLoading={slotsLoading}
           onChange={handleChange}
           onNext={handleNextStep2}
           onPrevious={handlePreviousStep}

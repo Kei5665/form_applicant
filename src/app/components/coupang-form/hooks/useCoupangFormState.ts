@@ -22,7 +22,6 @@ const initialFormData: CoupangFormData = {
   phoneNumber: '',
   jobPosition: '',
   desiredLocation: '',
-  seminarSlot: '',
   age: '',
   birthDate: '',
 };
@@ -164,7 +163,7 @@ export function useCoupangFormState() {
         // エラーがある場合、最初のエラーがあるステップに戻る
         if (validation.errors.jobPosition || validation.errors.desiredLocation) {
           setCurrentStep(1);
-        } else if (validation.errors.seminarSlot || validation.errors.age || validation.errors.birthDate) {
+        } else if (validation.errors.age || validation.errors.birthDate) {
           setCurrentStep(2);
         } else if (validation.errors.fullName || validation.errors.fullNameKana) {
           setCurrentStep(3);
