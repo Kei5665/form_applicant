@@ -137,6 +137,7 @@ function ApplicationFormInner({
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const modalContentRef = useRef<HTMLDivElement | null>(null);
+  const showLegalFooter = resolvedFormOrigin === 'default' || resolvedFormOrigin === 'mechanic';
 
   useEffect(() => {
     if (!resolvedUseModal) return;
@@ -149,8 +150,28 @@ function ApplicationFormInner({
   }, [resolvedUseModal]);
 
   const formWrapperClassName = resolvedUseModal
-    ? 'relative w-full max-w-sm px-1 py-6 max-h-[calc(100vh-3rem)] overflow-y-auto no-scrollbar'
+    ? 'relative w-full max-w-sm px-1 py-6 overflow-y-auto no-scrollbar'
     : 'relative w-full max-w-sm px-1 mx-auto no-scrollbar';
+
+  const formWrapperStyle = resolvedUseModal
+    ? {
+        maxHeight: `calc(100vh - ${resolvedShowHeader ? '7rem' : '3rem'} - ${showLegalFooter ? '4.5rem' : '1rem'})`,
+      }
+    : undefined;
+
+  const legalFooter = showLegalFooter ? (
+    <footer className="fixed inset-x-0 bottom-0 z-[10001] border-t border-gray-200 bg-white/95 backdrop-blur-sm">
+      <div className="mx-auto flex w-full max-w-md items-center justify-center gap-3 px-4 py-3 text-xs text-gray-700">
+        <a href="https://www.pmagent.jp" target="_blank" rel="noopener noreferrer" className="hover:underline">
+          会社概要
+        </a>
+        <span aria-hidden className="text-gray-400">|</span>
+        <a href="https://ridejob.pmagent.jp/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline">
+          プライバシーポリシー
+        </a>
+      </div>
+    </footer>
+  ) : null;
 
   const formContent = (
     <form onSubmit={handleSubmit} id="form" noValidate className="relative pb-4">
@@ -399,9 +420,10 @@ function ApplicationFormInner({
         </div>
       )}
 
-      <div ref={modalContentRef} className={formWrapperClassName}>
+      <div ref={modalContentRef} className={formWrapperClassName} style={formWrapperStyle}>
         {formContent}
       </div>
+      {legalFooter}
       <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} variant={exitModalVariant} />
     </div>
   );
@@ -422,7 +444,8 @@ function ApplicationFormInner({
 
   return (
     <div className={`flex justify-center px-4 ${resolvedContainerClassName}`.trim()}>
-      <div className={formWrapperClassName}>{formContent}</div>
+      <div className={formWrapperClassName} style={formWrapperStyle}>{formContent}</div>
+      {legalFooter}
       <FormExitModal isOpen={showExitModal} onClose={hideExitModal} onConfirm={confirmExit} variant={exitModalVariant} />
     </div>
   );
