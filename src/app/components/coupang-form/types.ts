@@ -1,10 +1,6 @@
-export type JobPosition =
-  | 'field_sales'
-  | 'account_manager';
+export type JobPosition = string;
 
-export type DesiredLocation =
-  | 'tokyo'
-  | 'fukuoka';
+export type DesiredLocation = string;
 
 export type Age =
   | '18'

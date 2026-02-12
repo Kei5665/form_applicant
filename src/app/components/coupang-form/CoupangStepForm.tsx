@@ -1,9 +1,8 @@
 'use client';
 
 import { useCoupangFormState } from './hooks/useCoupangFormState';
+import { useCoupangStep1Options } from './hooks/useCoupangStep1Options';
 import {
-  JOB_POSITION_LABELS,
-  LOCATION_LABELS,
   AGE_OPTIONS,
 } from './constants';
 import CoupangApplicationInfoCard from './components/CoupangApplicationInfoCard';
@@ -40,17 +39,7 @@ export default function CoupangStepForm({
     handlePreviousStep,
     handleSubmit,
   } = useCoupangFormState();
-
-  // 選択肢の配列作成
-  const jobPositionOptions = Object.entries(JOB_POSITION_LABELS).map(([value, label]) => ({
-    value: value as keyof typeof JOB_POSITION_LABELS,
-    label,
-  }));
-
-  const locationOptions = Object.entries(LOCATION_LABELS).map(([value, label]) => ({
-    value: value as keyof typeof LOCATION_LABELS,
-    label,
-  }));
+  const { jobPositionOptions, locationOptions } = useCoupangStep1Options();
 
   const ageOptions = AGE_OPTIONS;
 

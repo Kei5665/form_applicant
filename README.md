@@ -72,6 +72,9 @@ LARK_BASE_WEBHOOK_URL_COUPANG_PROD=your_prod_base_webhook_url
 # Gmail送信用GAS API URL
 GAS_EMAIL_API_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
 
+# Coupangステップ1選択肢取得用GAS API URL
+GAS_COUPANG_STEP1_OPTIONS_API_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+
 # テストモード（オプション、trueの場合Baseのみ送信）
 LARK_SEND_BASE_ONLY=false
 ```
@@ -79,6 +82,7 @@ LARK_SEND_BASE_ONLY=false
 **注意**:
 - `GAS_EMAIL_API_URL`の設定方法は`gas/README.md`を参照してください
 - Gmail送信機能が不要な場合は`GAS_EMAIL_API_URL`を設定しなくても動作します
+- `GAS_COUPANG_STEP1_OPTIONS_API_URL`が未設定または取得失敗時は、Coupangの固定選択肢を使用します
 
 ### 開発サーバー起動
 ```bash

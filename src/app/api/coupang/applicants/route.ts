@@ -4,6 +4,7 @@ import {
   JOB_POSITION_LABELS,
   LOCATION_LABELS,
 } from '@/app/components/coupang-form/constants';
+import { getCoupangStep1Options } from '../step1-options/options';
 
 type UTMParams = {
   utm_source?: string;
@@ -49,10 +50,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ラベル変換
-    const jobPositionLabel = formData.jobPosition ? JOB_POSITION_LABELS[formData.jobPosition] : '未選択';
+    const step1Options = await getCoupangStep1Options();
+    const fallbackJobPositionMap = JOB_POSITION_LABELS as Record<string, string>;
+    const fallbackLocationMap = LOCATION_LABELS as Record<string, string>;
+
+    // ラベル変換（シート定義の日本語値を優先し、旧固定値もフォールバック）
+    const jobPositionLabel = formData.jobPosition
+      ? (
+          step1Options.jobPositions.find((v) => v === formData.jobPosition)
+          || fallbackJobPositionMap[formData.jobPosition]
+          || formData.jobPosition
+        )
+      : '未選択';
     const desiredLocationLabel = formData.desiredLocation
-      ? LOCATION_LABELS[formData.desiredLocation]
+      ? (
+          step1Options.desiredLocations.find((v) => v === formData.desiredLocation)
+          || fallbackLocationMap[formData.desiredLocation]
+          || formData.desiredLocation
+        )
       : '未選択';
     const ageLabel = formData.age ? `${formData.age}歳` : '未選択';
     const birthDateLabel = formData.birthDate || '未入力';
