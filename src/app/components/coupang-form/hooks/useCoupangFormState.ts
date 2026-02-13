@@ -87,7 +87,17 @@ export function useCoupangFormState() {
         }
       }
 
-      setFormData((prev) => ({ ...prev, [name]: processedValue }));
+      setFormData((prev) => {
+        if (name === 'jobPosition') {
+          return {
+            ...prev,
+            jobPosition: processedValue,
+            desiredLocation: '',
+          };
+        }
+
+        return { ...prev, [name]: processedValue };
+      });
     }
 
     if (!isFormDirty) {

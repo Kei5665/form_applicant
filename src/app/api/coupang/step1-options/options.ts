@@ -1,6 +1,7 @@
 export type CoupangStep1Options = {
   jobPositions: string[];
   desiredLocations: string[];
+  combinations: { jobPosition: string; desiredLocation: string }[];
   updatedAt: string;
   source: 'gas' | 'fallback';
 };
@@ -25,9 +26,39 @@ function getFallbackOptions(): CoupangStep1Options {
   return {
     jobPositions: [],
     desiredLocations: [],
+    combinations: [],
     updatedAt: new Date().toISOString(),
     source: 'fallback',
   };
+}
+
+function parseCombinations(rawValue: unknown): { jobPosition: string; desiredLocation: string }[] {
+  if (!Array.isArray(rawValue)) {
+    return [];
+  }
+
+  const seen = new Set<string>();
+  const result: { jobPosition: string; desiredLocation: string }[] = [];
+
+  for (const item of rawValue) {
+    if (!item || typeof item !== 'object') {
+      continue;
+    }
+    const obj = item as { jobPosition?: unknown; desiredLocation?: unknown };
+    const jobPosition = String(obj.jobPosition ?? '').trim();
+    const desiredLocation = String(obj.desiredLocation ?? '').trim();
+    if (!jobPosition || !desiredLocation) {
+      continue;
+    }
+    const key = `${jobPosition}@@${desiredLocation}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    result.push({ jobPosition, desiredLocation });
+  }
+
+  return result;
 }
 
 export async function getCoupangStep1Options(): Promise<CoupangStep1Options> {
@@ -55,11 +86,13 @@ export async function getCoupangStep1Options(): Promise<CoupangStep1Options> {
     const rawData = (await response.json()) as {
       jobPositions?: unknown[];
       desiredLocations?: unknown[];
+      combinations?: unknown[];
       updatedAt?: string;
     };
 
     const jobPositions = uniqueNonEmpty(rawData.jobPositions ?? []);
     const desiredLocations = uniqueNonEmpty(rawData.desiredLocations ?? []);
+    const combinations = parseCombinations(rawData.combinations);
 
     if (jobPositions.length === 0 || desiredLocations.length === 0) {
       console.error('Invalid step1 options payload from GAS. Using empty fallback options.', rawData);
@@ -69,6 +102,7 @@ export async function getCoupangStep1Options(): Promise<CoupangStep1Options> {
     return {
       jobPositions,
       desiredLocations,
+      combinations,
       updatedAt: rawData.updatedAt || new Date().toISOString(),
       source: 'gas',
     };

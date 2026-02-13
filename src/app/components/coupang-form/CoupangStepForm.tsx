@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useCoupangFormState } from './hooks/useCoupangFormState';
 import { useCoupangStep1Options } from './hooks/useCoupangStep1Options';
 import {
@@ -39,9 +40,15 @@ export default function CoupangStepForm({
     handlePreviousStep,
     handleSubmit,
   } = useCoupangFormState();
-  const { jobPositionOptions, locationOptions } = useCoupangStep1Options();
+  const { jobPositionOptions, locationOptions, locationOptionsByJobPosition } = useCoupangStep1Options();
 
   const ageOptions = AGE_OPTIONS;
+  const filteredLocationOptions = useMemo(() => {
+    if (!formData.jobPosition) {
+      return locationOptions;
+    }
+    return locationOptionsByJobPosition[formData.jobPosition] || locationOptions;
+  }, [formData.jobPosition, locationOptions, locationOptionsByJobPosition]);
 
   return (
     <div className="relative w-full">
@@ -52,7 +59,7 @@ export default function CoupangStepForm({
           formData={formData}
           errors={errors}
           jobPositionOptions={jobPositionOptions}
-          locationOptions={locationOptions}
+          locationOptions={filteredLocationOptions}
           onChange={handleChange}
           onNext={handleNextStep1}
           isActive={cardStates.isStep1Active}
