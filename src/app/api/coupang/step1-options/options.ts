@@ -1,8 +1,3 @@
-import {
-  JOB_POSITION_LABELS,
-  LOCATION_LABELS,
-} from '@/app/components/coupang-form/constants';
-
 export type CoupangStep1Options = {
   jobPositions: string[];
   desiredLocations: string[];
@@ -28,8 +23,8 @@ function uniqueNonEmpty(values: unknown[]): string[] {
 
 function getFallbackOptions(): CoupangStep1Options {
   return {
-    jobPositions: uniqueNonEmpty(Object.values(JOB_POSITION_LABELS)),
-    desiredLocations: uniqueNonEmpty(Object.values(LOCATION_LABELS)),
+    jobPositions: [],
+    desiredLocations: [],
     updatedAt: new Date().toISOString(),
     source: 'fallback',
   };
@@ -67,7 +62,7 @@ export async function getCoupangStep1Options(): Promise<CoupangStep1Options> {
     const desiredLocations = uniqueNonEmpty(rawData.desiredLocations ?? []);
 
     if (jobPositions.length === 0 || desiredLocations.length === 0) {
-      console.error('Invalid step1 options payload from GAS. Using fallback options.', rawData);
+      console.error('Invalid step1 options payload from GAS. Using empty fallback options.', rawData);
       return getFallbackOptions();
     }
 

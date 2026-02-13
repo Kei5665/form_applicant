@@ -1,10 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import {
-  JOB_POSITION_LABELS,
-  LOCATION_LABELS,
-} from '../constants';
 
 type SelectOption = {
   value: string;
@@ -22,8 +18,8 @@ function toOptions(values: string[]): SelectOption[] {
 
 function getFallbackOptions(): OptionsState {
   return {
-    jobPositionOptions: toOptions(Object.values(JOB_POSITION_LABELS)),
-    locationOptions: toOptions(Object.values(LOCATION_LABELS)),
+    jobPositionOptions: [],
+    locationOptions: [],
   };
 }
 
@@ -76,4 +72,3 @@ export function useCoupangStep1Options() {
     isLoadingOptions,
   };
 }
-
