@@ -79,7 +79,7 @@ export const FORM_PRESETS: Record<FormPreset, FormPresetConfig> = {
   mechanic: {
     headerLogoSrc: '/images/mechanic-logo.png',
     headerUpperText: 'ホワイト企業への整備士転職なら',
-    headerLowerText: 'ライドジョブ メカニクス',
+    headerLowerText: 'ライドジョブメカニック',
     loadingLogoSrc: '/images/ride_logo.svg',
     step1ImageSrc: '/images/STEP1.webp',
     step2ImageSrc: '/images/STEP2.webp',

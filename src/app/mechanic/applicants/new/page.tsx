@@ -74,7 +74,7 @@ export default function MechanicApplicationComplete() {
             />
             <div className="text-right text-[11px] leading-relaxed text-gray-700">
               <p>ホワイト企業への整備士転職なら</p>
-              <p className="font-semibold text-gray-900">ライドジョブ メカニクス</p>
+              <p className="font-semibold text-gray-900">ライドジョブメカニック</p>
             </div>
           </div>
       </header>
