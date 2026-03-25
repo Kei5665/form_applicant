@@ -45,10 +45,14 @@ export default function MechanicQualificationCard({
     onSelect(value);
   };
 
+  const isNewgrad = formOrigin === 'mechanic_newgrad';
   const isNextEnabled = Boolean(selectedQualification);
 
-  const cardOptions = qualificationOptions.filter((option) => option.value !== 'none');
-  const noneOption = qualificationOptions.find((option) => option.value === 'none');
+  const newgradValues: MechanicQualification[] = ['level3', 'level2', 'level1'];
+  const cardOptions = isNewgrad
+    ? qualificationOptions.filter((option) => newgradValues.includes(option.value))
+    : qualificationOptions.filter((option) => option.value !== 'none');
+  const noneOption = isNewgrad ? null : qualificationOptions.find((option) => option.value === 'none');
 
   return (
     <FormCard isActive={isActive} className="pb-6 mt-10">
@@ -56,7 +60,7 @@ export default function MechanicQualificationCard({
 
       <div className="mb-6 text-center">
         <p className="text-xs font-semibold text-gray-500">条件に合った求人を検索します</p>
-        <h2 className="mt-2 text-lg font-bold text-gray-900">{formOrigin === 'mechanic_newgrad' ? '通学コースを教えてください' : '保有資格を教えてください'}</h2>
+        <h2 className="mt-2 text-lg font-bold text-gray-900">{isNewgrad ? '取得見込みの資格を教えてください' : '保有資格を教えてください'}</h2>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4">
