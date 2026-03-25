@@ -299,7 +299,7 @@ function ApplicationFormInner({
             onNext={handleNextMechanicQualification}
             onPrevious={handlePreviousCard}
             isActive={cardStates.isCard1Active}
-            progress={{ currentStep: 1, totalSteps: 6 }}
+            progress={{ currentStep: 1, totalSteps: 5 }}
           />
 
           <BirthDateCard
@@ -309,7 +309,7 @@ function ApplicationFormInner({
             onNext={handleNextCard2}
             onPrevious={handlePreviousCard}
             isActive={cardStates.isCard2Active}
-            progress={{ currentStep: 2, totalSteps: 6 }}
+            progress={{ currentStep: 2, totalSteps: 5 }}
           />
 
           <NameCard
@@ -321,7 +321,7 @@ function ApplicationFormInner({
             onPrevious={handlePreviousCard}
             onNext={handleNextCard3}
             isActive={cardStates.isCard3Active}
-            progress={{ currentStep: 3, totalSteps: 6 }}
+            progress={{ currentStep: 3, totalSteps: 5 }}
           />
 
           <NameInputCard
@@ -334,7 +334,7 @@ function ApplicationFormInner({
             onPrevious={handlePreviousCard}
             onNext={handleNextCard4}
             isActive={cardStates.isCard4Active}
-            progress={{ currentStep: 4, totalSteps: 6 }}
+            progress={{ currentStep: 4, totalSteps: 5 }}
           />
 
           <PhoneNumberCard
@@ -353,7 +353,7 @@ function ApplicationFormInner({
             showEmailField={true}
             preferPhoneFirst={true}
             submitButtonText="求人情報を受け取る"
-            progress={{ currentStep: 6, totalSteps: 6 }}
+            progress={{ currentStep: 5, totalSteps: 5 }}
           />
         </>
       ) : resolvedFormOrigin === 'coupang' ? (
