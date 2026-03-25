@@ -1,4 +1,4 @@
-import type { MechanicQualification } from '../types';
+import type { FormOrigin, MechanicQualification } from '../types';
 
 const qualificationLabels: Record<MechanicQualification, string> = {
   none: '資格なし',
@@ -13,4 +13,8 @@ export function mapMechanicQualifications(qualification: MechanicQualification |
     return '未選択';
   }
   return qualificationLabels[qualification] ?? '未選択';
+}
+
+export function getMechanicQualificationFieldLabel(formOrigin?: FormOrigin): string {
+  return formOrigin === 'mechanic_newgrad' ? '通学コース' : '保有資格';
 }

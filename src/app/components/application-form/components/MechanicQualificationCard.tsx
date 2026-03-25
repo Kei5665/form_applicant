@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import FormCard from './FormCard';
 import StepProgressBar from './StepProgressBar';
-import type { FormErrors, MechanicQualification } from '../types';
+import type { FormErrors, FormOrigin, MechanicQualification } from '../types';
 
 type MechanicQualificationCardProps = {
   selectedQualification: MechanicQualification | '';
@@ -12,6 +12,7 @@ type MechanicQualificationCardProps = {
   onNext: () => void;
   onPrevious?: () => void;
   isActive: boolean;
+  formOrigin?: FormOrigin;
   progress: {
     currentStep: number;
     totalSteps: number;
@@ -37,6 +38,7 @@ export default function MechanicQualificationCard({
   onNext,
   onPrevious,
   isActive,
+  formOrigin = 'mechanic',
   progress,
 }: MechanicQualificationCardProps) {
   const handleToggle = (value: MechanicQualification) => {
@@ -54,7 +56,7 @@ export default function MechanicQualificationCard({
 
       <div className="mb-6 text-center">
         <p className="text-xs font-semibold text-gray-500">条件に合った求人を検索します</p>
-        <h2 className="mt-2 text-lg font-bold text-gray-900">保有資格を教えてください</h2>
+        <h2 className="mt-2 text-lg font-bold text-gray-900">{formOrigin === 'mechanic_newgrad' ? '通学コースを教えてください' : '保有資格を教えてください'}</h2>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4">

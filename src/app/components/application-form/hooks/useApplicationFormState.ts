@@ -38,6 +38,8 @@ const initialFormData: FormData = {
 export function useApplicationFormState({ showLoadingScreen, imagesToPreload, variant, formOrigin, enableJobTimingStep }: UseApplicationFormStateParams) {
   const router = useRouter();
   const isMechanic = formOrigin === 'mechanic';
+  const isMechanicNewgrad = formOrigin === 'mechanic_newgrad';
+  const isMechanicLike = isMechanic || isMechanicNewgrad;
   const [loading, setLoading] = useState(showLoadingScreen);
   const [currentCardIndex, setCurrentCardIndex] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -64,7 +66,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
     markFormClean,
     setPendingNavigation,
     setExitModalVariant,
-    phoneCardIndex: isMechanic ? 8 : formOrigin === 'coupang' ? 3 : enableJobTimingStep ? 5 : 4,
+    phoneCardIndex: isMechanic ? 8 : isMechanicNewgrad ? 5 : formOrigin === 'coupang' ? 3 : enableJobTimingStep ? 5 : 4,
   });
 
   const getStepNumber = useCallback(
@@ -118,7 +120,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
   const loadJobCount = useCallback(async (params: Partial<JobCountParams>) => {
     const hasPostal = typeof params.postalCode === 'string' && params.postalCode.trim().length > 0;
     const hasPref = typeof params.prefectureId === 'string' && params.prefectureId.trim().length > 0;
-    const jobCategoryIds = formOrigin === 'mechanic' ? ['3', '10'] : undefined;
+    const jobCategoryIds = isMechanicLike ? ['3', '10'] : undefined;
 
     if (!hasPostal && !hasPref) {
       setJobResult({ jobCount: null, message: '', isLoading: false, error: '' });
@@ -145,7 +147,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       console.error('Error fetching job count:', error);
       setJobResult({ jobCount: null, message: '', isLoading: false, error: '求人件数の取得中にエラーが発生しました' });
     }
-  }, [formOrigin]);
+  }, [isMechanicLike]);
 
   const isSubmitReady = useCallback(
     (phoneNumber: string, email: string) => {
@@ -153,8 +155,8 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       if (trimmedPhone.length !== 11 || !isValidPhoneNumber(trimmedPhone)) {
         return false;
       }
-      // coupangとmechanicはメールアドレス必須
-      if (formOrigin === 'coupang' || formOrigin === 'mechanic') {
+      // coupangとmechanic系はメールアドレス必須
+      if (formOrigin === 'coupang' || isMechanicLike) {
         const trimmedEmail = email.trim();
         if (!trimmedEmail) {
           return false;
@@ -163,7 +165,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       }
       return true;
     },
-    [formOrigin]
+    [formOrigin, isMechanicLike]
   );
 
   const validatePhoneNumberInput = useCallback(
@@ -189,7 +191,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
   const validateEmailInput = useCallback(
     (email: string) => {
-      if (formOrigin !== 'coupang' && formOrigin !== 'mechanic') {
+      if (formOrigin !== 'coupang' && !isMechanicLike) {
         return;
       }
       const trimmed = email.trim();
@@ -207,7 +209,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
       const submitReady = isSubmitReady(formData.phoneNumber, trimmed);
       setIsSubmitDisabled(!submitReady);
     },
-    [formData.phoneNumber, formOrigin, isSubmitReady]
+    [formData.phoneNumber, formOrigin, isMechanicLike, isSubmitReady]
   );
 
   const handleInputChange = useCallback(
@@ -571,7 +573,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         setIsSubmitDisabled(true);
         return;
       }
-      const finalValidation = validateFinalStep(formData, formOrigin === 'coupang' || formOrigin === 'mechanic');
+      const finalValidation = validateFinalStep(formData, formOrigin === 'coupang' || isMechanicLike);
       if (!finalValidation.isValid) {
         setErrors((prev) => ({ ...prev, ...finalValidation.errors }));
         setIsSubmitDisabled(true);
@@ -650,7 +652,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           }
         }
         
-        const targetPath = formOrigin === 'mechanic'
+        const targetPath = isMechanicLike
           ? '/mechanic/applicants/new'
           : formOrigin === 'coupang' ? '/coupang/applicants/new' : '/applicants/new';
         router.push(targetPath);
@@ -660,7 +662,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         setIsSubmitting(false);
       }
     },
-    [formData, formOrigin, router, variant, isSubmitting, jobResult.prefectureId]
+    [formData, formOrigin, isMechanicLike, router, variant, isSubmitting, jobResult.prefectureId]
   );
 
   const cardStates = useMemo(
@@ -676,6 +678,20 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           isCard6Active: currentCardIndex === 6,
           isCard7Active: currentCardIndex === 7,
           isCard8Active: currentCardIndex === 8,
+        };
+      }
+
+      if (formOrigin === 'mechanic_newgrad') {
+        // mechanic_newgrad: 5カード (Qualification, BirthDate, PostalCode, Name, Contact)
+        return {
+          isCard1Active: currentCardIndex === 1,
+          isCard2Active: currentCardIndex === 2,
+          isCard3Active: currentCardIndex === 3,
+          isCard4Active: currentCardIndex === 4,
+          isCard5Active: currentCardIndex === 5,
+          isCard6Active: false,
+          isCard7Active: false,
+          isCard8Active: false,
         };
       }
 

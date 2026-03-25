@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { FormData } from '@/app/components/application-form/types';
 import { mapJobTimingLabel } from '@/app/components/application-form/utils/mapJobTimingLabel';
-import { mapMechanicQualifications } from '@/app/components/application-form/utils/mapMechanicQualifications';
+import { getMechanicQualificationFieldLabel, mapMechanicQualifications } from '@/app/components/application-form/utils/mapMechanicQualifications';
 import { mapDesiredIncomeLabel } from '@/app/components/application-form/utils/mapDesiredIncomeLabel';
 
 // Types for submission payload
@@ -38,7 +38,7 @@ type ApplicantFormData = {
 type ApplicantSubmission = ApplicantFormData & {
   utmParams?: UTMParams;
   experiment?: ExperimentInfo;
-  formOrigin?: 'coupang' | 'default' | 'mechanic';
+  formOrigin?: 'coupang' | 'default' | 'mechanic' | 'mechanic_newgrad';
 };
 
 // UTM parameters to media name mapping function
@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
     // Determine form origin type
     const referer = request.headers.get('referer') || '';
     const isCoupang = formOrigin === 'coupang' || /\/coupang(\?|$|\/)?.*/.test(referer);
-    const isMechanic = formOrigin === 'mechanic' || /\/mechanic(\?|$|\/)?.*/.test(referer);
+    const isMechanicNewgrad = formOrigin === 'mechanic_newgrad' || /\/mechanic-newgrad(\?|$|\/)?.*/.test(referer);
+    const isMechanic = formOrigin === 'mechanic' || /\/mechanic(\?|$|\/)?.*/.test(referer) || isMechanicNewgrad;
 
     // Determine the appropriate Lark webhook URLs based on environment (with sensible fallbacks)
     const larkWebhookUrlCommon = isProduction
@@ -168,6 +169,10 @@ export async function POST(request: NextRequest) {
     const jobIntentLabel = mapJobTimingLabel(formData.jobIntent ?? '', 'default');
     const mechanicQualificationsLabel = mapMechanicQualifications(formData.mechanicQualification ?? '');
     const desiredIncomeLabel = mapDesiredIncomeLabel(formData.desiredIncome ?? '');
+    const qualificationFieldLabel = getMechanicQualificationFieldLabel(formOrigin);
+    const baseJobTimingLabel = isMechanicNewgrad ? '' : jobTimingLabel;
+    const baseJobIntentLabel = isMechanicNewgrad ? '' : jobIntentLabel;
+    const baseDesiredIncomeLabel = isMechanicNewgrad ? '' : desiredIncomeLabel;
     console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
     
     // 並列送信（Baseのみテスト中は直下の単独送信へ）
@@ -186,14 +191,18 @@ export async function POST(request: NextRequest) {
           ? `${formData.prefectureName || ''} ${formData.municipalityName || ''}`.trim()
           : '未入力';
         const mechanicQualificationsDisplay = isMechanic && mechanicQualificationsLabel
-          ? `\n保有資格: ${mechanicQualificationsLabel}`
+          ? `${qualificationFieldLabel}: ${mechanicQualificationsLabel}`
           : '';
-        const desiredIncomeDisplay = isMechanic && desiredIncomeLabel
-          ? `\n希望年収: ${desiredIncomeLabel}`
+        const desiredIncomeDisplay = isMechanic && !isMechanicNewgrad && desiredIncomeLabel
+          ? `希望年収: ${desiredIncomeLabel}`
           : '';
-        const jobIntentDisplay = isMechanic && jobIntentLabel
-          ? `\n転職意向: ${jobIntentLabel}`
+        const jobIntentDisplay = isMechanic && !isMechanicNewgrad && jobIntentLabel
+          ? `転職意向: ${jobIntentLabel}`
           : '';
+        const transferTimingDisplay = isMechanicNewgrad ? '' : `転職時期: ${jobTimingLabel || '未選択'}`;
+        const additionalFields = [transferTimingDisplay, desiredIncomeDisplay, mechanicQualificationsDisplay, jobIntentDisplay]
+          .filter(Boolean)
+          .join('\n');
         const messageContent = `
 ${title}
 -------------------------
@@ -202,8 +211,7 @@ ${title}
 氏名: ${formData.fullName || '未入力'} (${formData.fullNameKana || '未入力'})
 郵便番号: ${formData.postalCode || '未入力'}
 地域: ${locationDisplay}
-転職時期: ${jobTimingLabel || '未選択'}${desiredIncomeDisplay}${mechanicQualificationsDisplay}${jobIntentDisplay}
-電話番号: ${formData.phoneNumber || '未入力'}
+${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phoneNumber || '未入力'}
 メールアドレス: ${formData.email || '未入力'}
 -------------------------
         `.trim();
@@ -252,9 +260,9 @@ ${title}
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
           email: formData.email || '',
-          job_timing: jobTimingLabel,
-          job_intent: jobIntentLabel,
-          desired_income: desiredIncomeLabel,
+          job_timing: baseJobTimingLabel,
+          job_intent: baseJobIntentLabel,
+          desired_income: baseDesiredIncomeLabel,
           mechanic_qualifications: mechanicQualificationsLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',
@@ -309,9 +317,9 @@ ${title}
           municipality_name: formData.municipalityName || '',
           phone_number: formData.phoneNumber || '',
           email: formData.email || '',
-          job_timing: jobTimingLabel,
-          job_intent: jobIntentLabel,
-          desired_income: desiredIncomeLabel,
+          job_timing: baseJobTimingLabel,
+          job_intent: baseJobIntentLabel,
+          desired_income: baseDesiredIncomeLabel,
           mechanic_qualifications: mechanicQualificationsLabel,
           experiment_name: submissionData?.experiment?.name || '',
           experiment_variant: submissionData?.experiment?.variant || '',

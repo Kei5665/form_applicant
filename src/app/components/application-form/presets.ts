@@ -1,4 +1,4 @@
-export type FormPreset = 'default' | 'coupang' | 'mechanic';
+export type FormPreset = 'default' | 'coupang' | 'mechanic' | 'mechanic_newgrad';
 
 export interface FormPresetConfig {
   // Visual settings
@@ -23,7 +23,7 @@ export interface FormPresetConfig {
   useModal: boolean;
 
   // Form behavior
-  formOrigin: 'default' | 'coupang' | 'mechanic';
+  formOrigin: 'default' | 'coupang' | 'mechanic' | 'mechanic_newgrad';
 
   // Styling
   footerBgClassName: string;
@@ -92,6 +92,26 @@ export const FORM_PRESETS: Record<FormPreset, FormPresetConfig> = {
     enableJobTimingStep: true,
     useModal: true,
     formOrigin: 'mechanic',
+    footerBgClassName: '',
+    containerClassName: '',
+  },
+
+  mechanic_newgrad: {
+    headerLogoSrc: '/images/mechanic-logo.png',
+    headerUpperText: 'ホワイト企業への整備士転職なら',
+    headerLowerText: 'ライドジョブメカニック',
+    loadingLogoSrc: '/images/ride_logo.svg',
+    step1ImageSrc: '/images/STEP1.webp',
+    step2ImageSrc: '/images/STEP2.webp',
+    step3ImageSrc: '/images/STEP3.webp',
+    step4ImageSrc: '/images/STEP4.webp',
+    showHeader: true,
+    showLoadingScreen: true,
+    showFooterLogo: true,
+    showBottomImage: true,
+    enableJobTimingStep: true,
+    useModal: true,
+    formOrigin: 'mechanic_newgrad',
     footerBgClassName: '',
     containerClassName: '',
   },

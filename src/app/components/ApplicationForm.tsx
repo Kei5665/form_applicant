@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 
 import { BirthDateCard, DesiredIncomeCard, FormExitModal, JobTimingCard, MechanicJobTimingCard, MechanicQualificationCard, NameCard, NameInputCard, PhoneNumberCard, NameAndContactCard } from './application-form/components';
 import { useApplicationFormState } from './application-form/hooks/useApplicationFormState';
-import type { PeopleImageVariant } from './application-form/types';
+import type { FormOrigin, PeopleImageVariant } from './application-form/types';
 import { FORM_PRESETS, type FormPreset } from './application-form/presets';
 
 declare global {
@@ -26,7 +26,7 @@ interface ApplicationFormProps {
   variant: PeopleImageVariant;
 
   // オーバーライド用（オプション）- プリセット設定を上書きしたい場合に使用
-  formOrigin?: 'coupang' | 'default' | 'mechanic';
+  formOrigin?: FormOrigin;
   headerLogoSrc?: string;
   headerUpperText?: string;
   headerLowerText?: string;
@@ -137,7 +137,9 @@ function ApplicationFormInner({
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const modalContentRef = useRef<HTMLDivElement | null>(null);
-  const showLegalFooter = resolvedFormOrigin === 'default' || resolvedFormOrigin === 'mechanic';
+  const isMechanic = resolvedFormOrigin === 'mechanic';
+  const isMechanicNewgrad = resolvedFormOrigin === 'mechanic_newgrad';
+  const showLegalFooter = resolvedFormOrigin === 'default' || isMechanic || isMechanicNewgrad;
 
   useEffect(() => {
     if (!resolvedUseModal) return;
@@ -181,7 +183,7 @@ function ApplicationFormInner({
         </div>
       )}
 
-      {resolvedFormOrigin === 'mechanic' && (
+      {isMechanic && (
         <JobTimingCard
           selectedTiming={formData.jobIntent}
           errors={errors}
@@ -191,7 +193,7 @@ function ApplicationFormInner({
         />
       )}
 
-      {resolvedEnableJobTimingStep && resolvedFormOrigin !== 'mechanic' && (
+      {resolvedEnableJobTimingStep && !isMechanic && !isMechanicNewgrad && (
         <JobTimingCard
           selectedTiming={formData.jobTiming}
           errors={errors}
@@ -200,11 +202,12 @@ function ApplicationFormInner({
         />
       )}
 
-      {resolvedFormOrigin === 'mechanic' ? (
+      {isMechanic ? (
         <>
           <MechanicQualificationCard
             selectedQualification={formData.mechanicQualification}
             errors={errors}
+            formOrigin={resolvedFormOrigin}
             onSelect={(value) => handleMechanicQualificationSelect(value, true)}
             onNext={handleNextMechanicQualification}
             onPrevious={handlePreviousCard}
@@ -284,6 +287,73 @@ function ApplicationFormInner({
             preferPhoneFirst={true}
             submitButtonText="求人情報を受け取る"
             progress={{ currentStep: 7, totalSteps: 7 }}
+          />
+        </>
+      ) : isMechanicNewgrad ? (
+        <>
+          <MechanicQualificationCard
+            selectedQualification={formData.mechanicQualification}
+            errors={errors}
+            formOrigin={resolvedFormOrigin}
+            onSelect={(value) => handleMechanicQualificationSelect(value, true)}
+            onNext={handleNextMechanicQualification}
+            onPrevious={handlePreviousCard}
+            isActive={cardStates.isCard1Active}
+            progress={{ currentStep: 1, totalSteps: 6 }}
+          />
+
+          <BirthDateCard
+            birthDate={formData.birthDate}
+            errors={errors}
+            onChange={handleInputChange}
+            onNext={handleNextCard2}
+            onPrevious={handlePreviousCard}
+            isActive={cardStates.isCard2Active}
+            progress={{ currentStep: 2, totalSteps: 6 }}
+          />
+
+          <NameCard
+            postalCode={formData.postalCode}
+            prefectureId={formData.prefectureId}
+            municipalityId={formData.municipalityId}
+            errors={errors}
+            onChange={handleInputChange}
+            onPrevious={handlePreviousCard}
+            onNext={handleNextCard3}
+            isActive={cardStates.isCard3Active}
+            progress={{ currentStep: 3, totalSteps: 6 }}
+          />
+
+          <NameInputCard
+            formData={formData}
+            errors={errors}
+            jobResult={jobResult}
+            showJobCount={true}
+            onChange={handleInputChange}
+            onBlur={handleNameBlur}
+            onPrevious={handlePreviousCard}
+            onNext={handleNextCard4}
+            isActive={cardStates.isCard4Active}
+            progress={{ currentStep: 4, totalSteps: 6 }}
+          />
+
+          <PhoneNumberCard
+            jobResult={jobResult}
+            showJobCount={true}
+            formData={formData}
+            errors={errors}
+            phoneError={phoneError}
+            emailError={emailError}
+            phoneNumber={formData.phoneNumber}
+            onChange={handleInputChange}
+            onPrevious={handlePreviousCard}
+            isSubmitDisabled={isSubmitDisabled}
+            isSubmitting={isSubmitting}
+            isActive={cardStates.isCard5Active}
+            showEmailField={true}
+            preferPhoneFirst={true}
+            submitButtonText="求人情報を受け取る"
+            progress={{ currentStep: 6, totalSteps: 6 }}
           />
         </>
       ) : resolvedFormOrigin === 'coupang' ? (
