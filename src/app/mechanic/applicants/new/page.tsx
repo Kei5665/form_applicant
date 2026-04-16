@@ -167,6 +167,57 @@ export default function MechanicApplicationComplete() {
         </section>
 
         <section className="mt-12">
+          <div className="bg-[#9CCAF5] p-4">
+            <div className="rounded-xl bg-white px-6 py-8 shadow-[0_10px_25px_rgba(34,5,217,0.12)]">
+              <div className="text-center">
+                <p className="text-xl font-semibold text-[#2205D9]">RIDE JOBで転職した人の声</p>
+                <div className="mx-auto mt-2 h-0.5 w-10 rounded bg-[#2205D9]"></div>
+              </div>
+
+              <div className="mt-6 space-y-5 text-[15px] leading-relaxed text-gray-900">
+                <p>
+                  転職活動中の不安な気持ちを、担当の方が常に寄り添って話を聞いてくださり、とても安心できました。
+                </p>
+                <p>
+                  対応も丁寧で、こちらの立場に立って考えてくださっているのが伝わってきました。
+                </p>
+                <p>
+                  おかげさまで納得のいくご縁に繋がりました。
+                  <br />
+                  感謝の気持ちでいっぱいです。
+                  <br />
+                  この度はありがとうございました。
+                </p>
+              </div>
+
+              <div className="mt-6 border-t border-dotted border-[#7AA7FF] pt-6">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">Cさん</p>
+                    <div className="mt-3 inline-flex items-center gap-2 whitespace-nowrap">
+                      <span className="rounded border border-[#2205D9] px-2 py-0.5 text-xs font-semibold text-[#2205D9]">
+                        前職
+                      </span>
+                      <span className="text-sm text-gray-700">整備士</span>
+                    </div>
+                    <p className="mt-1 text-base font-semibold text-gray-900">年齢：30代</p>
+                  </div>
+                  <div className="flex h-24 w-24 items-center justify-center">
+                    <Image
+                      src="/images/Profile Image.png"
+                      alt="転職者のアイコン"
+                      width={80}
+                      height={80}
+                      className="h-20 w-20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-12">
           <div className="flex items-center pl-2">
             <span className="mr-2 block h-6 w-1 rounded bg-[#2205D9]"></span>
             <h2 className="text-xl font-semibold text-gray-900">RIDE JOBが大切にしていること</h2>
@@ -176,19 +227,8 @@ export default function MechanicApplicationComplete() {
               私たちはおもてなしの心あふれるサポートを通して、求職者様の感動を作り出す転職支援をモットーにしています。
             </p>
             <p className="mt-4 text-lg leading-relaxed text-gray-900">
-              日本全国の移動を作り出すことを目指して、タクシー業界に特化した転職エージェント事業を行っています。
+              働くことで生きがいのある社会作りを目指して、整備士の転職エージェント事業を行っています。
             </p>
-          </div>
-          <div className="mt-6 overflow-hidden rounded-2xl border border-[#00A0E9] shadow-[0_8px_20px_rgba(0,160,233,0.25)]">
-            <div className="relative h-0 w-full pb-[56.25%]">
-              <iframe
-                src="https://www.youtube.com/embed/knB0b7Mq_KA?start=1101"
-                title="RIDE JOB紹介動画"
-                className="absolute left-0 top-0 h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
           </div>
         </section>
 
