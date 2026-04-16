@@ -41,7 +41,7 @@ export default function BusApplicationComplete() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('/api/jobs/random?categoryId=5&count=3');
+        const response = await fetch('/api/jobs/random?categoryId=5&prefectureIds=13,14&count=3');
         if (!response.ok) {
           console.error('Failed to fetch jobs');
           setIsLoadingJobs(false);

@@ -250,6 +250,34 @@ export async function getRandomJobsByPrefectureId(prefectureId: string, count: n
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
+export async function getRandomJobsByPrefectureIdsAndCategory(
+  prefectureIds: string[],
+  categoryId: string,
+  count: number = 3
+): Promise<Job[]> {
+  if (!hasMicrocmsEnv) {
+    throw new Error('microCMS environment variables are not set');
+  }
+  const ids = prefectureIds.map((id) => id.trim()).filter(Boolean);
+  if (ids.length === 0) {
+    return [];
+  }
+  const filters = buildFilters([
+    `prefecture[in]${ids.join(',')}`,
+    `jobCategory[equals]${categoryId.trim()}`,
+  ]);
+  if (!filters) {
+    return [];
+  }
+  const params = new URLSearchParams({ filters });
+  const response = await fetchAllFromMicroCMS<Job>('jobs', params);
+  if (response.length === 0) {
+    return [];
+  }
+  const shuffled = [...response].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
 export async function getLatestJobsByCategoryId(categoryId: string, count: number = 3): Promise<Job[]> {
   if (!hasMicrocmsEnv) {
     throw new Error('microCMS environment variables are not set');
