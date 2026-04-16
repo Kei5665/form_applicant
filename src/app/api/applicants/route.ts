@@ -38,7 +38,7 @@ type ApplicantFormData = {
 type ApplicantSubmission = ApplicantFormData & {
   utmParams?: UTMParams;
   experiment?: ExperimentInfo;
-  formOrigin?: 'coupang' | 'default' | 'mechanic' | 'mechanic_newgrad';
+  formOrigin?: 'coupang' | 'default' | 'bus' | 'mechanic' | 'mechanic_newgrad';
 };
 
 // UTM parameters to media name mapping function

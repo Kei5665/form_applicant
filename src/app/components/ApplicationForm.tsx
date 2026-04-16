@@ -139,7 +139,7 @@ function ApplicationFormInner({
   const modalContentRef = useRef<HTMLDivElement | null>(null);
   const isMechanic = resolvedFormOrigin === 'mechanic';
   const isMechanicNewgrad = resolvedFormOrigin === 'mechanic_newgrad';
-  const showLegalFooter = resolvedFormOrigin === 'default' || isMechanic || isMechanicNewgrad;
+  const showLegalFooter = resolvedFormOrigin === 'default' || resolvedFormOrigin === 'bus' || isMechanic || isMechanicNewgrad;
 
   useEffect(() => {
     if (!resolvedUseModal) return;

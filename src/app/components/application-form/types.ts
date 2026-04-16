@@ -1,6 +1,6 @@
 export type PeopleImageVariant = 'A' | 'B';
 
-export type FormOrigin = 'coupang' | 'default' | 'mechanic' | 'mechanic_newgrad';
+export type FormOrigin = 'coupang' | 'default' | 'bus' | 'mechanic' | 'mechanic_newgrad';
 
 export type BirthDate = string;
 
