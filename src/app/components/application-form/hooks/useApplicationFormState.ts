@@ -654,7 +654,11 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         
         const targetPath = isMechanicLike
           ? '/mechanic/applicants/new'
-          : formOrigin === 'coupang' ? '/coupang/applicants/new' : '/applicants/new';
+          : formOrigin === 'coupang'
+            ? '/coupang/applicants/new'
+            : formOrigin === 'bus'
+              ? '/bus/applicants/new'
+              : '/applicants/new';
         router.push(targetPath);
       } catch (error) {
         console.error('Error submitting form:', error);
