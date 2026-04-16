@@ -259,22 +259,33 @@ export async function getRandomJobsByPrefectureIdsAndCategory(
     throw new Error('microCMS environment variables are not set');
   }
   const ids = prefectureIds.map((id) => id.trim()).filter(Boolean);
-  if (ids.length === 0) {
+  const trimmedCategoryId = categoryId.trim();
+  if (ids.length === 0 || !trimmedCategoryId) {
     return [];
   }
-  const filters = buildFilters([
-    `prefecture[in]${ids.join(',')}`,
-    `jobCategory[equals]${categoryId.trim()}`,
-  ]);
-  if (!filters) {
+
+  // microCMS の reference field では [in] が使えないため、都道府県ごとに
+  // AND フィルタで取得してマージする
+  const results = await Promise.all(
+    ids.map(async (prefectureId) => {
+      const filters = buildFilters([
+        `prefecture[equals]${prefectureId}`,
+        `jobCategory[equals]${trimmedCategoryId}`,
+      ]);
+      if (!filters) return [] as Job[];
+      const params = new URLSearchParams({ filters });
+      return fetchAllFromMicroCMS<Job>('jobs', params);
+    })
+  );
+
+  const merged = results.flat();
+  if (merged.length === 0) {
     return [];
   }
-  const params = new URLSearchParams({ filters });
-  const response = await fetchAllFromMicroCMS<Job>('jobs', params);
-  if (response.length === 0) {
-    return [];
-  }
-  const shuffled = [...response].sort(() => Math.random() - 0.5);
+
+  // id で重複除去
+  const unique = Array.from(new Map(merged.map((job) => [job.id, job])).values());
+  const shuffled = unique.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
