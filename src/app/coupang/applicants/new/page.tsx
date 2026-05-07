@@ -42,7 +42,7 @@ export default function CoupangApplicationComplete() {
           <p>空き枠があるうちに、以下より日程をご予約ください。</p>
         </div>
         <a
-          href="https://pmagent.eeasy.jp/liftjob"
+          href="https://eeasy-internal.vercel.app/book/cpj"
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full bg-[#ff6b35] hover:bg-[#e55a2b] text-white font-bold py-4 px-6 rounded-lg text-center transition-colors"

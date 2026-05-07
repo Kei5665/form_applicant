@@ -119,7 +119,7 @@ export default function ApplicationComplete() {
             </p>
             <div className="mt-6">
               <Link
-                href="https://meeting.eeasy.jp/ridejob./general"
+                href="https://eeasy-internal.vercel.app/book/ride"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block rounded-2xl bg-[#2205D9] py-4 text-center text-lg font-semibold text-white shadow-[0_6px_0_rgba(0,0,0,0.15)] transition-transform hover:translate-y-[1px]"
