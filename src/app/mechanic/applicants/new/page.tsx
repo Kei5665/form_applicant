@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BookingEmbed from "@/app/components/BookingEmbed";
 import JobCard from "@/app/components/JobCard";
 import type { Job } from "@/lib/microcms";
 
@@ -120,14 +121,7 @@ export default function MechanicApplicationComplete() {
           </div>
 
           <div className="mt-6">
-            <Link
-              href="https://eeasy-internal.vercel.app/book/mec"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block rounded-2xl bg-[#2205D9] py-4 text-center text-lg font-semibold text-white shadow-[0_6px_0_rgba(0,0,0,0.15)] transition-transform hover:translate-y-[1px]"
-            >
-              面談予約へ
-            </Link>
+            <BookingEmbed slug="mec" />
           </div>
         </section>
 
