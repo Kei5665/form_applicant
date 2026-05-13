@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
+import BookingEmbed from "@/app/components/BookingEmbed";
 
 declare global {
   interface Window {
@@ -41,14 +42,7 @@ export default function CoupangApplicationComplete() {
           <p>{currentMonth}から求人の問い合わせが急増しており、ご希望日時に面談枠をご用意できないことがあります。</p>
           <p>空き枠があるうちに、以下より日程をご予約ください。</p>
         </div>
-        <a
-          href="https://eeasy-internal.vercel.app/book/cpj"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block w-full bg-[#ff6b35] hover:bg-[#e55a2b] text-white font-bold py-4 px-6 rounded-lg text-center transition-colors"
-        >
-          面談予約へ<br />
-        </a>
+        <BookingEmbed slug="cpj" />
       </div>
 
       {/* Footer */}

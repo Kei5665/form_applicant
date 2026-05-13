@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BookingEmbed from "@/app/components/BookingEmbed";
 import JobCard from "@/app/components/JobCard";
 import type { Job } from "@/lib/microcms";
 
@@ -118,14 +119,7 @@ export default function BusApplicationComplete() {
               高年収の求人から採用枠が埋まります。少しでも早く知りたい方は、こちらから面談日程のご予約ください。
             </p>
             <div className="mt-6">
-              <Link
-                href="https://eeasy-internal.vercel.app/book/ride"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-2xl bg-[#2205D9] py-4 text-center text-lg font-semibold text-white shadow-[0_6px_0_rgba(0,0,0,0.15)] transition-transform hover:translate-y-[1px]"
-              >
-                面談予約へ
-              </Link>
+              <BookingEmbed slug="ride" />
             </div>
           </div>
         </section>
