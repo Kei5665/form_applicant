@@ -3,6 +3,10 @@ import type { FormData } from '@/app/components/application-form/types';
 import { mapJobTimingLabel } from '@/app/components/application-form/utils/mapJobTimingLabel';
 import { getMechanicQualificationFieldLabel, mapMechanicQualifications } from '@/app/components/application-form/utils/mapMechanicQualifications';
 import { mapDesiredIncomeLabel } from '@/app/components/application-form/utils/mapDesiredIncomeLabel';
+import {
+  isSupportedEmailOrigin,
+  sendApplicationConfirmationEmail,
+} from '@/lib/email/send-application-confirmation';
 
 // Types for submission payload
 type ExperimentInfo = {
@@ -293,7 +297,51 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
         console.warn('Lark Base Webhook URL is not configured. Skipping Base record creation.');
       }
 
-      // どちらも失敗しても応募自体は成功扱い
+      // 応募受付完了 自動返信メール送信タスク
+      // formOrigin が default/bus/mechanic/mechanic_newgrad かつ email がある場合のみ送信
+      // (Coupang は別ルート/別仕様のため対象外)
+      const emailOriginCandidate: string = formOrigin
+        ?? (isMechanicNewgrad ? 'mechanic_newgrad'
+          : isMechanic ? 'mechanic'
+          : isCoupang ? 'coupang'
+          : 'default');
+      if (isSupportedEmailOrigin(emailOriginCandidate) && formData.email) {
+        const recipientEmail = formData.email;
+        const origin = emailOriginCandidate;
+        tasks.push(
+          (async () => {
+            const result = await sendApplicationConfirmationEmail({
+              to: recipientEmail,
+              applicantName: formData.fullName || '',
+              applicantNameKana: formData.fullNameKana,
+              phoneNumber: formData.phoneNumber,
+              email: recipientEmail,
+              formOrigin: origin,
+            });
+            if (result.sent) {
+              console.log('Confirmation email sent:', {
+                to: recipientEmail,
+                messageId: result.messageId,
+                formOrigin: origin,
+              });
+            } else if (result.reason === 'error') {
+              console.error('Confirmation email failed:', {
+                to: recipientEmail,
+                error: result.error,
+                formOrigin: origin,
+              });
+            } else {
+              console.log('Confirmation email skipped:', {
+                to: recipientEmail,
+                reason: result.reason,
+                formOrigin: origin,
+              });
+            }
+          })()
+        );
+      }
+
+      // どれかが失敗しても応募自体は成功扱い (Lark/Base/メール全て)
       await Promise.allSettled(tasks);
     } else {
       // Baseのみ送信（テストモード）

@@ -84,6 +84,45 @@ LARK_SEND_BASE_ONLY=false
 - Gmail送信機能が不要な場合は`GAS_EMAIL_API_URL`を設定しなくても動作します
 - `GAS_COUPANG_STEP1_OPTIONS_API_URL`が未設定または取得失敗時は、Coupangの固定選択肢を使用します
 
+#### 応募受付メール送信（Gmail API / Service Account + DWD）
+ライドジョブ・ライドジョブメカニックの応募完了時に応募者へ自動返信メールを送る機能の設定です。
+Workspace側で「Service AccountにDomain-Wide Delegationでスコープ `https://www.googleapis.com/auth/gmail.send` を許可」しておく必要があります。
+
+```bash
+# 送信元アドレス (impersonate対象)。例: support_team@pmagent.jp
+GMAIL_SENDER_EMAIL=support_team@pmagent.jp
+
+# Service Account の JSON 鍵を base64 化したもの (1行に詰める)
+# 取得方法: base64 -w0 service-account.json
+GOOGLE_SERVICE_ACCOUNT_KEY_BASE64=ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIs...
+
+# (任意) 送信者表示名のオーバーライド。未指定ならフォーム種別ごとの既定値を使用
+# GMAIL_SENDER_NAME_OVERRIDE=ライドジョブ運営事務局
+
+# (任意) BCC 宛先 (カンマ区切り)。応募者からは見えず、チーム側だけ受信箱に届く
+# GMAIL_BCC=support_team@pmagent.jp,ridejob@pmagent.jp
+
+# (任意) CC 宛先 (カンマ区切り)。応募者からも見える形でCC
+# GMAIL_CC=ops@example.com
+
+# (任意) true なら実送信せずログのみ出力。ローカル開発・本番テスト用
+# EMAIL_DRY_RUN=true
+
+# (任意) false なら全フォームのメール送信を無効化（緊急停止用）
+# ENABLE_EMAIL_NOTIFICATION=true
+```
+
+**Workspace側の必須設定**:
+1. GCP プロジェクトで Gmail API を有効化 → サービスアカウント作成 → JSON鍵を発行
+2. Workspace 管理コンソール → セキュリティ → アクセスとデータ管理 → API 制御 → 「ドメイン全体の委任を管理」
+3. サービスアカウントの `client_id`(数字) と スコープ `https://www.googleapis.com/auth/gmail.send` を登録
+4. `GMAIL_SENDER_EMAIL` で指定するアドレスが当該Workspaceに存在すること
+
+**対象フォーム**:
+- `default`(RIDE JOB) / `bus` → 件名「【ライドジョブ】ご応募ありがとうございます」
+- `mechanic` / `mechanic_newgrad` → 件名「【ライドジョブメカニック】ご応募ありがとうございます」
+- `coupang` は別ルート/別仕様のため対象外
+
 ### 開発サーバー起動
 ```bash
 npm run dev

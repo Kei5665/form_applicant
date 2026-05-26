@@ -11,6 +11,7 @@
     "webhook:local": "node scripts/local-webhook.mjs"
   },
   "dependencies": {
+    "google-auth-library": "^10.6.2",
     "kuroshiro": "^1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "next": "^16.0.8",
@@ -26,6 +27,7 @@
     "eslint": "^9",
     "eslint-config-next": "^16.0.8",
     "tailwindcss": "^4",
+    "tsx": "^4.22.3",
     "typescript": "^5"
   }
 }
