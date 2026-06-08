@@ -601,6 +601,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
         let municipalityName = formData.municipalityId
           ? await fetchMunicipalityName(formData.municipalityId)
           : '';
+        let townName = '';
 
         // 郵便番号が入力されている場合、ZipCloud APIから住所情報を取得
         if (formData.postalCode && !formData.prefectureId && !formData.municipalityId) {
@@ -609,6 +610,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           if (addressInfo) {
             prefectureName = addressInfo.prefectureName || '';
             municipalityName = addressInfo.municipalityName || '';
+            townName = addressInfo.townName || '';
           }
         }
 
@@ -617,6 +619,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           birthDate: birthDateString,
           prefectureName,
           municipalityName,
+          townName,
           utmParams,
           experiment: { name: 'people_image', variant },
           formOrigin,

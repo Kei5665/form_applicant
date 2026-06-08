@@ -32,6 +32,7 @@ type ApplicantFormData = {
   prefectureName?: string;
   municipalityId?: string;
   municipalityName?: string;
+  townName?: string;
   phoneNumber?: string;
   email?: string;
   jobTiming?: FormData['jobTiming'];
@@ -210,8 +211,8 @@ export async function POST(request: NextRequest) {
         const utmDisplay = utmParams?.utm_source
           ? `${utmParams.utm_source}${utmParams.utm_medium ? `(${utmParams.utm_medium})` : ''}`
           : 'RIDEJOB HP';
-        const locationDisplay = formData.prefectureName || formData.municipalityName
-          ? `${formData.prefectureName || ''} ${formData.municipalityName || ''}`.trim()
+        const locationDisplay = formData.prefectureName || formData.municipalityName || formData.townName
+          ? `${formData.prefectureName || ''} ${formData.municipalityName || ''} ${formData.townName || ''}`.replace(/\s+/g, ' ').trim()
           : '未入力';
         const mechanicQualificationsDisplay = isMechanic && mechanicQualificationsLabel
           ? `${qualificationFieldLabel}: ${mechanicQualificationsLabel}`
@@ -283,6 +284,7 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           prefecture_name: formData.prefectureName || '',
           municipality_id: formData.municipalityId || '',
           municipality_name: formData.municipalityName || '',
+          town_name: formData.townName || '',
           phone_number: formData.phoneNumber || '',
           email: formData.email || '',
           job_timing: baseJobTimingLabel,
@@ -384,6 +386,7 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           prefecture_name: formData.prefectureName || '',
           municipality_id: formData.municipalityId || '',
           municipality_name: formData.municipalityName || '',
+          town_name: formData.townName || '',
           phone_number: formData.phoneNumber || '',
           email: formData.email || '',
           job_timing: baseJobTimingLabel,
