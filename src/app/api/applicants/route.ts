@@ -46,6 +46,25 @@ type ApplicantSubmission = ApplicantFormData & {
 };
 
 // UTM parameters to media name mapping function
+// 生年月日（YYYY-MM-DD）から年齢を計算する。算出できない場合は null を返す
+function calculateAge(birthDate?: string): string | null {
+  if (!birthDate) return null;
+  const match = birthDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const [, y, m, d] = match;
+  const year = Number(y);
+  const month = Number(m);
+  const day = Number(d);
+  const now = new Date();
+  let age = now.getFullYear() - year;
+  const monthDiff = now.getMonth() + 1 - month;
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < day)) {
+    age -= 1;
+  }
+  if (age < 0 || age > 120) return null;
+  return `${age}歳`;
+}
+
 function getMediaName(utmParams: { utm_source?: string; utm_medium?: string }): string {
   const { utm_source, utm_medium } = utmParams;
   
@@ -207,11 +226,13 @@ export async function POST(request: NextRequest) {
         const additionalFields = [transferTimingDisplay, desiredIncomeDisplay, mechanicQualificationsDisplay, jobIntentDisplay]
           .filter(Boolean)
           .join('\n');
+        const ageDisplay = calculateAge(formData.birthDate) ?? '未入力';
         const messageContent = `
 ${title}
 -------------------------
 流入元: ${utmDisplay}
 生年月日: ${formData.birthDate || '未入力'}
+年齢: ${ageDisplay}
 氏名: ${formData.fullName || '未入力'} (${formData.fullNameKana || '未入力'})
 郵便番号: ${formData.postalCode || '未入力'}
 地域: ${locationDisplay}
