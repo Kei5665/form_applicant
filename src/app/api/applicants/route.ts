@@ -7,6 +7,7 @@ import {
   isSupportedEmailOrigin,
   sendApplicationConfirmationEmail,
 } from '@/lib/email/send-application-confirmation';
+import { sendApplicationSms } from '@/lib/sms/send-application-sms';
 
 // Types for submission payload
 type ExperimentInfo = {
@@ -359,6 +360,29 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
                 reason: result.reason,
                 formOrigin: origin,
               });
+            }
+          })()
+        );
+      }
+
+      // 新規応募SMS(Meta流入・ライド/メカのみ)。電話はフォームで取得済み。
+      // 送信本体は eeasy の共通エンドポイントに委譲(文面/送信/効果測定記録を一元化)。
+      const isMetaInflow = (utmParams?.utm_source || '').toLowerCase() === 'meta';
+      const smsChannel: 'ridejob' | 'mechanic' | null =
+        isCoupang || formOrigin === 'bus' ? null : isMechanic ? 'mechanic' : 'ridejob';
+      if (isMetaInflow && smsChannel && formData.phoneNumber) {
+        const channel = smsChannel;
+        tasks.push(
+          (async () => {
+            const r = await sendApplicationSms({
+              channel,
+              phone: formData.phoneNumber,
+              applicantName: formData.fullName,
+            });
+            if (r.sent) {
+              console.log('Meta SMS sent:', { order: r.deliveryOrderId, ref: r.ref, channel });
+            } else {
+              console.log('Meta SMS skipped/failed:', { reason: r.reason, error: r.error, channel });
             }
           })()
         );
