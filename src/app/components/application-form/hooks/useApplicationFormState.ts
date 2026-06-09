@@ -590,6 +590,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           utm_campaign: urlParams.get('utm_campaign') || '',
           utm_term: urlParams.get('utm_term') || '',
           utm_creative: urlParams.get('utm_creative') || '',
+          utm_content: urlParams.get('utm_content') || '', // Meta広告: {{ad.id}} を想定
         };
 
         const birthDateString = formData.birthDate.length === 8
