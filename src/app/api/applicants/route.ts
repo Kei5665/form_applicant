@@ -119,6 +119,12 @@ function getMediaName(utmParams: { utm_source?: string; utm_medium?: string }): 
   }
 }
 
+// Meta(Facebook/Instagram)広告の流入判定。広告側UTMは utm_source=fb 等で来るため複数表記を許容する。
+const META_UTM_SOURCES = new Set(['meta', 'fb', 'facebook', 'ig', 'instagram']);
+function isMetaUtmSource(utmSource?: string): boolean {
+  return META_UTM_SOURCES.has((utmSource || '').toLowerCase());
+}
+
 export async function POST(request: NextRequest) {
   try {
     const submissionData = (await request.json()) as ApplicantSubmission;
@@ -204,7 +210,7 @@ export async function POST(request: NextRequest) {
 
     // Meta広告の広告ID(ad.id)から広告画像URLを解決する。
     // 入稿URLに utm_content={{ad.id}} を仕込む想定。後方互換で utm_creative が数値なら ad.id とみなす。
-    const isMetaInflowForImage = isCoupang || (utmParams?.utm_source || '').toLowerCase() === 'meta';
+    const isMetaInflowForImage = isCoupang || isMetaUtmSource(utmParams?.utm_source);
     const adId = isLikelyAdId(utmParams?.utm_content)
       ? (utmParams?.utm_content as string)
       : isLikelyAdId(utmParams?.utm_creative)
@@ -391,24 +397,26 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
         );
       }
 
-      // 新規応募SMS(Meta流入・ライド/メカのみ)。電話はフォームで取得済み。
-      // 送信本体は eeasy の共通エンドポイントに委譲(文面/送信/効果測定記録を一元化)。
-      const isMetaInflow = (utmParams?.utm_source || '').toLowerCase() === 'meta';
+      // 新規応募SMS(ライド/メカの全応募者)。流入元では絞らない(電話を残した応募者に予約リンクを送る)。
+      // coupang / bus は対象外(smsChannel=null)。送信本体は eeasy の共通エンドポイントに委譲。
+      // media には実際の流入元(utm_source)を渡す。無ければ 'form'。
       const smsChannel: 'ridejob' | 'mechanic' | null =
         isCoupang || formOrigin === 'bus' ? null : isMechanic ? 'mechanic' : 'ridejob';
-      if (isMetaInflow && smsChannel && formData.phoneNumber) {
+      if (smsChannel && formData.phoneNumber) {
         const channel = smsChannel;
+        const media = (utmParams?.utm_source || 'form').toLowerCase().slice(0, 32);
         tasks.push(
           (async () => {
             const r = await sendApplicationSms({
               channel,
               phone: formData.phoneNumber,
               applicantName: formData.fullName,
+              media,
             });
             if (r.sent) {
-              console.log('Meta SMS sent:', { order: r.deliveryOrderId, ref: r.ref, channel });
+              console.log('Application SMS sent:', { order: r.deliveryOrderId, ref: r.ref, channel, media });
             } else {
-              console.log('Meta SMS skipped/failed:', { reason: r.reason, error: r.error, channel });
+              console.log('Application SMS skipped/failed:', { reason: r.reason, error: r.error, channel, media });
             }
           })()
         );

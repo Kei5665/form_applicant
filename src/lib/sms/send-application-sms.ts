@@ -1,5 +1,5 @@
 /**
- * 新規応募SMS送信の高レベル API(Meta流入のフォーム応募者向け)。
+ * 新規応募SMS送信の高レベル API(ライド/メカのフォーム応募者向け・流入元不問)。
  *
  * 送信本体は eeasy(leomeet) の共通エンドポイント /api/sms/send に委譲する
  * (文面・事業部マッピング・CPaaS送信・効果測定記録は eeasy 側に一元化)。
@@ -29,6 +29,8 @@ export async function sendApplicationSms(input: {
   channel: SmsChannel;
   phone?: string;
   applicantName?: string;
+  /** 流入元ラベル(eeasy の sms_messages.media に記録)。未指定は 'form'。 */
+  media?: string;
 }): Promise<SmsSendResult> {
   if (process.env.META_SMS_ENABLED !== 'true') {
     return { sent: false, reason: 'disabled' };
@@ -56,7 +58,7 @@ export async function sendApplicationSms(input: {
       body: JSON.stringify({
         phone: input.phone,
         channel: input.channel,
-        media: 'meta',
+        media: input.media || 'form',
         applicantName: input.applicantName || undefined,
       }),
     });
