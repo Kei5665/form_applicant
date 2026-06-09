@@ -179,12 +179,19 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${safeSubject}</title>
+  <style>
+    /* モバイル(600px以下)では左右の余白を詰めて本文の表示幅を広げる。
+       縦方向のパディングは各セルのインライン指定をそのまま維持する。 */
+    @media only screen and (max-width:600px) {
+      .px { padding-left:20px !important; padding-right:20px !important; }
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background:${COLOR_PAGE_BG};font-family:${FONT_STACK};color:${COLOR_TEXT};line-height:1.9;-webkit-font-smoothing:antialiased;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${COLOR_PAGE_BG};">
-    <tr><td align="center" style="padding:40px 16px;">
+    <tr><td align="center" style="padding:0;">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:${COLOR_CARD_BG};border-radius:6px;">
-        <tr><td style="padding:48px 40px 16px 40px;">
+        <tr><td class="px" style="padding:48px 40px 16px 40px;">
 
           ${sectionLabel('MESSAGE', `${content.brandName}より`)}
 
@@ -200,11 +207,11 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
 
         </td></tr>
 
-        <tr><td style="padding:24px 40px 0 40px;">
+        <tr><td class="px" style="padding:24px 40px 0 40px;">
           <div style="border-top:1px solid ${COLOR_BORDER};height:0;line-height:0;font-size:0;">&nbsp;</div>
         </td></tr>
 
-        <tr><td style="padding:28px 40px 8px 40px;">
+        <tr><td class="px" style="padding:28px 40px 8px 40px;">
 
           <div style="font-size:15px;color:${COLOR_TEXT};font-weight:bold;line-height:1.8;padding-bottom:8px;">
             ${escapeHtml(content.ctaHeading)}
@@ -234,11 +241,11 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
 
         </td></tr>
 
-        <tr><td style="padding:0 40px;">
+        <tr><td class="px" style="padding:0 40px;">
           <div style="border-top:1px solid ${COLOR_BORDER};height:0;line-height:0;font-size:0;">&nbsp;</div>
         </td></tr>
 
-        <tr><td style="padding:24px 40px 40px 40px;">
+        <tr><td class="px" style="padding:24px 40px 40px 40px;">
           <div style="font-size:12px;color:#666666;line-height:1.9;">
             株式会社PM Agent<br>
             <a href="https://pmagent.jp/" style="color:${COLOR_GOLD};text-decoration:underline;">https://pmagent.jp/</a>
