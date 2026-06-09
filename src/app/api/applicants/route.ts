@@ -300,6 +300,7 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           client_ip: clientIp,
           form_origin: formOrigin || '',
           is_coupang: isCoupang,
+          page_url: referer,
         } as Record<string, unknown>;
 
         tasks.push(
@@ -425,6 +426,7 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           client_ip: clientIp,
           form_origin: formOrigin || '',
           is_coupang: isCoupang,
+          page_url: referer,
         } as Record<string, unknown>;
 
         const resp = await fetch(baseWebhookUrl, {
