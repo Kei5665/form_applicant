@@ -8,6 +8,7 @@ import {
   sendApplicationConfirmationEmail,
 } from '@/lib/email/send-application-confirmation';
 import { sendApplicationSms } from '@/lib/sms/send-application-sms';
+import { resolveAdImageUrl, isLikelyAdId } from '@/lib/meta/resolveAdImage';
 
 // Types for submission payload
 type ExperimentInfo = {
@@ -21,6 +22,7 @@ type UTMParams = {
   utm_campaign?: string;
   utm_term?: string;
   utm_creative?: string;
+  utm_content?: string; // Meta広告: {{ad.id}} を想定
 };
 
 type ApplicantFormData = {
@@ -199,7 +201,26 @@ export async function POST(request: NextRequest) {
     const baseJobIntentLabel = isMechanicNewgrad ? '' : jobIntentLabel;
     const baseDesiredIncomeLabel = isMechanicNewgrad ? '' : desiredIncomeLabel;
     console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
-    
+
+    // Meta広告の広告ID(ad.id)から広告画像URLを解決する。
+    // 入稿URLに utm_content={{ad.id}} を仕込む想定。後方互換で utm_creative が数値なら ad.id とみなす。
+    const isMetaInflowForImage = isCoupang || (utmParams?.utm_source || '').toLowerCase() === 'meta';
+    const adId = isLikelyAdId(utmParams?.utm_content)
+      ? (utmParams?.utm_content as string)
+      : isLikelyAdId(utmParams?.utm_creative)
+        ? (utmParams?.utm_creative as string)
+        : '';
+    let adImageUrl = '';
+    let adCreativeId = '';
+    if (isMetaInflowForImage && adId) {
+      const resolved = await resolveAdImageUrl(adId);
+      if (resolved) {
+        adImageUrl = resolved.imageUrl || '';
+        adCreativeId = resolved.creativeId || '';
+      }
+      console.log('Resolved Meta ad image:', { adId, adImageUrl: adImageUrl ? '(取得済)' : '(なし)', adCreativeId });
+    }
+
     // 並列送信（Baseのみテスト中は直下の単独送信へ）
     if (!sendBaseOnly) {
       const tasks: Promise<void>[] = [];
@@ -277,6 +298,10 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           utm_creative: utmParams?.utm_creative || '',
+          utm_content: utmParams?.utm_content || '',
+          ad_id: adId,
+          ad_creative_id: adCreativeId,
+          ad_image_url: adImageUrl,
           birth_date: formData.birthDate || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',
@@ -403,6 +428,10 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           utm_creative: utmParams?.utm_creative || '',
+          utm_content: utmParams?.utm_content || '',
+          ad_id: adId,
+          ad_creative_id: adCreativeId,
+          ad_image_url: adImageUrl,
           birth_date: formData.birthDate || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',

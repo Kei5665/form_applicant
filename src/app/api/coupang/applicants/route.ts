@@ -5,6 +5,7 @@ import {
   LOCATION_LABELS,
 } from '@/app/components/coupang-form/constants';
 import { getCoupangStep1Options } from '../step1-options/options';
+import { resolveAdImageUrl, isLikelyAdId } from '@/lib/meta/resolveAdImage';
 
 type UTMParams = {
   utm_source?: string;
@@ -12,6 +13,7 @@ type UTMParams = {
   utm_campaign?: string;
   utm_term?: string;
   utm_creative?: string;
+  utm_content?: string; // Meta広告: {{ad.id}} を想定
 };
 
 type CoupangSubmission = CoupangFormData & {
@@ -71,6 +73,24 @@ export async function POST(request: NextRequest) {
       : '未選択';
     const ageLabel = formData.age ? `${formData.age}歳` : '未選択';
     const birthDateLabel = formData.birthDate || '未入力';
+
+    // Meta広告の広告ID(ad.id)から広告画像URLを解決する（Coupangは常にMeta流入）。
+    // 入稿URLに utm_content={{ad.id}} を仕込む想定。後方互換で utm_creative が数値なら ad.id とみなす。
+    const adId = isLikelyAdId(utmParams?.utm_content)
+      ? (utmParams?.utm_content as string)
+      : isLikelyAdId(utmParams?.utm_creative)
+        ? (utmParams?.utm_creative as string)
+        : '';
+    let adImageUrl = '';
+    let adCreativeId = '';
+    if (adId) {
+      const resolved = await resolveAdImageUrl(adId);
+      if (resolved) {
+        adImageUrl = resolved.imageUrl || '';
+        adCreativeId = resolved.creativeId || '';
+      }
+      console.log('Resolved Meta ad image (coupang):', { adId, adImageUrl: adImageUrl ? '(取得済)' : '(なし)', adCreativeId });
+    }
 
     // 並列送信
     if (!sendBaseOnly) {
@@ -132,6 +152,10 @@ export async function POST(request: NextRequest) {
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           utm_creative: utmParams?.utm_creative || '',
+          utm_content: utmParams?.utm_content || '',
+          ad_id: adId,
+          ad_creative_id: adCreativeId,
+          ad_image_url: adImageUrl,
           email: formData.email || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',
@@ -178,6 +202,10 @@ export async function POST(request: NextRequest) {
           utm_campaign: utmParams?.utm_campaign || '',
           utm_term: utmParams?.utm_term || '',
           utm_creative: utmParams?.utm_creative || '',
+          utm_content: utmParams?.utm_content || '',
+          ad_id: adId,
+          ad_creative_id: adCreativeId,
+          ad_image_url: adImageUrl,
           email: formData.email || '',
           full_name: formData.fullName || '',
           full_name_kana: formData.fullNameKana || '',
