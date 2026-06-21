@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // マルチゾーン配信: ridejob.jp 配下へ複製する deployment でのみ NEXT_PUBLIC_BASE_PATH=/entry を設定する。
+  // 既存の ridejob.pmagent.jp（単独ドメイン）deployment では未設定＝basePathなし（挙動不変）。
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
   images: {
     // Vercelで自動的にAVIF/WebP形式に変換
     formats: ['image/avif', 'image/webp'],

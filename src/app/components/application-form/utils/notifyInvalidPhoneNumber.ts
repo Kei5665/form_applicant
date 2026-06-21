@@ -1,10 +1,11 @@
+import { apiPath } from '@/lib/basePath';
 import type { FormData } from '../types';
 
 type NotifyPayload = Pick<FormData, 'fullName' | 'phoneNumber'>;
 
 export async function notifyInvalidPhoneNumber(payload: NotifyPayload) {
   try {
-    await fetch('/api/notify_invalid_phone', {
+    await fetch(apiPath('/api/notify_invalid_phone'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

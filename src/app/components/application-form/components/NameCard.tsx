@@ -1,5 +1,6 @@
 'use client';
 
+import { apiPath } from '@/lib/basePath';
 import { useEffect, useMemo, useState } from 'react';
 
 import Image from 'next/image';
@@ -47,7 +48,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
     const loadPrefectures = async () => {
       setIsPrefectureLoading(true);
       try {
-        const response = await fetch('/api/location/prefectures');
+        const response = await fetch(apiPath('/api/location/prefectures'));
         if (!response.ok) {
           throw new Error('Failed to load prefectures');
         }
@@ -90,7 +91,7 @@ export default function NameCard({ stepImageSrc, postalCode, prefectureId, munic
     const loadMunicipalities = async () => {
       setIsMunicipalityLoading(true);
       try {
-        const response = await fetch(`/api/location/municipalities?prefectureId=${prefectureId}`);
+        const response = await fetch(apiPath(`/api/location/municipalities?prefectureId=${prefectureId}`));
         if (!response.ok) {
           throw new Error('Failed to load municipalities');
         }

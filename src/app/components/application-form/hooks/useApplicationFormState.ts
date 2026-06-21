@@ -1,5 +1,6 @@
 'use client';
 
+import { apiPath } from '@/lib/basePath';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -626,7 +627,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           formOrigin,
         } as Record<string, unknown>;
 
-        const response = await fetch('/api/applicants', {
+        const response = await fetch(apiPath('/api/applicants'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),

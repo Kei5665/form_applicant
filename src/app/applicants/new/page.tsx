@@ -1,5 +1,6 @@
 'use client';
 
+import { apiPath } from '@/lib/basePath';
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -42,7 +43,7 @@ export default function ApplicationComplete() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('/api/jobs/random?categoryId=6&count=3');
+        const response = await fetch(apiPath('/api/jobs/random?categoryId=6&count=3'));
         if (!response.ok) {
           console.error('Failed to fetch jobs');
           setIsLoadingJobs(false);
