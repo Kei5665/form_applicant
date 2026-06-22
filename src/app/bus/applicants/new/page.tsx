@@ -1,7 +1,7 @@
 'use client';
 
 import { apiPath } from '@/lib/basePath';
-import Image from "next/image";
+import Image from "@/app/components/AppImage";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import BookingEmbed from "@/app/components/BookingEmbed";
