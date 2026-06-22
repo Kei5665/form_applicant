@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
+import { assetPath } from '@/lib/basePath';
+
 type KuroshiroInstance = import('kuroshiro').default | null;
 
 export function useHiraganaConverter() {
@@ -13,7 +15,7 @@ export function useHiraganaConverter() {
         const Kuroshiro = (await import('kuroshiro')).default;
         const KuromojiAnalyzer = (await import('kuroshiro-analyzer-kuromoji')).default;
         const kuroshiro = new Kuroshiro();
-        await kuroshiro.init(new KuromojiAnalyzer({ dictPath: '/dict' }));
+        await kuroshiro.init(new KuromojiAnalyzer({ dictPath: assetPath('/dict') }));
         kuroshiroRef.current = kuroshiro;
       } catch (error) {
         console.error('Failed to initialize Kuroshiro:', error);
