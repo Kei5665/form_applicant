@@ -1,5 +1,5 @@
 import { BASE_PATH } from '@/lib/basePath';
-import Image from 'next/image';
+import Image from '@/app/components/AppImage';
 import CoupangStepForm from '@/app/components/coupang-form/CoupangStepForm';
 
 export default function CoupangPage() {

@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from '@/app/components/AppImage';
 import Link from 'next/link';
 import type { Job } from '@/lib/microcms';
 

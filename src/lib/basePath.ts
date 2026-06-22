@@ -10,3 +10,10 @@ export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
  * Next.js の basePath は fetch の絶対パス（/api/...）を自動補完しないため、クライアントからのAPI呼び出しはこれを通す。
  */
 export const apiPath = (p: string): string => `${BASE_PATH}${p}`;
+
+/**
+ * /public 配下の静的アセット（/images/... 等）の絶対パスにベースパスを前置する。
+ * basePath 配下では public は `${BASE_PATH}/...` で配信されるが、next/image の url パラメータや
+ * 生の img.src・CSS url() には basePath が自動補完されないため、これを通す。
+ */
+export const assetPath = (p: string): string => `${BASE_PATH}${p}`;

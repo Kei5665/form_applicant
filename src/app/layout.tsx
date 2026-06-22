@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
+import { BASE_PATH } from "@/lib/basePath";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
   title: "タクシー運転手の転職ならライドジョブ｜応募フォーム",
   description: "未経験でもわかるドライバー業界の魅力発掘メディア。\nライドジョブは仕事のやりがいやリアルな声、キャリアの可能性など、ドライバー業界の魅力を発見・共有する情報発信プラットフォームです。経験者の声や成功事例、未経験からのキャリアスタートのヒントなど、幅広い情報をお届けします。",
   icons: {
-    icon: "/favicon.png",
+    icon: `${BASE_PATH}/favicon.png`,
   },
 };
 
@@ -28,6 +30,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        {/* basePath 配下では /public 画像が `${BASE_PATH}/...` で配信されるため、背景画像URLを注入する */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `:root{--app-bg-mobile:url('${BASE_PATH}/images/mobile-bg.png');--app-bg-pc:url('${BASE_PATH}/images/pc-bg.png');}`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
