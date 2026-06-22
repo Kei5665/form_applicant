@@ -1,3 +1,4 @@
+import { apiPath } from '@/lib/basePath';
 type JobCountResponse = {
   jobCount: number | null;
   message: string;
@@ -24,7 +25,7 @@ export async function fetchJobCount(params: JobCountParams): Promise<JobCountRes
     query.set('jobCategoryIds', params.jobCategoryIds.join(','));
   }
 
-  const response = await fetch(`/api/jobs-count?${query.toString()}`);
+  const response = await fetch(apiPath(`/api/jobs-count?${query.toString()}`));
   const data: JobCountResponse = await response.json();
   if (!response.ok) {
     throw new Error(data.error || '求人件数の取得に失敗しました');

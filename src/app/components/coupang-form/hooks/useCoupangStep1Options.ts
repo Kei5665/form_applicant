@@ -1,5 +1,6 @@
 'use client';
 
+import { apiPath } from '@/lib/basePath';
 import { useEffect, useMemo, useState } from 'react';
 
 type SelectOption = {
@@ -56,7 +57,7 @@ export function useCoupangStep1Options() {
 
     (async () => {
       try {
-        const response = await fetch('/api/coupang/step1-options');
+        const response = await fetch(apiPath('/api/coupang/step1-options'));
         if (!response.ok) {
           return;
         }

@@ -1,5 +1,6 @@
 'use client';
 
+import { BASE_PATH } from '@/lib/basePath';
 import { useEffect } from "react";
 import BookingEmbed from "@/app/components/BookingEmbed";
 
@@ -50,7 +51,7 @@ export default function CoupangApplicationComplete() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-around items-center text-center md:text-left text-xs mb-3 space-y-2 md:space-y-0">
             <a href="https://pmagent.jp/" className="text-white hover:underline">運営会社について</a>
-            <a href="/privacy" className="text-white hover:underline">プライバシーポリシー</a>
+            <a href={`${BASE_PATH}/privacy`} className="text-white hover:underline">プライバシーポリシー</a>
           </div>
           <div className="text-center mt-3">
             <p className="text-xs">© 2025 株式会社PMAgent</p>

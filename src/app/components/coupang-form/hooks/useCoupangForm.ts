@@ -1,3 +1,4 @@
+import { apiPath } from '@/lib/basePath';
 import { useState, useCallback, type FormEvent, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CoupangFormData, CoupangFormErrors } from '../types';
@@ -90,7 +91,7 @@ export function useCoupangForm() {
         });
       }
 
-      const response = await fetch('/api/coupang/applicants', {
+      const response = await fetch(apiPath('/api/coupang/applicants'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

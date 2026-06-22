@@ -1,3 +1,4 @@
+import { apiPath } from '@/lib/basePath';
 import { useEffect, useState } from 'react';
 import type { SeminarSlot } from '../types';
 
@@ -14,7 +15,7 @@ export function useSeminarSlots() {
     const fetchSlots = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/coupang/seminar-slots');
+        const response = await fetch(apiPath('/api/coupang/seminar-slots'));
 
         if (!response.ok) {
           const errorData = await response.json();
