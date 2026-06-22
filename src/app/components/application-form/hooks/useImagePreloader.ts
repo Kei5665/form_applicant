@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 
+import { assetPath } from '@/lib/basePath';
+
 type UseImagePreloaderParams = {
   images: string[];
   onComplete: () => void;
@@ -30,8 +32,11 @@ export function useImagePreloader({ images, onComplete, enable }: UseImagePreloa
 
     images.forEach((src) => {
       const img = document.createElement('img');
-      img.src = src;
+      // basePath 配下では /public 画像が `${BASE_PATH}/...` で配信されるため前置する。
+      img.src = src.startsWith('/') ? assetPath(src) : src;
       img.onload = handleLoad;
+      // 画像が見つからない場合もローディングが止まらないよう、エラーも「完了」扱いにする。
+      img.onerror = handleLoad;
     });
 
     const fallbackTimer = setTimeout(onComplete, 5000);

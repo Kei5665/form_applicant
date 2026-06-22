@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import Image from '@/app/components/AppImage';
 import FormCard from '../../application-form/components/FormCard';
 import { SelectInput } from './SelectInput';
 import type { CoupangFormData, CoupangFormErrors, JobPosition, DesiredLocation } from '../types';

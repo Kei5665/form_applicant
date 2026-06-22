@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import Image from '@/app/components/AppImage';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 

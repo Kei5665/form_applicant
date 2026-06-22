@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import Image from '@/app/components/AppImage';
 
 type FingerHintProps = {
   isVisible: boolean;
