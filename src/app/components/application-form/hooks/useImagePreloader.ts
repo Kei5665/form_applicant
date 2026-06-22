@@ -11,40 +11,44 @@ type UseImagePreloaderParams = {
 };
 
 export function useImagePreloader({ images, onComplete, enable }: UseImagePreloaderParams) {
-  const loadedCount = useRef(0);
-  const totalImages = useRef(images.length);
+  // onComplete はインラインで毎レンダー変わるため ref 経由で参照し、effect の依存に含めない。
+  // （依存に含めると親の再レンダーごとに effect が再実行され、完了タイマーが毎回クリアされてローディングが終わらない）
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  const doneRef = useRef(false);
 
   useEffect(() => {
     if (!enable) return;
+    if (doneRef.current) return;
+
+    const complete = () => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      onCompleteRef.current();
+    };
+
     if (images.length === 0) {
-      onComplete();
+      complete();
       return;
     }
 
-    const timers: NodeJS.Timeout[] = [];
-
-    const handleLoad = () => {
-      loadedCount.current += 1;
-      if (loadedCount.current >= totalImages.current) {
-        timers.push(setTimeout(onComplete, 500));
-      }
+    let loaded = 0;
+    const handleOne = () => {
+      loaded += 1;
+      if (loaded >= images.length) complete();
     };
 
     images.forEach((src) => {
       const img = document.createElement('img');
+      img.onload = handleOne;
+      // 画像が見つからない場合もローディングが止まらないよう、エラーも「完了」扱いにする。
+      img.onerror = handleOne;
       // basePath 配下では /public 画像が `${BASE_PATH}/...` で配信されるため前置する。
       img.src = src.startsWith('/') ? assetPath(src) : src;
-      img.onload = handleLoad;
-      // 画像が見つからない場合もローディングが止まらないよう、エラーも「完了」扱いにする。
-      img.onerror = handleLoad;
     });
 
-    const fallbackTimer = setTimeout(onComplete, 5000);
-    timers.push(fallbackTimer);
-
-    return () => {
-      timers.forEach((timer) => clearTimeout(timer));
-    };
-  }, [enable, images, onComplete]);
+    // 何があっても一定時間で必ずローディングを終了させる安全網。
+    const fallbackTimer = setTimeout(complete, 5000);
+    return () => clearTimeout(fallbackTimer);
+  }, [enable, images]);
 }
-

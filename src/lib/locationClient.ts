@@ -1,3 +1,5 @@
+import { apiPath } from '@/lib/basePath';
+
 const prefectureCache = new Map<string, string>();
 const municipalityCache = new Map<string, string>();
 
@@ -14,7 +16,7 @@ export async function fetchPrefectureName(prefectureId: string): Promise<string>
     return prefectureCache.get(prefectureId) ?? '';
   }
 
-  const data = await fetchJSON<{ contents: { id: string; region: string }[] }>('/api/location/prefectures');
+  const data = await fetchJSON<{ contents: { id: string; region: string }[] }>(apiPath('/api/location/prefectures'));
   data.contents.forEach((item) => {
     prefectureCache.set(item.id, item.region);
   });
@@ -27,7 +29,7 @@ export async function fetchMunicipalityName(municipalityId: string): Promise<str
     return municipalityCache.get(municipalityId) ?? '';
   }
 
-  const data = await fetchJSON<{ contents: { id: string; name: string }[] }>(`/api/location/municipalities?municipalityId=${municipalityId}`);
+  const data = await fetchJSON<{ contents: { id: string; name: string }[] }>(apiPath(`/api/location/municipalities?municipalityId=${municipalityId}`));
   data.contents.forEach((item) => {
     municipalityCache.set(item.id, item.name);
   });
