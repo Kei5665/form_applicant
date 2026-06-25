@@ -26,7 +26,8 @@ export async function POST(req: Request) {
     if (!name) errors.push("お名前は必須です。");
     if (!email) errors.push("メールアドレスは必須です。");
     else if (!isValidEmail(email)) errors.push("メールアドレスの形式が正しくありません。");
-    if (tel && !/^[0-9\-+() ]{10,}$/.test(tel)) errors.push("電話番号の形式が正しくありません。");
+    if (!tel) errors.push("電話番号は必須です。");
+    else if (!/^[0-9\-+() ]{10,}$/.test(tel)) errors.push("電話番号の形式が正しくありません。");
 
     if (errors.length > 0) {
       return NextResponse.json({ error: errors.join(" ") }, { status: 400 });
