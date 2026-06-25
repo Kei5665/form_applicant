@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
+import { createBaseRecord, isLarkBaseConfigured } from "@/lib/larkBase";
 
 // 2027新卒 鈑金塗装職LP（/gulliver/newgraduate → 本番は /entry/gulliver/newgraduate）の
-// 会社説明会お申し込み受付。当リポジトリの applicants と同じく Lark Webhook へ通知する軽量リード窓口。
-// 専用チャンネル LARK_WEBHOOK_URL_GULLIVER_BP を優先し、無ければ MECHANIC → 既定 にフォールバック。
+// 会社説明会お申し込み受付。
+//   1) Lark Base(Bitable)「IDOM_新卒2027」テーブルへレコード登録（永続化／主処理。失敗時はエラー）
+//   2) Lark チャットへ Webhook 通知（即時把握用／ベストエフォート。失敗しても申込は成功扱い）
+
+// 投入先テーブル。既定は IDOM_新卒2027（tblfCA6cyDp8ZGao）。
+const TABLE_ID = process.env.LARK_BASE_TABLE_ID_GULLIVER_BP || "tblfCA6cyDp8ZGao";
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const cap = (s: string, n: number) => (s.length > n ? s.slice(0, n) : s);
@@ -33,6 +38,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: errors.join(" ") }, { status: 400 });
     }
 
+    // --- 1) Lark Base 登録（主処理）---
+    // 認証情報が未設定（本番 env 未投入など）の場合はスキップし、チャット通知だけ行う。
+    // これによりフォーム自体は止まらず、env 投入後に自動で Base 登録が有効化される。
+    if (isLarkBaseConfigured()) {
+      try {
+        await createBaseRecord(TABLE_ID, {
+          求職者名: name,
+          メールアドレス: email,
+          電話番号: tel || undefined,
+          ステータス: "リード",
+          登録職種: "板金/塗装技能士",
+          応募日: Date.now(),
+          クリエイティブ: "BP_2027新卒LP (/entry/gulliver/newgraduate)",
+          対応履歴メモ: area ? `希望勤務エリア: ${area}` : undefined,
+        });
+      } catch (e) {
+        console.error("[entry-bp] Lark Base 登録失敗:", e);
+        return NextResponse.json(
+          { error: "送信に失敗しました。時間をおいて再度お試しください。" },
+          { status: 502 }
+        );
+      }
+    } else {
+      console.warn("[entry-bp] Lark Base 認証情報が未設定のため Base 登録をスキップ（チャット通知のみ）");
+    }
+
+    // --- 2) Lark チャット通知（ベストエフォート）---
     const isProd = process.env.NODE_ENV === "production";
     const webhookUrl =
       process.env.LARK_WEBHOOK_URL_GULLIVER_BP_PROD ||
@@ -41,46 +73,33 @@ export async function POST(req: Request) {
       process.env.LARK_WEBHOOK_URL_MECHANIC ||
       process.env.LARK_WEBHOOK_URL;
 
-    if (!webhookUrl) {
-      return NextResponse.json({ error: "サーバー設定が不足しています。(WEBHOOK)" }, { status: 500 });
-    }
+    if (webhookUrl) {
+      const textLines: string[] = [
+        "【2027新卒 鈑金塗装職LP / Gulliver】会社説明会のお申し込みが届きました",
+        `お名前: ${name}`,
+        `メール: ${email}`,
+        tel ? `電話: ${tel}` : undefined,
+        area ? `希望エリア: ${area}` : undefined,
+        "経路: /entry/gulliver/newgraduate (BP / 2027新卒)",
+      ].filter((line): line is string => typeof line === "string");
 
-    const textLines: string[] = [
-      "【2027新卒 鈑金塗装職LP / Gulliver】会社説明会のお申し込みが届きました",
-      `お名前: ${name}`,
-      `メール: ${email}`,
-      tel ? `電話: ${tel}` : undefined,
-      area ? `希望エリア: ${area}` : undefined,
-      "経路: /entry/gulliver/newgraduate (BP / 2027新卒)",
-    ].filter((line): line is string => typeof line === "string");
+      const payload = { msg_type: "text", content: { text: textLines.join("\n") } };
 
-    const payload = { msg_type: "text", content: { text: textLines.join("\n") } };
-
-    let larkRes: Response;
-    try {
-      larkRes = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(5000),
-      });
-    } catch {
-      return NextResponse.json(
-        { error: "送信に失敗しました。時間をおいて再度お試しください。" },
-        { status: 502 }
-      );
-    }
-
-    const larkData = await larkRes.json().catch(() => ({} as { code?: number }));
-
-    if (
-      !larkRes.ok ||
-      (larkData && typeof larkData.code !== "undefined" && larkData.code !== 0)
-    ) {
-      return NextResponse.json(
-        { error: "送信に失敗しました。時間をおいて再度お試しください。" },
-        { status: 502 }
-      );
+      try {
+        const larkRes = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(5000),
+        });
+        const larkData = await larkRes.json().catch(() => ({} as { code?: number }));
+        if (!larkRes.ok || (larkData && typeof larkData.code !== "undefined" && larkData.code !== 0)) {
+          // Base には登録済みなので、通知失敗は記録のみで握りつぶす。
+          console.error("[entry-bp] Lark チャット通知失敗:", larkData);
+        }
+      } catch (e) {
+        console.error("[entry-bp] Lark チャット通知エラー:", e);
+      }
     }
 
     return NextResponse.json({ ok: true });
