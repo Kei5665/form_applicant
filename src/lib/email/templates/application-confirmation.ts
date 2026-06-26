@@ -35,36 +35,99 @@ export type BrandConfig = {
 // メール本文 (フォーム種別ごとに差し替え可能)
 // ──────────────────────────────────────────
 
+/** CTA ブロックの後に続く求人紹介セクション (任意) の 1 求人ぶん。 */
+type JobListing = {
+  /** 見出し (テンプレート側で 【】 を自動付与。例: '1 業界最高水準の給与') */
+  title: string;
+  /** 給与行 (\n で改行可) */
+  salary: string;
+  /** 特徴行 (\n で改行可) */
+  feature: string;
+};
+
 type MailContent = BrandConfig & {
+  /**
+   * 挨拶文の「株式会社PM Agentです。」に続く一文。
+   * 未指定なら `${brandName}へのご登録ありがとうございます。` を自動生成。
+   */
+  greetingLine?: string;
   /**
    * 本文の段落配列。
    * 文字列内の `\n` は HTML では `<br>`、テキスト版では改行として展開される。
    * 段落と段落の間は自動で空行が入る。
    */
   bodyParagraphs: string[];
-  /** CTA ブロックの太字リード */
+  /** CTA ブロックの太字リード (\n で改行可) */
   ctaHeading: string;
-  /** CTA ブロックのサブテキスト */
+  /** CTA ブロックのサブテキスト (\n で改行可) */
   ctaSubheading: string;
   /** CTA ボタンのラベル (右矢印は自動付与) */
   ctaButtonLabel: string;
+  /**
+   * 「※すでに面談をご予約済みの方にも〜」の注意書きを表示するか。
+   * 未指定 (=true) で表示。RIDE JOB のように出さない場合は false。
+   */
+  showBookingNote?: boolean;
+  /** CTA ブロックの後に続く求人紹介セクション (任意) */
+  jobSection?: {
+    /** 「＼ 今ご紹介できるイチオシ求人をチラ見せ ／」等の見出し行 */
+    heading: string;
+    /** 見出し下のリード文 (任意) */
+    lead?: string;
+    listings: JobListing[];
+  };
+  /** 求人セクションの後に続く締めの段落 (任意, \n で改行可) */
+  closingParagraphs?: string[];
+  /** フッターに表示する電話番号 (任意) */
+  phone?: string;
 };
 
 // ─── RIDE JOB (タクシー: default + bus) ────────────────
 const RIDEJOB_CONTENT: MailContent = {
   brandName: 'RIDE JOB',
   fromName: 'RIDE JOB',
-  subject: '【RIDE JOB】もう、我慢して働くのはやめませんか？',
+  subject: '【限定公開】あなたに合ったドライバーの「好条件求人」を一部お届けします',
   bookingUrl: 'https://leomeet.pmagent.jp/book/ride',
+  greetingLine: 'ドライバーのお仕事探しRIDE JOBへのご登録ありがとうございます。',
   bodyParagraphs: [
-    '「毎日こんなにがんばっているのに、なぜ生活がラクにならないんだろう？」 そう思ったことはありませんか？',
-    'それは、あなたが悪いのではありません。「我慢すれば報われる」という会社都合のルールに縛られているからです。',
-    '世渡り上手で器用な人たちを、うらやむ必要はありません。\n人間関係のゴマすりや書類作りなんて、稼ぐ力とは関係ないからです。不器用なのは、あなたが真っ直ぐに生きている証拠です。',
-    'タクシードライバーは、誰の顔色もうかがう必要がない「自由な仕事」です。\nわずらわしい人間関係から解放され、がんばった分だけ、すべてダイレクトにあなたの収入になります。\n自分の力だけで、オフィスで威張っている人たち以上に稼げる世界です。',
+    '「まずは求人を見てみたい」と思われたところ、すぐに一覧をお見せできず申し訳ありません。',
+    '実は、ドライバー業界には「給与保障が高く、稼げる好条件求人」が多数ありますが、ご自身の希望の働き方や適性によって、一番ご活躍いただける会社が異なります。そのため、ネット上の情報だけで判断していただくのではなく、直接お話しして最適な求人をご案内する形をとっております。',
   ],
-  ctaHeading: 'もう、誰かのために自分をすり減らすのは終わりにしませんか？',
-  ctaSubheading: 'まずは履歴書なしで、フランクにお話ししましょう。',
-  ctaButtonLabel: '新しい一歩を踏み出す（30分カジュアル面談）',
+  ctaHeading:
+    'そこで、あなたのご希望に合う求人があるかを【10分〜20分の気軽なお電話（またはオンライン）】でサクッと確認できる時間をご用意しました。',
+  ctaSubheading:
+    '無理な転職の強要は一切ありません。\nまずは以下のリンクから、お気軽に都合の良い日時をお選びください。',
+  ctaButtonLabel: '【1分で完了】ご希望の日時をこちらから選ぶ',
+  showBookingNote: false,
+  jobSection: {
+    heading: '＼ 今ご紹介できるイチオシ求人をチラ見せ ／',
+    lead: '以下のような好条件求人をたくさんご用意しています。',
+    listings: [
+      {
+        title: '1 業界最高水準の給与',
+        salary: '平均月収50万円＋賞与年３回！年収1000万も目指せる！',
+        feature: '二種免許は会社負担でOK！隔日・日勤・夜勤が選べる！',
+      },
+      {
+        title: '2 高級ハイヤー',
+        salary: '年収600〜900万円、未経験の方は3ヶ月40万円の給与保証あり',
+        feature:
+          '高級車でVIP顧客・インバウンド旅行者を送迎\n流し営業は一切なし！月18~19日休みも可能！',
+      },
+      {
+        title: '3 大手グループ・福利厚生充実',
+        salary: '平均月収50万円以上、福利厚生充実！',
+        feature:
+          '社会保険完備＆社員寮あり！研修＆二種免許取得支援あり 大手ならではのキャリアアップ制度あり！月11乗務（標準パターン）',
+      },
+    ],
+  },
+  closingParagraphs: [
+    'ここだけの「リアルな本音」、ちょっと聞いてみませんか？',
+    '「一番稼げる会社はどこ？」「労働時間は本当にきつくない？」など、ネットの検索では出てこない業界の裏事情を、10分〜20分の電話（またはオンライン）でこっそりお伝えします。',
+    '「まずは情報収集だけしたい」「話を聞いてみたい」という動機で全く問題ありません。\n履歴書も不要ですので、ぜひ上のURLからお気軽にご予約ください。\nご予約をお待ちしています。',
+  ],
+  phone: '03-6692-0477',
 };
 
 // ─── RIDE JOBメカニック (整備士: mechanic + mechanic_newgrad) ─
@@ -146,6 +209,22 @@ function paragraph(innerHtml: string, bottomPx: number = 20): string {
   return `<div style="font-size:14px;color:${COLOR_TEXT};line-height:2.0;padding-bottom:${bottomPx}px;">${innerHtml}</div>`;
 }
 
+/** 求人 1 件のカード HTML を生成。 */
+function jobCard(listing: JobListing): string {
+  const title = escapeHtml(listing.title);
+  const salary = nl2br(escapeHtml(listing.salary));
+  const feature = nl2br(escapeHtml(listing.feature));
+  const labelStyle = `display:inline-block;font-size:12px;font-weight:bold;color:${COLOR_GOLD};min-width:3.5em;`;
+  const valueStyle = `font-size:13px;color:${COLOR_TEXT_SUB};line-height:1.8;`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px 0;">
+            <tr><td style="background:#faf8f3;border:1px solid ${COLOR_BORDER};border-radius:4px;padding:14px 16px;">
+              <div style="font-size:14px;font-weight:bold;color:${COLOR_TEXT};line-height:1.6;padding-bottom:8px;">【${title}】</div>
+              <div style="padding-bottom:4px;"><span style="${labelStyle}">給与</span><span style="${valueStyle}">${salary}</span></div>
+              <div><span style="${labelStyle}">特徴</span><span style="${valueStyle}">${feature}</span></div>
+            </td></tr>
+          </table>`;
+}
+
 // ──────────────────────────────────────────
 // Public API
 // ──────────────────────────────────────────
@@ -172,6 +251,39 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
       return paragraph(html, isLast ? 8 : 20);
     })
     .join('');
+
+  const greetingLine = content.greetingLine
+    ? escapeHtml(content.greetingLine)
+    : `${safeBrand}へのご登録ありがとうございます。`;
+
+  // 求人紹介セクション (任意)
+  const jobSectionHtml = content.jobSection
+    ? `<tr><td class="px" style="padding:8px 40px 0 40px;">
+          <div style="font-size:15px;font-weight:bold;color:${COLOR_TEXT};text-align:center;line-height:1.8;padding-bottom:6px;">
+            ${escapeHtml(content.jobSection.heading)}
+          </div>
+          ${
+            content.jobSection.lead
+              ? `<div style="font-size:13px;color:${COLOR_TEXT_SUB};text-align:center;line-height:1.8;padding-bottom:18px;">${escapeHtml(content.jobSection.lead)}</div>`
+              : '<div style="height:6px;line-height:6px;font-size:0;">&nbsp;</div>'
+          }
+          ${content.jobSection.listings.map(jobCard).join('')}
+          <div style="height:8px;line-height:8px;font-size:0;">&nbsp;</div>
+        </td></tr>`
+    : '';
+
+  // 締めの段落 (任意)
+  const closingHtml =
+    content.closingParagraphs && content.closingParagraphs.length > 0
+      ? `<tr><td class="px" style="padding:20px 40px 8px 40px;">
+          ${content.closingParagraphs
+            .map((p, i) => {
+              const isLast = i === content.closingParagraphs!.length - 1;
+              return paragraph(nl2br(escapeHtml(p)), isLast ? 8 : 20);
+            })
+            .join('')}
+        </td></tr>`
+      : '';
 
   return `<!DOCTYPE html>
 <html lang="ja">
@@ -201,7 +313,7 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
             ${safeName} 様
           </div>
 
-          ${paragraph(`株式会社PM Agentです。<br>${safeBrand}へのご登録ありがとうございます。`, 28)}
+          ${paragraph(`株式会社PM Agentです。<br>${greetingLine}`, 28)}
 
           ${bodyParagraphsHtml}
 
@@ -214,10 +326,10 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
         <tr><td class="px" style="padding:28px 40px 8px 40px;">
 
           <div style="font-size:15px;color:${COLOR_TEXT};font-weight:bold;line-height:1.8;padding-bottom:8px;">
-            ${escapeHtml(content.ctaHeading)}
+            ${nl2br(escapeHtml(content.ctaHeading))}
           </div>
           <div style="font-size:14px;color:${COLOR_TEXT_SUB};line-height:1.9;padding-bottom:24px;">
-            ${escapeHtml(content.ctaSubheading)}
+            ${nl2br(escapeHtml(content.ctaSubheading))}
           </div>
 
           <!-- CTA Button -->
@@ -233,13 +345,21 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
             <a href="${ctaUrl}" style="color:${COLOR_LABEL};text-decoration:underline;">${ctaUrl}</a>
           </div>
 
-          <div style="font-size:11px;color:${COLOR_LABEL};line-height:1.7;padding-bottom:8px;">
+          ${
+            content.showBookingNote === false
+              ? ''
+              : `<div style="font-size:11px;color:${COLOR_LABEL};line-height:1.7;padding-bottom:8px;">
             ※すでに面談をご予約済みの方にも行き違いで配信される場合がございます。あらかじめご了承ください。
-          </div>
+          </div>`
+          }
 
           <div style="height:24px;line-height:24px;font-size:0;">&nbsp;</div>
 
         </td></tr>
+
+        ${jobSectionHtml}
+
+        ${closingHtml}
 
         <tr><td class="px" style="padding:0 40px;">
           <div style="border-top:1px solid ${COLOR_BORDER};height:0;line-height:0;font-size:0;">&nbsp;</div>
@@ -248,6 +368,7 @@ export function buildApplicationConfirmationHtml(input: TemplateInput): string {
         <tr><td class="px" style="padding:24px 40px 40px 40px;">
           <div style="font-size:12px;color:#666666;line-height:1.9;">
             株式会社PM Agent<br>
+            ${content.phone ? `TEL：${escapeHtml(content.phone)}<br>` : ''}
             <a href="https://pmagent.jp/" style="color:${COLOR_GOLD};text-decoration:underline;">https://pmagent.jp/</a>
           </div>
         </td></tr>
@@ -263,11 +384,14 @@ export function buildApplicationConfirmationText(input: TemplateInput): string {
   const content = CONTENT_BY_ORIGIN[input.formOrigin];
   const line = '────────────────────────────';
 
+  const greetingLine =
+    content.greetingLine ?? `${content.brandName}へのご登録ありがとうございます。`;
+
   const lines: string[] = [
     `${input.applicantName || 'お客様'} 様`,
     '',
     '株式会社PM Agentです。',
-    `${content.brandName}へのご登録ありがとうございます。`,
+    greetingLine,
     '',
   ];
 
@@ -284,15 +408,39 @@ export function buildApplicationConfirmationText(input: TemplateInput): string {
     content.ctaSubheading,
     '',
     `▼${content.ctaButtonLabel}`,
-    ` ${content.bookingUrl}`,
-    '',
-    '※すでに面談をご予約済みの方にも行き違いで配信される場合がございます。あらかじめご了承ください。',
-    '',
-    line,
-    '',
-    '株式会社PM Agent',
-    'https://pmagent.jp/'
+    ` ${content.bookingUrl}`
   );
+
+  if (content.showBookingNote !== false) {
+    lines.push(
+      '',
+      '※すでに面談をご予約済みの方にも行き違いで配信される場合がございます。あらかじめご了承ください。'
+    );
+  }
+
+  // 求人紹介セクション (任意)
+  if (content.jobSection) {
+    lines.push('', content.jobSection.heading);
+    if (content.jobSection.lead) {
+      lines.push(content.jobSection.lead);
+    }
+    content.jobSection.listings.forEach((job) => {
+      lines.push('', `【${job.title}】`, `給与：${job.salary}`, `特徴：${job.feature}`);
+    });
+  }
+
+  // 締めの段落 (任意)
+  if (content.closingParagraphs && content.closingParagraphs.length > 0) {
+    content.closingParagraphs.forEach((p) => {
+      lines.push('', p);
+    });
+  }
+
+  lines.push('', line, '', '株式会社PM Agent');
+  if (content.phone) {
+    lines.push(`TEL：${content.phone}`);
+  }
+  lines.push('https://pmagent.jp/');
 
   return lines.join('\n');
 }
