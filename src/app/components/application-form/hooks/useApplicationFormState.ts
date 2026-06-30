@@ -9,6 +9,7 @@ import { useHiraganaConverter } from './useHiraganaConverter';
 import { useFormExitGuard } from './useFormExitGuard';
 import { useImagePreloader } from './useImagePreloader';
 import { trackEvent } from '../utils/trackEvent';
+import { genEventId, trackMeta } from '@/lib/meta/pixel';
 import { isValidEmail, isValidPhoneNumber, validateBirthDateCard, validateCard2, validateDesiredIncome, validateFinalStep, validateJobTiming, validateMechanicQualification, validateNameFields } from '../utils/validators';
 import { fetchJobCount, type JobCountParams } from '../utils/fetchJobCount';
 import { notifyInvalidPhoneNumber } from '../utils/notifyInvalidPhoneNumber';
@@ -616,6 +617,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           }
         }
 
+        const metaEventId = genEventId();
         const body = {
           ...formData,
           birthDate: birthDateString,
@@ -625,6 +627,7 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
           utmParams,
           experiment: { name: 'people_image', variant },
           formOrigin,
+          metaEventId,
         } as Record<string, unknown>;
 
         const response = await fetch(apiPath('/api/applicants'), {
@@ -642,6 +645,9 @@ export function useApplicationFormState({ showLoadingScreen, imagesToPreload, va
 
         await response.json();
         setIsFormDirty(false);
+
+        // 送信成功時に Meta Lead を発火（サーバーCAPIと同一 eventId で重複排除）
+        trackMeta('Lead', { value: 0, currency: 'JPY' }, metaEventId);
 
         // 都道府県IDとお名前をlocalStorageに保存（サンクスページで求人表示・パーソナライズ用）
         if (typeof window !== 'undefined') {

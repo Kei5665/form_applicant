@@ -9,6 +9,7 @@ import {
 } from '@/lib/email/send-application-confirmation';
 import { sendApplicationSms } from '@/lib/sms/send-application-sms';
 import { resolveAdImageUrl, isLikelyAdId } from '@/lib/meta/resolveAdImage';
+import { sendMetaCapiLead } from '@/lib/meta/capi';
 
 // Types for submission payload
 type ExperimentInfo = {
@@ -47,6 +48,7 @@ type ApplicantSubmission = ApplicantFormData & {
   utmParams?: UTMParams;
   experiment?: ExperimentInfo;
   formOrigin?: 'coupang' | 'default' | 'bus' | 'mechanic' | 'mechanic_newgrad';
+  metaEventId?: string;
 };
 
 // UTM parameters to media name mapping function
@@ -419,6 +421,24 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
               console.log('Application SMS skipped/failed:', { reason: r.reason, error: r.error, channel, media });
             }
           })()
+        );
+      }
+
+      // Meta Conversions API（Lead）— 非致命。eventId が無ければスキップ
+      if (typeof submissionData.metaEventId === 'string' && submissionData.metaEventId) {
+        const capiUserAgent = request.headers.get('user-agent') || '';
+        const capiClientIp = (request.headers.get('x-forwarded-for') || '').split(',')[0]?.trim() || '';
+        tasks.push(
+          sendMetaCapiLead({
+            eventId: submissionData.metaEventId,
+            eventSourceUrl: referer,
+            email: formData.email,
+            phone: formData.phoneNumber,
+            fbp: request.cookies.get('_fbp')?.value,
+            fbc: request.cookies.get('_fbc')?.value,
+            clientIpAddress: capiClientIp || undefined,
+            clientUserAgent: capiUserAgent || undefined,
+          }).then(() => {})
         );
       }
 

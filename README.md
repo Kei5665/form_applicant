@@ -59,6 +59,13 @@ npm install
 LARK_WEBHOOK_URL=your_lark_webhook_url_here
 ```
 
+#### Meta計測（直ピクセル + Conversions API）
+```bash
+NEXT_PUBLIC_META_PIXEL_ID=1945615652686189    # 統合ピクセル「タクシー」（公開値・ページに埋め込まれる）
+META_CAPI_ACCESS_TOKEN=your_capi_access_token # Events Manager > 設定で発行・サーバー専用・秘匿。未設定だとCAPIはスキップ
+META_TEST_EVENT_CODE=                          # 検証時のみ設定（Events Manager > テストイベント）。本番は空
+```
+
 #### Coupangフォーム用設定
 ```bash
 # Lark Webhook URLs（開発環境）
