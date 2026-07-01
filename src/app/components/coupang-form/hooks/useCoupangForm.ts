@@ -80,7 +80,8 @@ export function useCoupangForm() {
         utm_campaign: urlParams.get('utm_campaign') || undefined,
         utm_term: urlParams.get('utm_term') || undefined,
         utm_creative: urlParams.get('utm_creative') || undefined,
-        utm_content: urlParams.get('utm_content') || undefined, // Meta広告: {{ad.id}} を想定
+        utm_content: urlParams.get('utm_content') || undefined, // Meta広告: {{ad.name}}（広告名）
+        utm_id: urlParams.get('utm_id') || undefined, // Meta広告: {{ad.id}}（広告ID）
       };
 
       // GTMイベント送信
