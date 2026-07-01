@@ -22,7 +22,8 @@ type UTMParams = {
   utm_campaign?: string;
   utm_term?: string;
   utm_creative?: string;
-  utm_content?: string; // Meta広告: {{ad.id}} を想定
+  utm_content?: string; // Meta広告: {{ad.name}}（広告名）
+  utm_id?: string; // Meta広告: {{ad.id}}（広告ID）
 };
 
 type ApplicantFormData = {
@@ -209,13 +210,16 @@ export async function POST(request: NextRequest) {
     console.log('Generated media name:', mediaName, 'isCoupang:', isCoupang);
 
     // Meta広告の広告ID(ad.id)から広告画像URLを解決する。
-    // 入稿URLに utm_content={{ad.id}} を仕込む想定。後方互換で utm_creative が数値なら ad.id とみなす。
+    // 入稿URLの utm_id={{ad.id}} を優先。後方互換で utm_content / utm_creative が数値なら ad.id とみなす。
+    // ※ utm_content は {{ad.name}}（広告名）、utm_term は {{adset.id}} のため ad.id には使わない。
     const isMetaInflowForImage = isCoupang || isMetaUtmSource(utmParams?.utm_source);
-    const adId = isLikelyAdId(utmParams?.utm_content)
-      ? (utmParams?.utm_content as string)
-      : isLikelyAdId(utmParams?.utm_creative)
-        ? (utmParams?.utm_creative as string)
-        : '';
+    const adId = isLikelyAdId(utmParams?.utm_id)
+      ? (utmParams?.utm_id as string)
+      : isLikelyAdId(utmParams?.utm_content)
+        ? (utmParams?.utm_content as string)
+        : isLikelyAdId(utmParams?.utm_creative)
+          ? (utmParams?.utm_creative as string)
+          : '';
     let adImageUrl = '';
     let adCreativeId = '';
     if (isMetaInflowForImage && adId) {
@@ -305,6 +309,7 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           utm_term: utmParams?.utm_term || '',
           utm_creative: utmParams?.utm_creative || '',
           utm_content: utmParams?.utm_content || '',
+          utm_id: utmParams?.utm_id || '',
           ad_id: adId,
           ad_creative_id: adCreativeId,
           ad_image_url: adImageUrl,
@@ -437,6 +442,7 @@ ${additionalFields ? `${additionalFields}\n` : ''}電話番号: ${formData.phone
           utm_term: utmParams?.utm_term || '',
           utm_creative: utmParams?.utm_creative || '',
           utm_content: utmParams?.utm_content || '',
+          utm_id: utmParams?.utm_id || '',
           ad_id: adId,
           ad_creative_id: adCreativeId,
           ad_image_url: adImageUrl,
